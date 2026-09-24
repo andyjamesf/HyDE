@@ -62,6 +62,8 @@ _BLACKLIST_EXE = frozenset(
         "dbus-daemon",
         "dbus-broker",
         # bars & widgets
+        "qs",
+        "quickshell",
         "waybar",
         "wayle",
         "ags",

@@ -43,6 +43,16 @@ hl.layer_rule({
   ignore_alpha = 0,
 })
 
+-- Quickshell shell surfaces (namespaces "quickshell:*"): blur behind them, but not behind their
+-- fully transparent parts (the gaps between the bar islands); the shell animates them itself.
+hl.layer_rule({
+  name         = "hyde_layer_quickshell",
+  match        = { namespace = "^quickshell:.*$" },
+  blur         = true,
+  ignore_alpha = 0.1,
+  no_anim      = true,
+})
+
 hl.layer_rule({
   name    = "hyde_layer_no_anim",
   no_anim = true,

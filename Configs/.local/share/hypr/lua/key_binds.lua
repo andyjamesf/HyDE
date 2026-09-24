@@ -82,13 +82,14 @@ hl.bind("SHIFT + F11", cycle_fullscreen, _F)
 _F = {description = "[Window Management] toggle pin"}
 hl.bind(MOD .. " + SHIFT + F", hl.dsp.exec_cmd(hyde.sh.window.pin()), _F)
 _F = {description = "[Window Management] logout menu"}
-hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd(hyde.sh.session.logout.launcher()), _F)
+hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call powermenu toggle"), _F)
 -- ALT_R is a keysym, not a modifier: "ALT_R + CONTROL_R" resolves to a bare
 -- right Control, so every press of that key hid the bar.
-_F = {description = "[Window Management] hide waybar"}
-hl.bind(MOD .. " + CTRL + B", hl.dsp.exec_cmd(hyde.sh.waybar("--hide")), _F)
+_F = {description = "[Window Management] hide bar"}
+hl.bind(MOD .. " + CTRL + B", hl.dsp.exec_cmd("qs ipc call bar toggle"), _F)
 _F = {description = "[Window Management] lock session"}
-hl.bind(MOD .. " + L", hl.dsp.exec_cmd(hyde.sh.session.lock()), _F)
+-- Via loginctl: hypridle runs its lock_cmd (the Quickshell lockscreen, hyprlock as fallback).
+hl.bind(MOD .. " + L", hl.dsp.exec_cmd("loginctl lock-session"), _F)
 
 _F = {description = "[Window Management|Group Navigation] change active group backwards"}
 hl.bind(MOD .. " + CTRL + H", hl.dsp.group.prev(), _F)
@@ -160,8 +161,12 @@ hl.bind(MOD .. " + X", hl.dsp.window.resize(), _F)
 _F = {description = "[Layout Management|Dwindle] toggle split"}
 hl.bind(MOD .. " + J", hl.dsp.layout("togglesplit"), _F)
 
-_F = {description = "[Launcher|Rofi menus] application finder"}
-hl.bind(MOD .. " + A", hl.dsp.exec_cmd(hyde.sh.menu.apps()), _F)
+_F = {description = "[Launcher|Apps] application finder"}
+hl.bind(MOD .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), _F)
+_F = {description = "[Launcher|Apps] control center"}
+hl.bind(MOD .. " + ALT + C", hl.dsp.exec_cmd("qs ipc call controlcenter toggle"), _F)
+_F = {description = "[Utilities] toggle notification center"}
+hl.bind(MOD .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), _F)
 _F = {description = "[Launcher|Rofi menus] window switcher"}
 hl.bind(MOD .. " + TAB", hl.dsp.exec_cmd(hyde.sh.menu.windows()), _F)
 _F = {description = "[Launcher|Rofi menus] file finder"}
@@ -174,12 +179,12 @@ _F = {description = "[Launcher|Rofi menus] glyph picker"}
 hl.bind(MOD .. " + period", hl.dsp.exec_cmd(hyde.sh.menu.glyph()), _F)
 _F = {description = "[Launcher|Rofi menus] clipboard"}
 hl.bind(MOD .. " + V", hl.dsp.exec_cmd(hyde.sh.menu.clipboard()), _F)
-_F = {description = "[Launcher|Rofi menus] clipboard manager"}
-hl.bind(MOD .. " + SHIFT + V", hl.dsp.exec_cmd(hyde.sh.menu.cliphist()), _F)
+_F = {description = "[Launcher|Apps] clipboard manager"}
+hl.bind(MOD .. " + SHIFT + V", hl.dsp.exec_cmd("qs ipc call launcher clipboard"), _F)
 _F = {description = "[Launcher|Rofi menus] select rofi launcher"}
 hl.bind(MOD .. " + SHIFT + A", hl.dsp.exec_cmd(hyde.sh.menu.select()), _F)
-_F = {description = "[Launcher|Rofi menus] Calculator"}
-hl.bind(MOD .. " + SHIFT + K", hl.dsp.exec_cmd(hyde.sh.menu.calculator()), _F)
+_F = {description = "[Launcher|Apps] Calculator"}
+hl.bind(MOD .. " + SHIFT + K", hl.dsp.exec_cmd("qs ipc call launcher calc"), _F)
 _F = {description = "[Launcher|Rofi menus] Web Search"}
 hl.bind(MOD .. " + SHIFT + slash", hl.dsp.exec_cmd(hyde.sh.menu.search()), _F)
 
@@ -245,10 +250,10 @@ _F = {description = "[Theming and Wallpaper] next global wallpaper"}
 hl.bind(MOD .. "+ ALT + Right", hl.dsp.exec_cmd(hyde.sh.wallpaper("--next")), _F)
 _F = {description = "[Theming and Wallpaper] previous global wallpaper"}
 hl.bind(MOD .. "+ ALT + Left", hl.dsp.exec_cmd(hyde.sh.wallpaper("--prev")), _F)
-_F = {description = "[Theming and Wallpaper] next Waybar layout"}
-hl.bind(MOD .. "+ ALT + Up", hl.dsp.exec_cmd("hyde-shell waybar --next"), _F)
-_F = {description = "[Theming and Wallpaper] previous Waybar layout"}
-hl.bind(MOD .. "+ ALT + Down", hl.dsp.exec_cmd("hyde-shell waybar --prev"), _F)
+_F = {description = "[Theming and Wallpaper] next bar layout"}
+hl.bind(MOD .. "+ ALT + Up", hl.dsp.exec_cmd("qs ipc call bar next"), _F)
+_F = {description = "[Theming and Wallpaper] previous bar layout"}
+hl.bind(MOD .. "+ ALT + Down", hl.dsp.exec_cmd("qs ipc call bar prev"), _F)
 
 _F = {description = "[Theming and Wallpaper] select a global wallpaper"}
 hl.bind(MOD .. "+ SHIFT + W", hl.dsp.exec_cmd(hyde.sh.menu.wallpapers()), _F)
