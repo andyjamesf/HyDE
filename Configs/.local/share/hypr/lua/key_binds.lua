@@ -69,7 +69,7 @@ _F = {description = "[Window Management] kill focused window"}
 hl.bind(MOD .. "+ ALT  + F4", hl.dsp.window.kill(), _F)
 _F = {description = "[Window Management] exit hyprland session"}
 hl.bind(MOD .. " + Delete", hl.dsp.exit(), _F)
-_F = {description = "[Window Management] toggle float true"}
+_F = {description = "[Window Management] toggle floating"}
 hl.bind(MOD .. " + W", hl.dsp.window.float({action = "toggle"}), _F)
 _F = {description = "[Window Management] toggle group"}
 hl.bind(MOD .. " + G", hl.dsp.group.toggle(), _F)
@@ -161,9 +161,9 @@ hl.bind(MOD .. " + X", hl.dsp.window.resize(), _F)
 _F = {description = "[Layout Management|Dwindle] toggle split"}
 hl.bind(MOD .. " + J", hl.dsp.layout("togglesplit"), _F)
 
-_F = {description = "[Launcher|Apps] application finder"}
+_F = {description = "[Launcher] application finder"}
 hl.bind(MOD .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), _F)
-_F = {description = "[Launcher|Apps] control center"}
+_F = {description = "[Launcher] control center"}
 hl.bind(MOD .. " + ALT + C", hl.dsp.exec_cmd("qs ipc call controlcenter toggle"), _F)
 _F = {description = "[Utilities] toggle notification center"}
 hl.bind(MOD .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), _F)
@@ -171,19 +171,15 @@ _F = {description = "[Launcher|Rofi menus] window switcher"}
 hl.bind(MOD .. " + TAB", hl.dsp.exec_cmd(hyde.sh.menu.windows()), _F)
 _F = {description = "[Launcher|Rofi menus] file finder"}
 hl.bind(MOD .. " + SHIFT + E", hl.dsp.exec_cmd(hyde.sh.menu.files()), _F)
-_F = {description = "[Launcher|Rofi menus] keybindings hint"}
+_F = {description = "[Launcher] keybindings"}
 hl.bind(MOD .. " + slash", hl.dsp.exec_cmd("qs ipc call launcher keys"), _F)
 _F = {description = "[Launcher|Rofi menus] emoji picker"}
 hl.bind(MOD .. " + comma", hl.dsp.exec_cmd(hyde.sh.menu.emoji()), _F)
 _F = {description = "[Launcher|Rofi menus] glyph picker"}
 hl.bind(MOD .. " + period", hl.dsp.exec_cmd(hyde.sh.menu.glyph()), _F)
-_F = {description = "[Launcher|Rofi menus] clipboard"}
-hl.bind(MOD .. " + V", hl.dsp.exec_cmd(hyde.sh.menu.clipboard()), _F)
-_F = {description = "[Launcher|Apps] clipboard manager"}
-hl.bind(MOD .. " + SHIFT + V", hl.dsp.exec_cmd("qs ipc call launcher clipboard"), _F)
-_F = {description = "[Launcher|Rofi menus] select rofi launcher"}
-hl.bind(MOD .. " + SHIFT + A", hl.dsp.exec_cmd(hyde.sh.menu.select()), _F)
-_F = {description = "[Launcher|Apps] Calculator"}
+_F = {description = "[Launcher] clipboard"}
+hl.bind(MOD .. " + V", hl.dsp.exec_cmd("qs ipc call launcher clipboard"), _F)
+_F = {description = "[Launcher] calculator"}
 hl.bind(MOD .. " + SHIFT + K", hl.dsp.exec_cmd("qs ipc call launcher calc"), _F)
 _F = {description = "[Launcher|Rofi menus] Web Search"}
 hl.bind(MOD .. " + SHIFT + slash", hl.dsp.exec_cmd(hyde.sh.menu.search()), _F)
@@ -191,17 +187,7 @@ hl.bind(MOD .. " + SHIFT + slash", hl.dsp.exec_cmd(hyde.sh.menu.search()), _F)
 -- $hc=Hardware Controls
 -- $d=[$hc|Audio]
 
--- # binddl  = , F10, $d toggle mute output , exec, hyde-shell volumecontrol.sh -o m # toggle audio mute
--- # binddel = , F11, $d decrease volume , exec, hyde-shell volumecontrol.sh -o d # decrease volume
--- # binddel = , F12, $d increase volume , exec, hyde-shell volumecontrol.sh -o i # increase volume
-
 _F = {description = "[Hardware Controls|Audio] un/mute output", locked = true}
-hl.bind("F10", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "m")), _F)
-_F = {description = "[Hardware Controls|Audio] decrease volume", locked = true, repeating = true}
-hl.bind("F11", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "d")), _F)
-_F = {description = "[Hardware Controls|Audio] increase volume", locked = true, repeating = true}
-hl.bind("F12", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "i")), _F)
-_F = {description = "[Hardware Controls|Audio] un/mmute output", locked = true}
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "m")), _F)
 _F = {description = "[Hardware Controls|Audio] un/mute microphone", locked = true}
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-i", "m")), _F)
@@ -233,7 +219,7 @@ hl.bind(MOD .. " + ALT + G", hl.dsp.exec_cmd(hyde.sh.gamemode()), _F) -- TODO
 _F = {description = "[Utilities] game launcher"}
 hl.bind(MOD .. " + SHIFT + G", hl.dsp.exec_cmd("hyde-shell gamelauncher"), _F)
 
-_F = {description = "[Utilities] screen capture] color picker", locked = true}
+_F = {description = "[Utilities|Screen capture] color picker", locked = true}
 hl.bind(MOD .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -an"), _F)
 _F = {description = "[Utilities] partial screenshot capture", locked = true}
 hl.bind(MOD .. " + P", hl.dsp.exec_cmd(hyde.sh.screenshot.snip()), _F)
@@ -277,36 +263,12 @@ hl.bind(MOD .. "+ SHIFT + U", hl.dsp.exec_cmd("hyde-shell hyprlock --select"), _
 -- bindd = $mainMod SHIFT, R, $d wallbash mode selector , exec, pkill -x rofi || hyde-shell wallbashtoggle.sh -m # launch wallbash mode select menu
 -- bindd = $mainMod SHIFT, T, $d select a theme, exec, pkill -x rofi || hyde-shell themeselect.sh # launch theme select menu
 
--- Numpad keys for workspaces 11-20. The Lua bind parser has no keycode form,
--- so each key is bound under both keysyms it can emit: the digit while Num
--- Lock is on, the navigation name while it is off.
-local kp = {
-    [1] = {"KP_1", "KP_End"},
-    [2] = {"KP_2", "KP_Down"},
-    [3] = {"KP_3", "KP_Next"},
-    [4] = {"KP_4", "KP_Left"},
-    [5] = {"KP_5", "KP_Begin"},
-    [6] = {"KP_6", "KP_Right"},
-    [7] = {"KP_7", "KP_Home"},
-    [8] = {"KP_8", "KP_Up"},
-    [9] = {"KP_9", "KP_Prior"},
-    [10] = {"KP_0", "KP_Insert"}
-}
-
-for i = 1, 10 do
+-- Nine workspaces (keys 1-9).
+for i = 1, 9 do
     _F = {description = "[Workspaces|Navigation] navigate to workspace " .. i}
-    hl.bind(MOD .. " + " .. ((i == 10) and 0 or i), hl.dsp.focus({workspace = i}), _F)
+    hl.bind(MOD .. " + " .. i, hl.dsp.focus({workspace = i}), _F)
 end
 
-for i = 1, 10 do
-    for _, key in ipairs(kp[i]) do
-        hl.bind(
-            MOD .. " + " .. key,
-            hl.dsp.focus({workspace = tostring(i + 10)}),
-            {description = "[Workspaces|Navigation] navigate to workspace " .. (i + 10)}
-        )
-    end
-end
 
 _F = {description = "[Workspaces|Navigation|Relative workspace] change active workspace forwards"}
 hl.bind(MOD .. " + CONTROL + RIGHT", hl.dsp.focus({workspace = "r+1"}), _F)
@@ -316,20 +278,11 @@ hl.bind(MOD .. " + CONTROL + LEFT", hl.dsp.focus({workspace = "r-1"}), _F)
 _F = {description = "[Workspaces|Navigation] navigate to the nearest empty workspace"}
 hl.bind(MOD .. " + CONTROL + DOWN", hl.dsp.focus({workspace = "empty"}), _F)
 
-for i = 1, 10 do
+for i = 1, 9 do
     _F = {description = "[Workspaces|Move window to workspace] move focused window to workspace " .. i}
-    hl.bind(MOD .. " + SHIFT + " .. ((i == 10) and 0 or i), hl.dsp.window.move({workspace = i}), _F)
+    hl.bind(MOD .. " + SHIFT + " .. i, hl.dsp.window.move({workspace = i}), _F)
 end
 
-for i = 1, 10 do
-    for _, key in ipairs(kp[i]) do
-        hl.bind(
-            MOD .. " + SHIFT + " .. key,
-            hl.dsp.window.move({workspace = tostring(i + 10)}),
-            {description = "[Workspaces|Move window to workspace] move focused window to workspace " .. (i + 10)}
-        )
-    end
-end
 
 _F = {description = "[Workspaces|Move window to workspace|Relative workspace] move focused window to next workspace"}
 hl.bind(MOD .. " + CONTROL + ALT + RIGHT", hl.dsp.window.move({workspace = "r+1"}), _F)
@@ -353,9 +306,9 @@ hl.bind(MOD .. " + ALT + S", hl.dsp.window.move({workspace = "special", follow =
 
 --- Move silent
 ---
-for i = 1, 10 do
+for i = 1, 9 do
     _F = {description = "[Workspaces|Move window (Don't follow)] move focused window to workspace " .. i}
-    hl.bind(MOD .. " + ALT + " .. ((i == 10) and 0 or i), hl.dsp.window.move({workspace = i, follow = false}), _F)
+    hl.bind(MOD .. " + ALT + " .. i, hl.dsp.window.move({workspace = i, follow = false}), _F)
 end
 
 -- Optionals

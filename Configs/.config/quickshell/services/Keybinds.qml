@@ -79,28 +79,39 @@ Singleton {
         return parts;
     }
 
+    // Teclas que são só modificadores (ex.: soltar o Alt no fim do Alt+Tab): fazem parte de outro
+    // atalho e não se carregam sozinhas, por isso não aparecem na lista.
+    readonly property var modifierKeys: ["alt_l", "alt_r", "super_l", "super_r", "control_l", "control_r", "shift_l", "shift_r"]
+
+    // Um atalho por ação: combinações diferentes para a mesma coisa (Super+Q e Alt+F4 para fechar a
+    // janela) ficam na mesma linha, em `combos`.
     function parse(json) {
-        const seen = {};
+        const byAction = {};
         const out = [];
         for (const b of JSON.parse(json)) {
-            if (!b.has_description || !b.description)
+            if (!b.has_description || !b.description || modifierKeys.includes(String(b.key).toLowerCase()))
                 continue;
             const m = /^\[([^\]]*)\]\s*(.*)$/.exec(b.description);
             const category = m ? m[1].split("|").join(" · ") : "";
             const text = (m ? m[2] : b.description).trim();
             const keys = keysOf(b);
-            const id = `${keys.join("+")}|${text}`;
-            if (seen[id])
-                continue;
-            seen[id] = true;
-            out.push({
-                title: text.charAt(0).toUpperCase() + text.slice(1),
-                category: category,
-                keys: keys,
-                dispatcher: b.dispatcher,
-                arg: b.arg,
-                haystack: `${text} ${category} ${keys.join(" ")}`.toLowerCase()
-            });
+            const id = `${category}|${text}`;
+            let entry = byAction[id];
+            if (!entry) {
+                entry = byAction[id] = {
+                    title: text.charAt(0).toUpperCase() + text.slice(1),
+                    category: category,
+                    combos: [],
+                    dispatcher: b.dispatcher,
+                    arg: b.arg,
+                    haystack: `${text} ${category}`.toLowerCase()
+                };
+                out.push(entry);
+            }
+            if (!entry.combos.some(c => c.join("+") === keys.join("+"))) {
+                entry.combos.push(keys);
+                entry.haystack += " " + keys.join(" ").toLowerCase();
+            }
         }
         return out;
     }

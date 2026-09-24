@@ -472,33 +472,56 @@ PanelWindow {
                             onClicked: Apps.toggleFavorite(row.modelData.value)
                         }
 
-                        // Teclas do atalho, cada uma num chip.
+                        // Teclas do atalho, cada uma num chip; combinações alternativas separadas por "or".
                         Row {
                             visible: row.modelData.kind === "key"
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.space1
+                            spacing: Theme.space2
 
                             Repeater {
-                                model: row.modelData.kind === "key" ? row.modelData.value.keys : []
+                                model: row.modelData.kind === "key" ? row.modelData.value.combos : []
 
-                                Rectangle {
-                                    id: keyChip
+                                Row {
+                                    id: combo
 
-                                    required property string modelData
+                                    required property var modelData
+                                    required property int index
 
                                     anchors.verticalCenter: parent.verticalCenter
-                                    implicitWidth: Math.max(implicitHeight, keyText.implicitWidth + 2 * Theme.space2)
-                                    implicitHeight: 24
-                                    radius: Theme.shapeSmall - 2
-                                    color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.14) : Theme.surfaceContainerHighest
+                                    spacing: Theme.space1
 
                                     StyledText {
-                                        id: keyText
-                                        anchors.centerIn: parent
-                                        text: keyChip.modelData
-                                        font.pixelSize: Theme.labelMedium
-                                        font.weight: Font.Medium
-                                        color: row.selected ? Theme.onPrimaryContainer : Theme.text
+                                        visible: combo.index > 0
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        rightPadding: Theme.space1
+                                        text: "or"
+                                        font.pixelSize: Theme.labelSmall
+                                        color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.75) : Theme.textFaint
+                                    }
+
+                                    Repeater {
+                                        model: combo.modelData
+
+                                        Rectangle {
+                                            id: keyChip
+
+                                            required property string modelData
+
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            implicitWidth: Math.max(implicitHeight, keyText.implicitWidth + 2 * Theme.space2)
+                                            implicitHeight: 24
+                                            radius: Theme.shapeSmall - 2
+                                            color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.14) : Theme.surfaceContainerHighest
+
+                                            StyledText {
+                                                id: keyText
+                                                anchors.centerIn: parent
+                                                text: keyChip.modelData
+                                                font.pixelSize: Theme.labelMedium
+                                                font.weight: Font.Medium
+                                                color: row.selected ? Theme.onPrimaryContainer : Theme.text
+                                            }
+                                        }
                                     }
                                 }
                             }
