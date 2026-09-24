@@ -32,6 +32,11 @@ PanelWindow {
             id: "calc",
             icon: "calculate",
             label: "Calculator"
+        },
+        {
+            id: "keys",
+            icon: "keyboard",
+            label: "Keys"
         }
     ]
 
@@ -55,7 +60,7 @@ PanelWindow {
             lastMouse = g;
         return moved;
     }
-    readonly property var calcResult: mode !== "clipboard" ? Calculator.evaluate(query) : null
+    readonly property var calcResult: mode === "apps" || mode === "calc" ? Calculator.evaluate(query) : null
     readonly property var results: {
         if (mode === "apps")
             return Apps.search(query).slice(0, 60);
@@ -63,6 +68,8 @@ PanelWindow {
             const q = query.trim().toLowerCase();
             return (q ? Clipboard.entries.filter(e => e.text.toLowerCase().includes(q)) : Clipboard.entries).slice(0, 100);
         }
+        if (mode === "keys")
+            return Keybinds.search(query);
         return [];
     }
     // Linhas: o resultado da conta (se houver) vem primeiro.
@@ -72,7 +79,7 @@ PanelWindow {
                 value: calcResult
             }
         ] : []).concat(results.map(r => ({
-                kind: mode === "clipboard" ? "clip" : "app",
+                kind: mode === "clipboard" ? "clip" : mode === "keys" ? "key" : "app",
                 value: r
             })))
 
@@ -102,6 +109,8 @@ PanelWindow {
             openedAt = Date.now();
             if (mode === "clipboard")
                 Clipboard.refresh();
+            if (mode === "keys")
+                Keybinds.refresh();
             focusTimer.restart();
         }
     }
@@ -112,6 +121,8 @@ PanelWindow {
         current = 0;
         if (open && mode === "clipboard")
             Clipboard.refresh();
+        if (open && mode === "keys")
+            Keybinds.refresh();
     }
     onQueryChanged: current = 0
 
@@ -139,6 +150,9 @@ PanelWindow {
         else if (row.kind === "calc")
             Quickshell.clipboardText = Calculator.format(row.value);
         close();
+        // O atalho corre depois de o launcher fechar (para agir sobre a janela que tinha o foco).
+        if (row.kind === "key")
+            Keybinds.run(row.value);
     }
 
     Timer {
@@ -256,7 +270,7 @@ PanelWindow {
                     StyledText {
                         visible: input.text === ""
                         anchors.verticalCenter: parent.verticalCenter
-                        text: win.mode === "clipboard" ? "Search clipboard…" : win.mode === "calc" ? "Type a calculation, e.g. (2+3)*4^2" : "Search apps or calculate…"
+                        text: win.mode === "clipboard" ? "Search clipboard…" : win.mode === "keys" ? "Search keybindings…" : win.mode === "calc" ? "Type a calculation, e.g. (2+3)*4^2" : "Search apps or calculate…"
                         color: Theme.textFaint
                         font.pixelSize: Theme.titleMedium
                     }
@@ -310,14 +324,16 @@ PanelWindow {
                     }
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                }
-
+                // Ocupa só o que sobra dos chips; se não couber inteira, esconde-se (não empurra o
+                // launcher para fora da janela).
                 StyledText {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    horizontalAlignment: Text.AlignRight
                     text: "Tab switches mode"
                     font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
+                    opacity: width >= implicitWidth ? 1 : 0
                 }
             }
 
@@ -410,7 +426,7 @@ PanelWindow {
                         MaterialIcon {
                             visible: row.modelData.kind !== "app"
                             anchors.centerIn: parent
-                            icon: row.modelData.kind === "calc" ? "calculate" : row.modelData.value?.image ? "image" : "content_paste"
+                            icon: row.modelData.kind === "calc" ? "calculate" : row.modelData.kind === "key" ? "keyboard" : row.modelData.value?.image ? "image" : "content_paste"
                             size: 22
                             color: Theme.primary
                         }
@@ -426,7 +442,7 @@ PanelWindow {
 
                         StyledText {
                             Layout.fillWidth: true
-                            text: row.modelData.kind === "app" ? row.modelData.value.name : row.modelData.kind === "calc" ? `= ${Calculator.format(row.modelData.value)}` : row.modelData.value.image ? "Image" : row.modelData.value.text
+                            text: row.modelData.kind === "app" ? row.modelData.value.name : row.modelData.kind === "key" ? row.modelData.value.title : row.modelData.kind === "calc" ? `= ${Calculator.format(row.modelData.value)}` : row.modelData.value.image ? "Image" : row.modelData.value.text
                             font.pixelSize: Theme.titleSmall
                             font.weight: row.selected ? Font.DemiBold : Font.Normal
                             color: row.selected ? Theme.onPrimaryContainer : Theme.text
@@ -436,7 +452,7 @@ PanelWindow {
                         StyledText {
                             Layout.fillWidth: true
                             visible: text !== ""
-                            text: row.modelData.kind === "app" ? (row.modelData.value.genericName || row.modelData.value.comment || "") : row.modelData.kind === "calc" ? "Calculator · Enter copies" : row.modelData.value.image ? row.modelData.value.text : ""
+                            text: row.modelData.kind === "app" ? (row.modelData.value.genericName || row.modelData.value.comment || "") : row.modelData.kind === "key" ? row.modelData.value.category : row.modelData.kind === "calc" ? "Calculator · Enter copies" : row.modelData.value.image ? row.modelData.value.text : ""
                             font.pixelSize: Theme.labelSmall
                             color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.75) : Theme.textDim
                         }
@@ -456,6 +472,38 @@ PanelWindow {
                             onClicked: Apps.toggleFavorite(row.modelData.value)
                         }
 
+                        // Teclas do atalho, cada uma num chip.
+                        Row {
+                            visible: row.modelData.kind === "key"
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.space1
+
+                            Repeater {
+                                model: row.modelData.kind === "key" ? row.modelData.value.keys : []
+
+                                Rectangle {
+                                    id: keyChip
+
+                                    required property string modelData
+
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    implicitWidth: Math.max(implicitHeight, keyText.implicitWidth + 2 * Theme.space2)
+                                    implicitHeight: 24
+                                    radius: Theme.shapeSmall - 2
+                                    color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.14) : Theme.surfaceContainerHighest
+
+                                    StyledText {
+                                        id: keyText
+                                        anchors.centerIn: parent
+                                        text: keyChip.modelData
+                                        font.pixelSize: Theme.labelMedium
+                                        font.weight: Font.Medium
+                                        color: row.selected ? Theme.onPrimaryContainer : Theme.text
+                                    }
+                                }
+                            }
+                        }
+
                         IconButton {
                             visible: row.modelData.kind === "clip" && row.selected
                             icon: "delete"
@@ -471,7 +519,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 padding: 16
-                text: win.mode === "clipboard" ? (Clipboard.loading ? "Loading…" : "Clipboard is empty") : "No results"
+                text: win.mode === "clipboard" ? (Clipboard.loading ? "Loading…" : "Clipboard is empty") : win.mode === "keys" && Keybinds.loading ? "Loading…" : "No results"
                 color: Theme.textFaint
             }
         }

@@ -631,7 +631,7 @@ PanelWindow {
                         {
                             icon: "keyboard",
                             label: "Keybindings",
-                            cmd: "hyde-shell keybinds_hint"
+                            action: () => ShellState.toggleLauncher("keys")
                         }
                     ]
 

@@ -104,6 +104,10 @@ ShellRoot {
         function calc(): void {
             ShellState.toggleLauncher("calc");
         }
+        // Atalhos de teclado do Hyprland (substitui o keybinds_hint do HyDE).
+        function keys(): void {
+            ShellState.toggleLauncher("keys");
+        }
         function close(): void {
             ShellState.launcherOpen = false;
         }

@@ -172,7 +172,7 @@ hl.bind(MOD .. " + TAB", hl.dsp.exec_cmd(hyde.sh.menu.windows()), _F)
 _F = {description = "[Launcher|Rofi menus] file finder"}
 hl.bind(MOD .. " + SHIFT + E", hl.dsp.exec_cmd(hyde.sh.menu.files()), _F)
 _F = {description = "[Launcher|Rofi menus] keybindings hint"}
-hl.bind(MOD .. " + slash", hl.dsp.exec_cmd(hyde.sh.menu.binds()), _F)
+hl.bind(MOD .. " + slash", hl.dsp.exec_cmd("qs ipc call launcher keys"), _F)
 _F = {description = "[Launcher|Rofi menus] emoji picker"}
 hl.bind(MOD .. " + comma", hl.dsp.exec_cmd(hyde.sh.menu.emoji()), _F)
 _F = {description = "[Launcher|Rofi menus] glyph picker"}
