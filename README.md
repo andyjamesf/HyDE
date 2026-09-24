@@ -1,372 +1,255 @@
-> [!NOTE]
-> **Edição Quickshell** deste fork (`andyjamesf/HyDE`). Instala-se exatamente como o HyDE original,
-> mas a barra, as notificações, o OSD, o launcher (apps, clipboard, calculadora), o centro de
-> controlo, o power menu e o lockscreen são uma shell em [Quickshell](https://quickshell.org)
-> (`Configs/.config/quickshell/`, documentação no `README.md` dessa pasta) em vez da Waybar, do dunst
-> e do wlogout. O rofi (menus do HyDE) e o hyprlock (lockscreen de reserva) continuam instalados.
->
-> ```sh
-> git clone --depth 1 https://github.com/andyjamesf/HyDE ~/HyDE
-> cd ~/HyDE/Scripts && ./install.sh
-> ```
->
-> Acompanhar o HyDE oficial: `git fetch upstream && git rebase upstream/master` (as alterações da
-> edição estão em poucos commits isolados, no topo do ramo).
+# HyDE — Quickshell Edition
 
-<div align = center>
-  
-<a href="https://discord.gg/AYbJ9MJez7">
-    <img alt="Dynamic JSON Badge" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscordapp.com%2Fapi%2Finvites%2FmT5YqjaJFh%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&style=for-the-badge&logo=discord&logoSize=auto&label=The%20HyDe%20Project&labelColor=ebbcba&color=c79bf0">
-  </a>
-</div>
+A fork of [HyDE](https://github.com/HyDE-Project/HyDE) (the Hyprland desktop environment) in which
+the bar, notifications, OSD, launcher, control center, power menu and lock screen are a single
+desktop shell written from scratch in [Quickshell](https://quickshell.org) (QML). Everything else is
+still HyDE: the installer, themes, wallbash, wallpapers, scripts and Hyprland configuration.
 
-###### _<div align="right"><a id=-design-by-t2></a><sub>// design by t2</sub></div>_
+It installs exactly like the original HyDE:
 
-![hyde_banner](Source/assets/hyde_banner.png)
-
-<!--
-Multi-language README support
--->
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-[![es](https://img.shields.io/badge/lang-es-yellow.svg)](Source/docs/README.es.md)
-[![de](https://img.shields.io/badge/lang-de-black.svg)](Source/docs/README.de.md)
-[![nl](https://img.shields.io/badge/lang-nl-green.svg)](Source/docs/README.nl.md)
-[![中文](https://img.shields.io/badge/lang-中文-orange.svg)](Source/docs/README.zh.md)
-[![fr](https://img.shields.io/badge/lang-fr-blue.svg)](Source/docs/README.fr.md)
-[![ar](https://img.shields.io/badge/lang-AR-orange.svg)](Source/docs/README.ar.md)
-[![pt-br](https://img.shields.io/badge/lang-pt--br-006400.svg)](Source/docs/README.pt-br.md)
-[![tr](https://img.shields.io/badge/lang-tr-e30a17.svg)](Source/docs/README.tr.md)
-
-<div align="center">
-
-<br>
-
-<a href="#installation"><kbd> <br> Installation <br> </kbd></a>&ensp;&ensp;
-<a href="#updating"><kbd> <br> Updating <br> </kbd></a>&ensp;&ensp;
-<a href="#themes"><kbd> <br> Themes <br> </kbd></a>&ensp;&ensp;
-<a href="#styles"><kbd> <br> Styles <br> </kbd></a>&ensp;&ensp;
-<a href="CONTRIBUTING.md"><kbd> <br> Contributing <br> </kbd></a>&ensp;&ensp;
-<a href="KEYBINDINGS.md"><kbd> <br> Keybindings <br> </kbd></a>&ensp;&ensp;
-<a href="https://www.youtube.com/watch?v=2rWqdKU1vu8&list=PLt8rU_ebLsc5yEHUVsAQTqokIBMtx3RFY&index=1"><kbd> <br> Youtube <br> </kbd></a>&ensp;&ensp;
-<a href="https://hydeproject.pages.dev/"><kbd> <br> Wiki <br> </kbd></a>&ensp;&ensp;
-<a href="https://discord.gg/qWehcFJxPa"><kbd> <br> Discord <br> </kbd></a>
-
-</div><br><br>
-
-<div align="center">
-  <div style="display: flex; flex-wrap: nowrap; justify-content: center;">
-    <img src="Source/assets/archlinux.png" alt="Arch Linux" style="width: 10%; margin: 10px;"/>
-    <img src="Source/assets/cachyos.png" alt="CachyOS" style="width: 10%; margin: 10px;"/>
-    <img src="Source/assets/endeavouros.png" alt="EndeavourOS" style="width: 10%; margin: 10px;"/>
-    <img src="Source/assets/garuda.png" alt="Garuda" style="width: 10%; margin: 10px;"/>
-    <img src="Source/assets/nixos.png" alt="NixOS" style="width: 10%; margin: 10px;"/>
-  </div>
-</div>
-
-Check this out for the full note:
-[Journey to HyDE and beyond](./Hyprdots-to-HyDE.md)
-
-<!--
-<img alt="Dynamic JSON Badge" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscordapp.com%2Fapi%2Finvites%2FmT5YqjaJFh%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&style=for-the-badge&logo=discord&logoSize=auto&label=The%20HyDe%20Project&labelColor=ebbcba&color=c79bf0">
-
-<img alt="Dynamic JSON Badge" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscordapp.com%2Fapi%2Finvites%2FmT5YqjaJFh%3Fwith_counts%3Dtrue&query=%24.approximate_presence_count&suffix=%20online&style=for-the-badge&logo=discord&logoSize=auto&label=The%20HyDe%20Project&labelColor=ebbcba&color=c79bf0">
--->
-
-<https://github.com/prasanthrangan/hyprdots/assets/106020512/7f8fadc8-e293-4482-a851-e9c6464f5265>
-
-<br>
-
-<a id="installation"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=INSTALLATION" width="450"/>
-
----
-
-The installation script is designed for a minimal [Arch Linux](https://wiki.archlinux.org/title/Arch_Linux) install, but **may** work on some [Arch-based distros](https://wiki.archlinux.org/title/Arch-based_distributions).
-While installing HyDE alongside another [DE](https://wiki.archlinux.org/title/Desktop_environment)/[WM](https://wiki.archlinux.org/title/Window_manager) should work, due to it being a heavily customized setup, it **will** conflict with your [GTK](https://wiki.archlinux.org/title/GTK)/[Qt](https://wiki.archlinux.org/title/Qt) theming, [Shell](https://wiki.archlinux.org/title/Command-line_shell), [SDDM](https://wiki.archlinux.org/title/SDDM), [GRUB](https://wiki.archlinux.org/title/GRUB), etc. and is at your own risk.
-
-For NixOS support there is a separate project being maintained @ [Hydenix](https://github.com/richen604/hydenix/tree/main)
-
-> [!IMPORTANT]
-> The install script will auto-detect an NVIDIA card and install a matching DKMS driver path for your kernel.
-> Newer cards may use `nvidia-dkms` / `nvidia-open-dkms`, while legacy cards should be checked first against [`Scripts/nvidia-db/`](./Scripts/nvidia-db/).
-> Please ensure that your NVIDIA card supports the DKMS driver family selected for it in the list provided [here](https://wiki.archlinux.org/title/NVIDIA).
->
-> If a DKMS package is selected, expect a local module build for the current kernel during installation. This can take several minutes and may happen even when an NVIDIA DKMS package was already installed, because DKMS rebuilds modules for the active kernel.
-
-> [!CAUTION]
-> The script modifies your `grub` or `systemd-boot` config to enable NVIDIA DRM.
-
-> [!TIP]
-> BigLinux / Manjaro users may want to take a snapshot with Timeshift before running the installer, especially when HyDE is being installed alongside an existing desktop environment. On older NVIDIA cards, review the legacy driver list in [`Scripts/nvidia-db/`](./Scripts/nvidia-db/) before continuing.
-
-To install, execute the following commands:
-
-```shell
-sudo pacman -S --needed git base-devel
-git clone --depth 1 https://github.com/HyDE-Project/HyDE ~/HyDE
-cd ~/HyDE/Scripts
-./install.sh
+```sh
+git clone --depth 1 https://github.com/andyjamesf/HyDE ~/HyDE
+cd ~/HyDE/Scripts && ./install.sh
 ```
 
-> [!TIP]
-> You can also add any other apps you wish to install alongside HyDE to `Scripts/pkg_user.lst` and pass the file as a parameter to install it like so:
->
-> ```shell
-> ./install.sh pkg_user.lst
-> ```
-
-> [!IMPORTANT]
-> Refer your list from `Scripts/pkg_extra.lst`
-> or you can `cp Scripts/pkg_extra.lst Scripts/pkg_user.lst` if you wish to install all extra packages.
-
-<!--
-
-As a second install option, you can also use `Hyde-install`, which might be easier for some.
-View installation instructions for HyDE in [Hyde-cli - Usage](https://github.com/kRHYME7/Hyde-cli?tab=readme-ov-file#usage).
--->
-
-Please reboot after the install script completes and takes you to the SDDM login screen (or black screen) for the first time.
-For more details, please refer to the [installation wiki](https://hydeproject.pages.dev/en/getting-started/installation).
-
-Quick checklist for Arch-based distros such as BigLinux / Manjaro:
-
-- Create a restore point (for example with Timeshift) before running `install.sh`.
-- Expect changes to GRUB, SDDM, and `/etc/pacman.conf` during installation.
-- If your GPU is an older NVIDIA model, verify whether it belongs to a legacy dkms series before accepting the default driver path.
-- If a `*-dkms` NVIDIA package is selected, expect a local module build for the current kernel during install; this can take a while even if the package was already installed previously.
-- Reboot after the installer finishes, then select the Hyprland / HyDE session from the display manager.
-
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
-
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
-
-<a id="contributing"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=CONTRIBUTING" width="450"/>
+> The original HyDE README (features, themes, community, credits) is in
+> [`README.HyDE.md`](README.HyDE.md).
 
 ---
 
-We welcome contributions from the community! To get started:
+## Origin
 
-- Check our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
-- Read about team roles in [TEAM_ROLES.md](TEAM_ROLES.md)
-- Review our release process in [RELEASE_POLICY.md](RELEASE_POLICY.md)
-- Add yourself to [CONTRIBUTORS.md](CONTRIBUTORS.md) when making your first PR
+| | |
+|---|---|
+| Upstream | [`HyDE-Project/HyDE`](https://github.com/HyDE-Project/HyDE), `master` |
+| Forked at | `aceb94ee` (2026-09-20), the Lua configuration era (Hyprland 0.56, `hyprland.lua`) |
+| This fork | [`andyjamesf/HyDE`](https://github.com/andyjamesf/HyDE) |
+| Shell code | [`Configs/.config/quickshell/`](Configs/.config/quickshell/) |
 
-Whether you're helping with code, testing, or documentation, we appreciate your support in making HyDE better for everyone. Thank you!
+The edition lives in a small number of self-contained commits on top of upstream, so it can follow
+HyDE with a rebase:
 
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
-
-<a id="updating"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
-
----
-
-> [!NOTE]
-> If you are upgrading from an older version to the new Lua configuration, please follow the [Lua Migration Guide](https://hydeproject.pages.dev/en/help/lua/) in the HyDE wiki.
-
-To update HyDE, you will need to pull the latest changes from GitHub and restore the configs by running the following commands:
-
-> [!WARNING]
-> The following commands will discard any uncommitted local changes in the repository.
-
-```shell
-cd ~/HyDE/Scripts
-git fetch --update-shallow --depth 1 origin master
-git reset --hard origin/master
-./install.sh -r
+```sh
+git remote add upstream https://github.com/HyDE-Project/HyDE   # once
+git fetch upstream && git rebase upstream/master
 ```
 
-> [!IMPORTANT]
-> Please note that any configurations you made will be overwritten if listed to be done so as listed by `Scripts/restore_cfg.psv`.
-> However, all replaced configs are backed up and may be recovered from in `~/.config/cfg_backups`.
+## What changes compared to HyDE
 
-<!--
-As a second update option, you can use `Hyde restore ...`, which does have a better way of managing restore and backup options.
-For more details, you can refer to [Hyde-cli - dots management wiki](https://github.com/kRHYME7/Hyde-cli/wiki/Dots-Management).
--->
+| Part | HyDE | Quickshell Edition |
+|---|---|---|
+| Bar | Waybar | Quickshell bar (7 layouts, per-theme colors) |
+| Notifications | dunst (or swaync) | shell notification server + popups + history |
+| Volume/brightness OSD | notify-send popups | shell OSD |
+| App launcher, clipboard, calculator | rofi | shell launcher (4 modes) |
+| Keybindings hint | rofi | launcher **Keys** mode |
+| Logout menu | wlogout | shell power menu |
+| Lock screen | hyprlock | shell lock screen (hyprlock stays as fallback) |
+| Control center | — | new |
+| Theme/wallpaper/animation pickers, emoji, glyphs, window switcher | rofi | still rofi, restyled with the shell colors |
 
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
+The installer (`Scripts/dots/quickshell.toml` in the `core` group) installs the shell and its
+dependencies and no longer installs `waybar`, `dunst` or `wlogout`. The shell's code is updated by
+HyDE updates; your settings in `config/` are only copied when missing and are never overwritten.
 
-<a id="hydevm"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=HYDEVM" width="450"/>
+Dependencies: `quickshell`, `inter-font`, `upower`, `power-profiles-daemon`, `wl-clipboard`,
+`python` and `ttf-material-symbols-variable-git` (AUR).
 
----
+## Features
 
-HyDEVM is a script that allows you to run HyDE in a virtual machine for testing and development.
+### Bar
 
-## Quick Start
+- **7 layouts**: Islands (default), Minimal, Compact, Floating (a single dock-like island),
+  Productivity (CPU/memory/temperature), Media (music in the center with a visualizer) and Bottom.
+  Presets live in `config/layouts.json`; you can add your own.
+- **Island styles**: theme background, accent tint, raised, accent color, glass, outline only, or a
+  fixed `#rrggbb`; **opacity** 50–100 %.
+- **Adjustable height** (19–32 px or ±2 px steps). Text, icons and corner radius follow it.
+- A layout can be tied to a HyDE theme (`themeLayouts`), and the island corners follow Hyprland's
+  `decoration:rounding`, so the bar matches each theme.
+- **Widgets**: HyDE menu, workspaces (with app icons), active window, clock, media (with cava),
+  AI tools usage, tray, audio, microphone, brightness, network, Bluetooth, battery, system stats,
+  caffeine (idle inhibit), night light, notifications, control center and session.
+- Each widget has a tooltip, and most open a **popout**: sound (outputs and per-app volume),
+  network (Wi-Fi list, connect with password), Bluetooth (pair/connect), display (brightness and
+  night light), battery (power profiles), calendar (Google Calendar events via iCal) and media.
+- The **HyDE menu** (palette icon) has bar layout, island style and opacity, bar height, shell
+  colors, and all of HyDE's actions (theme, wallpaper, animations, workflows, lock screen layout,
+  shaders, …).
 
-### Arch Linux
+### Control center (`Super+Alt+C`)
 
-```bash
-# Download and run (will auto-detect missing packages)
-curl -L https://raw.githubusercontent.com/HyDE-Project/HyDE/main/Scripts/hydevm/hydevm.sh -o hydevm
-chmod +x hydevm
-./hydevm
+A compact Material 3 panel: user header with settings, lock and session buttons; quick toggles in a
+4-column grid (Wi-Fi, Bluetooth, Silent, Night light, Power profile, Caffeine, Microphone, Wallpaper
+colors). Right click, long press or the small badge opens the details. Below the grid: volume,
+microphone and brightness sliders, a media strip, the latest notifications, and one row of HyDE
+shortcuts. It fits a 800 px tall screen without scrolling. Detail pages cover Wi-Fi, Bluetooth,
+sound and the full notification history.
+
+### Notifications
+
+A built-in notification server (no dunst/swaync):
+
+- popups for 5 s (paused on hover; critical ones stay), with actions, images and links;
+- history in the control center, and Do Not Disturb;
+- a new notification with the same app and title replaces the visible one instead of stacking;
+- HyDE's own volume/brightness notifications are dropped, because the OSD shows them.
+
+### OSD
+
+Volume, microphone and brightness indicator. It ignores the brightness changes made by hypridle's
+screen dimming.
+
+### Launcher (`Super+A`)
+
+One window with four modes (Tab switches mode):
+
+- **Apps**: fuzzy search, favorites (Ctrl+F) and frecency. Typing a calculation shows the result.
+- **Clipboard** (`Super+V`): cliphist history with images; Delete removes an entry.
+- **Calculator** (`Super+Shift+K`): functions, constants, percentages; Enter copies the result.
+- **Keys** (`Super+/`): every Hyprland keybinding with its description, category and readable keys
+  (`Super` `/`, `Volume +`, `Left click`), alternative combos on one row, searchable. Enter runs it.
+
+### Power menu (`Ctrl+Alt+Delete`) and lock screen (`Super+L`)
+
+The power menu has lock, suspend, hibernate, log out, restart and shut down; destructive actions
+ask for a second press. The lock screen uses `ext-session-lock` with PAM (the same
+`/etc/pam.d/hyprlock` configuration, so the same password works). It is driven by hypridle and
+`loginctl lock-session`, and it survives a shell reload while locked.
+
+### Colors and theming
+
+- Colors follow HyDE and change with a smooth transition when you switch theme or wallpaper.
+  There are three sources: the **HyDE theme's bar colors** (default), the **theme palette
+  (wallbash)**, or the **current wallpaper**.
+- Every text and icon color is checked for WCAG contrast against what is behind it, so light
+  themes and every island style stay readable.
+- HyDE's **rofi** menus get the shell's panel colors, opacity and subtle outline. The shell writes
+  `~/.config/rofi/theme.rasi` and rewrites it when HyDE replaces it on a theme switch.
+- A single design system (`services/Theme.qml`) defines spacing (4 px grid), a Material 3 type
+  scale, shapes, surfaces and motion, and every surface uses it.
+
+## Fixes to HyDE itself
+
+- **wallbash**: templates no longer replace symlinked configs (kitty, swaync) with regular files.
+  The Waybar color template writes to `~/.cache/hyde/wallbash/bar.css`.
+- **Keybindings**:
+  - nine workspaces, without the `0` key and the numpad binds for workspaces 10–20;
+  - bare `F10`/`F11`/`F12` no longer steal those keys from apps;
+  - no duplicate binds;
+  - fixed descriptions.
+- **Running a bind from the keybindings list**: with the Lua configuration,
+  `hyprctl dispatch __lua N` no longer works, so the Keys mode calls the bind's function directly.
+- **Shaders**: `custom.frag` used `#define COLOR_VISION_ENABLED true`, which GLES rejects; it is
+  now `0`.
+- **Blur**: blur for the shell's layers and for the bar popouts (`blur_popups`).
+
+## Keybindings
+
+The shell's own binds (all others are HyDE's; press `Super+/` for the full list):
+
+| Keys | Action |
+|---|---|
+| `Super+A` | launcher (apps; type a calculation to compute it) |
+| `Super+V` | clipboard |
+| `Super+Shift+K` | calculator |
+| `Super+/` | keybindings |
+| `Super+Alt+C` | control center |
+| `Super+N` | notification history |
+| `Super+Alt+↑` / `↓` | next / previous bar layout |
+| `Super+Ctrl+B` | hide / show the bar |
+| `Super+L` | lock |
+| `Ctrl+Alt+Delete` | power menu |
+
+## Configuration
+
+`~/.config/quickshell/config/config.json` holds only what you change. Defaults are in
+`services/Config.qml`, and changes apply live:
+
+```jsonc
+{
+  "bar": {
+    "layout": "islands",           // a name from config/layouts.json
+    "position": "top",             // "top" | "bottom"
+    "opacity": 0.92,
+    "pillStyle": "tint",           // surface | tint | container | accent | glass | outline | "#rrggbb"
+    "themeLayouts": { "Catppuccin-Latte": "minimal" }
+  },
+  "appearance": { "locale": "en_GB", "font": "Inter", "fontSize": 12, "animationScale": 1 },
+  "widgets": {
+    "workspaces": { "shown": 5, "appIcons": true },
+    "clock": { "format": "HH:mm", "showDate": false },
+    "notifications": { "timeout": 5000, "maxPopups": 4, "historySize": 100 },
+    "osd": { "enabled": true, "timeout": 1500 },
+    "lock": { "enabled": true }    // false: lock with HyDE's hyprlock
+  }
+}
 ```
 
-### NixOS (or Nix)
+What you pick in the menus (layout, island style, opacity, height, color source, Do Not Disturb)
+is stored in `~/.local/state/quickshell/` and takes priority over `config.json`.
 
-```bash
-# Using flakes from HyDE repository
-nix run github:HyDE-Project/HyDE
+**Google Calendar**: create `~/.local/share/quickshell/calendars.json` with each calendar's secret
+iCal address. It stays out of any repository, because the address gives read access:
 
-# Or if you have the repository cloned locally
-nix run .
+```json
+{ "calendars": [ { "name": "Personal", "url": "https://calendar.google.com/calendar/ical/…/basic.ics", "color": "#8ab4f8" } ] }
 ```
 
-For more details, please refer to the [HyDEVM README](Scripts/hydevm/README.md).
+## IPC
 
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
+Everything can be driven from scripts or binds (`qs ipc show` lists it all):
 
-<a id="themes"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=THEMES" width="450"/>
+```
+qs ipc call bar            toggle | show | hide | layout <name> | next | prev | pill <style>
+                           opacity <0..1> | height <px> | taller | shorter | agents
+                           popout <name> | menu <name[:submenu]> | tooltip <name>
+qs ipc call controlcenter  toggle | open | close | page wifi|bluetooth|audio|notifications
+qs ipc call launcher       toggle | clipboard | calc | keys | close | openOn <screen>
+qs ipc call notifications  toggle | open | toggleDnd | clear
+qs ipc call colors         source hyde|wallbash|wallpaper | toggle
+qs ipc call lock           lock | unlock | isLocked
+qs ipc call idle           toggle | isInhibited
+qs ipc call brightness     up | down | set <percent>
+qs ipc call powermenu      toggle
+qs ipc call shell          reload
+```
 
----
+## Going back to HyDE's original pieces
 
-All our official themes are stored in a separate repository, allowing users to install them using themepatcher.
-For more information, visit [HyDE-Project/hyde-themes](https://github.com/HyDE-Project/hyde-themes).
+In `~/.config/hypr/hyprland.lua` (HyDE's user override layer):
 
-<div align="center">
-  <table><tr><td>
+- **Waybar**: `hyde.config.start.bar = "hyde-shell app -u hyde-" .. os.getenv("XDG_SESSION_DESKTOP") .. "-bar.scope -t scope -- waybar.py --watch"`
+  (and install `waybar`).
+- **dunst**: `hyde.config.start.notifications = "hyde-shell app -u hyde-" .. os.getenv("XDG_SESSION_DESKTOP") .. "-notifications.service -t service -- dunst"`
+  (and install `dunst`).
+- **hyprlock**: set `"lock": { "enabled": false }` in `config.json`. hypridle also falls back to
+  hyprlock whenever the shell is not running.
 
-[![Catppuccin-Latte](https://placehold.co/130x30/dd7878/eff1f5?text=Catppuccin-Latte&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Catppuccin-Latte)
-[![Catppuccin-Mocha](https://placehold.co/130x30/b4befe/11111b?text=Catppuccin-Mocha&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Catppuccin-Mocha)
-[![Decay-Green](https://placehold.co/130x30/90ceaa/151720?text=Decay-Green&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Decay-Green)
-[![Edge-Runner](https://placehold.co/130x30/fada16/000000?text=Edge-Runner&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Edge-Runner)
-[![Frosted-Glass](https://placehold.co/130x30/7ed6ff/1e4c84?text=Frosted-Glass&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Frosted-Glass)
-[![Graphite-Mono](https://placehold.co/130x30/a6a6a6/262626?text=Graphite-Mono&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Graphite-Mono)
-[![Gruvbox-Retro](https://placehold.co/130x30/475437/B5CC97?text=Gruvbox-Retro&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Gruvbox-Retro)
-[![Material-Sakura](https://placehold.co/130x30/f2e9e1/b4637a?text=Material-Sakura&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Material-Sakura)
-[![Nordic-Blue](https://placehold.co/130x30/D9D9D9/476A84?text=Nordic-Blue&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Nordic-Blue)
-[![Rosé-Pine](https://placehold.co/130x30/c4a7e7/191724?text=Rosé-Pine&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Rose-Pine)
-[![Synth-Wave](https://placehold.co/130x30/495495/ff7edb?text=Synth-Wave&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Synth-Wave)
-[![Tokyo-Night](https://placehold.co/130x30/7aa2f7/24283b?text=Tokyo-Night&font=Oswald)](https://github.com/HyDE-Project/hyde-themes/tree/Tokyo-Night)
+**Locked out?** Switch to a TTY (`Ctrl+Alt+F3`), log in and run `qs ipc call lock unlock`. If
+Hyprland shows "the lockscreen app died", run
+`hyprctl --instance 0 eval 'hl.clear_crashed_lockscreen()'` instead.
 
-  </td></tr></table>
-</div>
+## Project layout
 
-> [!TIP]
-> Everyone, including you can create, maintain, and share additional themes, all of which can be installed using themepatcher!
-> To create your own custom theme, please refer to the [theming wiki](https://github.com/prasanthrangan/hyprdots/wiki/Theming).
-> If you wish to have your hyde theme showcased, or you want to find some non-official themes, visit [kRHYME7/hyde-gallery](https://github.com/kRHYME7/hyde-gallery)!
+| Path | Contents |
+|---|---|
+| `Configs/.config/quickshell/shell.qml` | entry point: per-screen windows and IPC targets |
+| `…/services/` | singletons with the logic: colors, audio, network, Bluetooth, notifications, launcher, keybindings, lock, rofi colors… |
+| `…/components/` | reusable visual pieces (buttons, sliders, cards, popouts, menus, tooltips) |
+| `…/modules/` | bar, control center, notifications, OSD, launcher, power menu, lock screen |
+| `…/config/` | `config.json` and `layouts.json` (user settings; never overwritten) |
+| `Scripts/dots/quickshell.toml` | installer entry (packages and files) |
+| `Configs/.local/share/hypr/lua/` | HyDE's Lua config: shell autostart, binds, layer rules |
+| `Configs/.local/share/hyde/wallbash/` | wallbash templates (shell palette, bar colors) |
 
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
+## Credits
 
-<a id="styles"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=STYLES" width="450"/>
+- [HyDE](https://github.com/HyDE-Project/HyDE) and its contributors, for everything this builds on.
+- [Quickshell](https://quickshell.org), the QML toolkit the shell runs on.
+- Ideas were drawn from [Noctalia](https://github.com/noctalia-dev/noctalia-shell),
+  [Caelestia](https://github.com/caelestia-dots/shell),
+  [end-4's dots](https://github.com/end-4/dots-hyprland) and
+  [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell). The code here is original.
 
----
-
-<div align="center"><table><tr>Theme Select</tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/theme_select_1.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/theme_select_2.png"/></td></tr></table></div>
-
-<div align="center"><table><tr><td>Wallpaper Select</td><td>Launcher Select</td></tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/walls_select.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_sel.png"/></td></tr>
-<tr><td>Wallbash Modes</td><td>Notification Action</td></tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/wb_mode_sel.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/notif_action_sel.png"/></td></tr>
-</table></div>
-
-<div align="center"><table><tr>Rofi Launcher</tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_1.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_2.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_3.png"/></td></tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_4.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_5.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_6.png"/></td></tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_7.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_8.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_9.png"/></td></tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_10.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_11.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/rofi_style_12.png"/></td></tr>
-</table></div>
-
-<div align="center"><table><tr>Wlogout Menu</tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/wlog_style_1.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/wlog_style_2.png"/></td></tr></table></div>
-
-<div align="center"><table><tr>Game Launcher</tr><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/game_launch_1.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/game_launch_2.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/game_launch_3.png"/></td></tr></table></div>
-<div align="center"><table><tr><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/game_launch_4.png"/></td><td>
-<img src="https://raw.githubusercontent.com/prasanthrangan/hyprdots/main/Source/assets/game_launch_5.png"/></td></tr></table></div>
-
-
-
-<a id="star_history"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=STARS" width="450"/>
-                        
-[![Stargazers over time](https://starchart.cc/HyDE-Project/HyDE.svg?background=%231f2226&axis=%23ebbcba&line=%23c79bf0)](https://starchart.cc/HyDE-Project/HyDE)
-
-                    
-
----
-
-<a id="credits"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=THANK YOU!" width="450"/>
-
-
-- [See the full Credits page here](./CREDITS.md).
-
-
-
----
-
-<div align="right">
-  <br>
-  <a href="#-design-by-t2"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
-
-<div align="right">
-  <sub>Last edited on: 27/02/2025<span id="last-edited"></span></sub>
-</div>
-
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://rubiin.is-a.dev"><img src="https://avatars.githubusercontent.com/u/8222059?v=4?s=100" width="100px;" alt="Rubin Bhandari"/><br /><sub><b>Rubin Bhandari</b></sub></a><br /><a href="https://github.com/HyDE-Project/HyDE/commits?author=rubiin" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kRHYME7"><img src="https://avatars.githubusercontent.com/u/53417443?v=4?s=100" width="100px;" alt="Khing"/><br /><sub><b>Khing</b></sub></a><br /><a href="https://github.com/HyDE-Project/HyDE/commits?author=kRHYME7" title="Code">💻</a> <a href="https://github.com/HyDE-Project/HyDE/commits?author=kRHYME7" title="Documentation">📖</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+Licensed under the same license as HyDE ([GPL-3.0](LICENSE)).
