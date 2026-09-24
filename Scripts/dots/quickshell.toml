@@ -12,6 +12,7 @@ pacman = [
     "power-profiles-daemon", # power profiles (Quickshell.Services.UPower PowerProfiles)
     "wl-clipboard",          # wl-copy for the clipboard launcher
     "python",                # calendar (iCal) reader
+    "python-gobject",        # system file chooser (xdg-desktop-portal) for the user photo
 ]
 yay = [
     "ttf-material-symbols-variable-git", # icon font (variable: fill/weight are animated)
