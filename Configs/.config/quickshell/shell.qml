@@ -16,7 +16,8 @@ import qs.modules.lock
 
 ShellRoot {
     // Os singletons só são criados quando alguém os usa; estes têm de existir desde o arranque
-    // (os eventos do calendário e o servidor de notificações).
+    // (as cores do rofi, os eventos do calendário e o servidor de notificações).
+    readonly property var rofi: Rofi
     readonly property var agenda: Agenda
     readonly property var notifs: Notifs
 
