@@ -140,6 +140,8 @@ S|${HOME}/.config|MangoHud|mangohud
  Launcher 
 P|${HOME}/.config|rofi|rofi
 S|${HOME}/.config|wlogout|wlogout
+S|${HOME}/.config/quickshell|shell.qml README.md components services modules scripts|quickshell
+P|${HOME}/.config/quickshell|config|quickshell
 
  Lock Screen 
 S|${HOME}/.config|swaylock|swaylock-effects

@@ -1,0 +1,18 @@
+import QtQuick
+import qs.components
+import qs.services
+import qs.modules.controls
+
+// Bluetooth. Clique abre os dispositivos; clique direito liga/desliga.
+BarItem {
+    shown: Bluetooth.available
+    icon: Bluetooth.icon
+    iconColor: Bluetooth.enabled ? Theme.text : Theme.textFaint
+    tooltip: !Bluetooth.enabled ? "Bluetooth desligado" : Bluetooth.connected.length > 0 ? Bluetooth.connected.map(d => d.name + (d.batteryAvailable ? ` (${Math.round(d.battery * 100)}%)` : "")).join("\n") : "Bluetooth ligado, sem dispositivos"
+
+    popoutName: "bluetooth"
+    popout: Component {
+        BluetoothPanel {}
+    }
+    onRightClicked: Bluetooth.setEnabled(!Bluetooth.enabled)
+}

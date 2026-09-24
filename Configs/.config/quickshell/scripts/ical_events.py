@@ -1,0 +1,349 @@
+#!/usr/bin/env python3
+"""Eventos dos calendários (Google Calendar ou qualquer outro com endereço iCal) para a shell.
+
+Lê a lista de calendários de ~/.local/share/quickshell/calendars.json (fora do repositório de
+dotfiles, porque os endereços iCal privados dão acesso de leitura ao calendário):
+
+    {
+      "calendars": [
+        { "name": "Pessoal", "url": "https://calendar.google.com/calendar/ical/.../basic.ics",
+          "color": "#8ab4f8" }
+      ]
+    }
+
+Descarrega cada calendário, expande os eventos recorrentes para a janela [hoje - 45 dias,
+hoje + 120 dias] e escreve ~/.cache/quickshell/calendar.json (de forma atómica), que a shell
+vigia. Se um calendário falhar (sem rede), mantém os eventos da última leitura boa.
+
+Sem dependências fora da biblioteca padrão: o parser de iCal e a expansão de RRULE cobrem o que
+o Google produz (DAILY/WEEKLY/MONTHLY/YEARLY, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY,
+BYMONTH, EXDATE e exceções com RECURRENCE-ID).
+"""
+import json
+import os
+import re
+import sys
+import tempfile
+import urllib.request
+from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+
+HOME = os.path.expanduser("~")
+CONFIG = os.path.join(os.environ.get("XDG_DATA_HOME", f"{HOME}/.local/share"), "quickshell", "calendars.json")
+CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME", f"{HOME}/.cache"), "quickshell", "calendar.json")
+
+
+def local_zone():
+    """Fuso do sistema com as regras de hora de verão (e não só o desvio atual)."""
+    try:
+        if os.environ.get("TZ"):
+            return ZoneInfo(os.environ["TZ"].lstrip(":"))
+        with open("/etc/localtime", "rb") as f:
+            return ZoneInfo.from_file(f)
+    except Exception:
+        return datetime.now().astimezone().tzinfo
+
+
+LOCAL = local_zone()
+WEEKDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+MAX_STEPS = 20000
+
+
+# --- iCal -------------------------------------------------------------------------------------
+
+def unfold(text):
+    return re.sub(r"\r?\n[ \t]", "", text).splitlines()
+
+
+def split_prop(line):
+    """'DTSTART;TZID=Europe/Lisbon:20260101T100000' -> ('DTSTART', {'TZID': ...}, '2026...')."""
+    in_quotes = False
+    for i, ch in enumerate(line):
+        if ch == '"':
+            in_quotes = not in_quotes
+        elif ch == ":" and not in_quotes:
+            head, value = line[:i], line[i + 1:]
+            break
+    else:
+        return None
+    parts = head.split(";")
+    params = {}
+    for p in parts[1:]:
+        if "=" in p:
+            k, v = p.split("=", 1)
+            params[k.upper()] = v.strip('"')
+    return parts[0].upper(), params, value
+
+
+def unescape(s):
+    return s.replace("\\n", "\n").replace("\\N", "\n").replace("\\,", ",").replace("\\;", ";").replace("\\\\", "\\")
+
+
+def parse_dt(value, params):
+    """Devolve (datetime com fuso | date, all_day)."""
+    value = value.strip()
+    if params.get("VALUE") == "DATE" or re.fullmatch(r"\d{8}", value):
+        return date(int(value[:4]), int(value[4:6]), int(value[6:8])), True
+    dt = datetime.strptime(value[:15], "%Y%m%dT%H%M%S")
+    if value.endswith("Z"):
+        return dt.replace(tzinfo=timezone.utc), False
+    tzid = params.get("TZID")
+    if tzid:
+        try:
+            return dt.replace(tzinfo=ZoneInfo(tzid)), False
+        except Exception:
+            pass
+    return dt.replace(tzinfo=LOCAL), False
+
+
+def parse_duration(value):
+    m = re.fullmatch(r"([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?", value.strip())
+    if not m:
+        return timedelta(0)
+    sign = -1 if m.group(1) == "-" else 1
+    w, d, h, mi, s = (int(x or 0) for x in m.groups()[1:])
+    return sign * timedelta(weeks=w, days=d, hours=h, minutes=mi, seconds=s)
+
+
+def parse_events(text):
+    events, current = [], None
+    for line in unfold(text):
+        if line == "BEGIN:VEVENT":
+            current = {"exdates": set()}
+        elif line == "END:VEVENT":
+            if current is not None and "start" in current:
+                events.append(current)
+            current = None
+        elif current is not None:
+            prop = split_prop(line)
+            if not prop:
+                continue
+            name, params, value = prop
+            if name == "SUMMARY":
+                current["title"] = unescape(value)
+            elif name == "LOCATION":
+                current["location"] = unescape(value)
+            elif name == "UID":
+                current["uid"] = value
+            elif name == "STATUS":
+                current["status"] = value.upper()
+            elif name == "DTSTART":
+                current["start"], current["allDay"] = parse_dt(value, params)
+            elif name == "DTEND":
+                current["end"], _ = parse_dt(value, params)
+            elif name == "DURATION":
+                current["duration"] = parse_duration(value)
+            elif name == "RRULE":
+                current["rrule"] = dict(p.split("=", 1) for p in value.split(";") if "=" in p)
+            elif name == "EXDATE":
+                for v in value.split(","):
+                    current["exdates"].add(key_of(parse_dt(v, params)[0]))
+            elif name == "RECURRENCE-ID":
+                current["recurrenceId"] = key_of(parse_dt(value, params)[0])
+    return events
+
+
+def key_of(d):
+    """Chave comparável de uma ocorrência (instante em UTC, ou a data para dias inteiros)."""
+    if isinstance(d, datetime):
+        return d.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    return d.strftime("%Y%m%d")
+
+
+# --- Recorrência ------------------------------------------------------------------------------
+
+def add_months(d, months):
+    y, m = divmod(d.month - 1 + months, 12)
+    return y + d.year, m + 1
+
+
+def nth_weekday(year, month, weekday, n):
+    """n-ésimo dia da semana do mês (n negativo conta a partir do fim); None se não existir."""
+    first = date(year, month, 1)
+    last = (date(year + (month == 12), month % 12 + 1, 1) - timedelta(days=1)).day
+    days = [date(year, month, d) for d in range(1, last + 1) if date(year, month, d).weekday() == weekday]
+    try:
+        return days[n - 1] if n > 0 else days[n]
+    except IndexError:
+        return None
+
+
+def parse_byday(value):
+    out = []
+    for item in value.split(","):
+        m = re.fullmatch(r"([+-]?\d+)?(MO|TU|WE|TH|FR|SA|SU)", item.strip())
+        if m:
+            out.append((int(m.group(1)) if m.group(1) else 0, WEEKDAYS.index(m.group(2))))
+    return out
+
+
+def occurrences(start, rule, window_end):
+    """Datas de início (no mesmo tipo que `start`) geradas pela RRULE, por ordem."""
+    freq = rule.get("FREQ", "DAILY")
+    interval = int(rule.get("INTERVAL", 1))
+    count = int(rule["COUNT"]) if "COUNT" in rule else None
+    until = None
+    if "UNTIL" in rule:
+        until, _ = parse_dt(rule["UNTIL"], {})
+    byday = parse_byday(rule["BYDAY"]) if "BYDAY" in rule else []
+    bymonthday = [int(x) for x in rule["BYMONTHDAY"].split(",")] if "BYMONTHDAY" in rule else []
+    bymonth = [int(x) for x in rule["BYMONTH"].split(",")] if "BYMONTH" in rule else []
+    is_dt = isinstance(start, datetime)
+
+    def at(d):
+        return datetime.combine(d, start.timetz()) if is_dt else d
+
+    def past_until(x):
+        if until is None:
+            return False
+        if isinstance(x, datetime) and isinstance(until, datetime):
+            return x > until
+        return (x.date() if isinstance(x, datetime) else x) > (until.date() if isinstance(until, datetime) else until)
+
+    def past_window(x):
+        return (x.date() if isinstance(x, datetime) else x) > window_end
+
+    produced, step = 0, 0
+    start_day = start.date() if is_dt else start
+    while step < MAX_STEPS:
+        if freq == "DAILY":
+            candidates = [start_day + timedelta(days=step * interval)]
+        elif freq == "WEEKLY":
+            week0 = start_day - timedelta(days=start_day.weekday()) + timedelta(weeks=step * interval)
+            days = sorted(wd for _, wd in byday) if byday else [start_day.weekday()]
+            candidates = [week0 + timedelta(days=wd) for wd in days]
+        elif freq == "MONTHLY":
+            y, m = add_months(start_day, step * interval)
+            candidates = []
+            if byday:
+                for n, wd in byday:
+                    if n:
+                        d = nth_weekday(y, m, wd, n)
+                        if d:
+                            candidates.append(d)
+                    else:
+                        candidates += [d for d in (nth_weekday(y, m, wd, k) for k in range(1, 6)) if d]
+            else:
+                for md in bymonthday or [start_day.day]:
+                    try:
+                        candidates.append(date(y, m, md) if md > 0 else nth_last_day(y, m, md))
+                    except ValueError:
+                        pass
+        elif freq == "YEARLY":
+            y = start_day.year + step * interval
+            candidates = []
+            for mo in bymonth or [start_day.month]:
+                if byday:
+                    candidates += [d for n, wd in byday if (d := nth_weekday(y, mo, wd, n or 1))]
+                else:
+                    try:
+                        candidates.append(date(y, mo, start_day.day))
+                    except ValueError:
+                        pass
+        else:
+            return
+        step += 1
+        for d in sorted(candidates):
+            if d < start_day or (bymonth and d.month not in bymonth and freq != "YEARLY"):
+                continue
+            x = at(d)
+            if past_until(x) or past_window(x):
+                return
+            yield x
+            produced += 1
+            if count is not None and produced >= count:
+                return
+
+
+def nth_last_day(y, m, md):
+    last = (date(y + (m == 12), m % 12 + 1, 1) - timedelta(days=1)).day
+    return date(y, m, last + md + 1)
+
+
+# --- Saída ------------------------------------------------------------------------------------
+
+def to_local(d):
+    return d.astimezone(LOCAL) if isinstance(d, datetime) else d
+
+
+def expand(events, window_start, window_end, cal):
+    overrides = {(e.get("uid"), e["recurrenceId"]): e for e in events if "recurrenceId" in e}
+    out = []
+    for e in events:
+        if "recurrenceId" in e or e.get("status") == "CANCELLED":
+            continue
+        start = e["start"]
+        if "end" in e:
+            length = e["end"] - start
+        elif "duration" in e:
+            length = e["duration"]
+        else:
+            length = timedelta(days=1) if e["allDay"] else timedelta(0)
+        starts = occurrences(start, e["rrule"], window_end) if "rrule" in e else [start]
+        for s in starts:
+            k = key_of(s)
+            if k in e["exdates"]:
+                continue
+            item = overrides.get((e.get("uid"), k))
+            if item is not None:
+                if item.get("status") == "CANCELLED":
+                    continue
+                s = item["start"]
+                end = item.get("end", s + length)
+                title, location = item.get("title", e.get("title", "")), item.get("location", e.get("location", ""))
+            else:
+                end = s + length
+                title, location = e.get("title", ""), e.get("location", "")
+            day_end = to_local(end)
+            day_end = (day_end.date() if isinstance(day_end, datetime) else day_end)
+            if day_end < window_start:
+                continue
+            ls, le = to_local(s), to_local(end)
+            out.append({
+                "title": title or "(sem título)",
+                "location": location,
+                "allDay": e["allDay"],
+                "start": ls.isoformat(),
+                "end": le.isoformat(),
+                "calendar": cal.get("name", ""),
+                "color": cal.get("color", ""),
+            })
+    return out
+
+
+def main():
+    if not os.path.exists(CONFIG):
+        print(f"Sem calendários: criar {CONFIG}", file=sys.stderr)
+        return 0
+    calendars = json.load(open(CONFIG)).get("calendars", [])
+    try:
+        previous = json.load(open(CACHE))
+    except Exception:
+        previous = {"events": []}
+
+    today = date.today()
+    window_start, window_end = today - timedelta(days=45), today + timedelta(days=120)
+    events, errors = [], []
+    for cal in calendars:
+        try:
+            req = urllib.request.Request(cal["url"], headers={"User-Agent": "quickshell-calendar"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                text = r.read().decode("utf-8", "replace")
+            events += expand(parse_events(text), window_start, window_end, cal)
+        except Exception as ex:
+            errors.append(f"{cal.get('name', '?')}: {ex}")
+            events += [e for e in previous.get("events", []) if e.get("calendar") == cal.get("name")]
+
+    events.sort(key=lambda e: e["start"])
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(CACHE))
+    with os.fdopen(fd, "w") as f:
+        json.dump({"updated": datetime.now(LOCAL).isoformat(), "errors": errors, "events": events}, f, ensure_ascii=False)
+    os.replace(tmp, CACHE)
+    for e in errors:
+        print(e, file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

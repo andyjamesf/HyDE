@@ -17,10 +17,8 @@
         "../dots/hyde.toml",
         "../dots/hyprland.toml",
         "../dots/wallbash.toml",
-        "../dots/waybar.toml",
+        "../dots/quickshell.toml", # bar, notifications, launcher, lockscreen (replaces waybar, dunst, wlogout)
         "../dots/rofi.toml",
-        "../dots/dunst.toml",
-        "../dots/wlogout.toml",
         "../dots/archives.toml",
     ]
 

@@ -1,0 +1,72 @@
+{
+    "ilhas": {
+        "label": "Ilhas",
+        "description": "Grupos flutuantes com tudo: menu HyDE, janela ativa, AI usage",
+        "style": "islands",
+        "height": 23,
+        "margin": 4,
+        "left": [["hyde"], ["workspaces"], ["activeWindow"]],
+        "center": [["clock"]],
+        "right": [["media"], ["tray"], ["audio", "mic", "brightness", "network", "bluetooth", "battery"], ["idle", "notifications", "controlCenter", "power"]]
+    },
+    "minimal": {
+        "label": "Minimal",
+        "description": "Só o essencial: workspaces, relógio e estado",
+        "style": "islands",
+        "height": 21,
+        "margin": 4,
+        "left": [["workspaces"]],
+        "center": [["clock"]],
+        "right": [["tray"], ["audio", "network", "battery"], ["controlCenter", "power"]]
+    },
+    "compacta": {
+        "label": "Compacta",
+        "description": "Faixa contínua e fina de ponta a ponta",
+        "style": "continuous",
+        "height": 19,
+        "left": [["hyde", "workspaces", "activeWindow"]],
+        "center": [["clock"]],
+        "right": [["media", "tray", "audio", "mic", "brightness", "network", "bluetooth", "battery", "notifications", "controlCenter", "power"]]
+    },
+    "flutuante": {
+        "label": "Flutuante",
+        "description": "Uma única ilha ao centro, estilo dock",
+        "style": "islands",
+        "height": 23,
+        "margin": 6,
+        "left": [],
+        "center": [["workspaces", "clock", "audio", "network", "battery", "notifications", "controlCenter", "power"]],
+        "right": []
+    },
+    "produtividade": {
+        "label": "Produtividade",
+        "description": "CPU, memória, temperatura e uso das ferramentas de IA",
+        "style": "islands",
+        "height": 23,
+        "margin": 4,
+        "left": [["workspaces"], ["activeWindow"]],
+        "center": [["clock"]],
+        "right": [["stats"], ["tray"], ["audio", "network", "battery"], ["idle", "controlCenter", "power"]]
+    },
+    "media": {
+        "label": "Media",
+        "description": "Música ao centro com visualizador",
+        "style": "islands",
+        "height": 23,
+        "margin": 4,
+        "left": [["workspaces"], ["clock"]],
+        "center": [["media"]],
+        "right": [["tray"], ["audio", "network", "battery"], ["notifications", "controlCenter", "power"]]
+    },
+    "fundo": {
+        "label": "Fundo",
+        "description": "Minimal, no fundo do ecrã",
+        "style": "islands",
+        "position": "bottom",
+        "height": 23,
+        "margin": 4,
+        "left": [["hyde"], ["workspaces"]],
+        "center": [["clock"]],
+        "right": [["tray"], ["audio", "network", "battery"], ["notifications", "controlCenter", "power"]]
+    }
+}

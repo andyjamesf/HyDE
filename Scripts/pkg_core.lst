@@ -26,12 +26,15 @@ qt5-graphicaleffects                                   # for sddm theme effects
 
 # --------------------------------------------------- // Window Manager
 hyprland                                               # wlroots-based wayland compositor
-dunst                                                  # notification daemon
-rofi                                                   # application launcher
-waybar                                                 # system bar
+rofi                                                   # application launcher (HyDE's pickers)
+quickshell                                             # desktop shell: bar, notifications, launcher, lockscreen
+inter-font                                             # quickshell UI font
+ttf-material-symbols-variable-git                      # quickshell icon font
+upower                                                 # battery (quickshell)
+power-profiles-daemon                                  # power profiles (quickshell)
+wl-clipboard                                           # clipboard (quickshell launcher)
 awww                                                   # wallpaper
 hyprlock                                               # lock screen
-wlogout                                                # logout menu
 grim                                                   # screenshot tool
 hyprpicker                                             # color picker
 slurp                                                  # region select for screenshot/screenshare
