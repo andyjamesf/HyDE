@@ -13,7 +13,7 @@ BarItem {
     icon: "schedule"
     iconColor: Theme.primary
     text: Utils.formatDate(clock.date, cfg.format) + (cfg.showDate ? "  ·  " + Utils.formatDate(clock.date, cfg.dateFormat) : "")
-    tooltip: Utils.formatDate(clock.date, "dddd, d 'de' MMMM")
+    tooltip: Utils.formatDate(clock.date, "dddd, d MMMM")
     popoutName: "calendar"
     popout: Component {
         CalendarView {}

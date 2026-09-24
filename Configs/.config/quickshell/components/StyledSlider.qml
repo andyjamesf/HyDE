@@ -1,8 +1,8 @@
 import QtQuick
 import qs.services
 
-// Slider ao estilo Material 3 "expressive": trilho grosso com o ícone dentro, uma pega fina em pé
-// que separa a parte ativa da inativa, e o valor à direita, fora do trilho.
+// Slider em barra: um trilho arredondado que enche e esvazia, com o ícone dentro e o valor à direita,
+// fora do trilho.
 // `value` vem de fora (0..1); ao arrastar, emite moved() e mostra o valor local para não saltar.
 Item {
     id: root
@@ -21,26 +21,14 @@ Item {
     property real dragValue: 0
     readonly property real shown: dragging ? dragValue : Math.max(0, Math.min(1, value))
 
-    // Geometria: pega de 4 px com 4 px de folga de cada lado.
     property int trackHeight: 32
-    readonly property int handleWidth: 4
-    readonly property int gap: 4
-    readonly property real trackWidth: track.width
-    property real handleX: shown * (trackWidth - handleWidth)
-
-    Behavior on handleX {
-        enabled: !root.dragging
-        NumberAnim {
-            duration: Anim.fast
-        }
-    }
 
     implicitWidth: 240
-    implicitHeight: trackHeight + 8
+    implicitHeight: trackHeight
     opacity: enabled ? 1 : 0.45
 
     function setFromX(x) {
-        dragValue = Math.max(0, Math.min(1, x / trackWidth));
+        dragValue = Math.max(0, Math.min(1, x / track.width));
         moved(dragValue);
     }
 
@@ -52,50 +40,36 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         height: root.trackHeight
 
-        // Parte ativa: redonda do lado de fora, quase reta junto à pega.
         Rectangle {
-            visible: width > 0
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.max(0, root.handleX - root.gap)
-            height: parent.height
-            topLeftRadius: height / 2
-            bottomLeftRadius: height / 2
-            topRightRadius: Math.min(4, width / 2)
-            bottomRightRadius: Math.min(4, width / 2)
-            color: root.accent
-        }
-
-        Rectangle {
-            readonly property real start: root.handleX + root.handleWidth + root.gap
-            visible: width > 0
-            x: start
-            anchors.verticalCenter: parent.verticalCenter
-            width: Math.max(0, parent.width - start)
-            height: parent.height
-            topRightRadius: height / 2
-            bottomRightRadius: height / 2
-            topLeftRadius: Math.min(4, width / 2)
-            bottomLeftRadius: Math.min(4, width / 2)
+            anchors.fill: parent
+            radius: height / 2
             color: Theme.surfaceContainerHighest
         }
 
+        // Parte cheia: cresce e encolhe com o valor (nunca menor que um círculo, para o ícone).
         Rectangle {
-            x: root.handleX
-            anchors.verticalCenter: parent.verticalCenter
-            width: root.handleWidth
-            height: root.height
-            radius: width / 2
+            id: fill
+            height: parent.height
+            width: Math.max(height, root.shown * parent.width)
+            radius: height / 2
             color: root.accent
+
+            Behavior on width {
+                enabled: !root.dragging
+                NumberAnim {
+                    duration: Anim.fast
+                }
+            }
         }
 
         MaterialIcon {
             visible: root.icon !== ""
-            x: Theme.space3
+            x: Math.round((root.trackHeight - width) / 2)
             anchors.verticalCenter: parent.verticalCenter
             icon: root.icon
             size: Math.min(20, Math.round(root.trackHeight * 0.55))
             fill: 1
-            color: root.handleX - root.gap > x + width ? Theme.onPrimary : Theme.textDim
+            color: Theme.onPrimary
         }
 
         MouseArea {
@@ -109,7 +83,7 @@ Item {
 
             onPressed: mouse => {
                 // Clique no ícone: ação própria (normalmente silenciar), sem mexer no valor.
-                if (root.icon !== "" && mouse.x < Theme.space3 + 24) {
+                if (root.icon !== "" && mouse.x < root.trackHeight) {
                     mouse.accepted = false;
                     root.iconClicked();
                     return;

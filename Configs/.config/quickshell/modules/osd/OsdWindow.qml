@@ -104,7 +104,7 @@ PanelWindow {
             anchors.rightMargin: 14
             anchors.verticalCenter: parent.verticalCenter
             horizontalAlignment: Text.AlignRight
-            text: Osd.muted ? "Mudo" : `${Math.round(Osd.value * 100)}%`
+            text: Osd.muted ? "Muted" : `${Math.round(Osd.value * 100)}%`
             font.weight: Font.DemiBold
         }
     }

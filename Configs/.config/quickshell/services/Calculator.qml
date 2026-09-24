@@ -102,20 +102,20 @@ Singleton {
             if (t === "(") {
                 const v = expr();
                 if (next() !== ")")
-                    throw "parêntese";
+                    throw "parenthesis";
                 return v;
             }
             if (constants[t] !== undefined)
                 return constants[t];
             if (functions[t]) {
                 if (next() !== "(")
-                    throw "função";
+                    throw "function";
                 const v = expr();
                 if (next() !== ")")
-                    throw "parêntese";
+                    throw "parenthesis";
                 return functions[t](v);
             }
-            throw "símbolo";
+            throw "symbol";
         }
 
         try {

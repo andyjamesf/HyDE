@@ -73,6 +73,15 @@ Singleton {
         if (isHydeOsd(n))
             return;
         n.tracked = true;
+
+        // Mesma app e mesmo título que um popup ainda à vista (ex.: mudar de layout várias vezes
+        // seguidas): a nova substitui a antiga, em vez de se empilharem. O `-r` do notify-send só
+        // o faria se a app soubesse o id que o servidor lhe deu.
+        for (const old of popups.filter(p => p !== n && p.appName === n.appName && p.summary === n.summary)) {
+            popups = popups.filter(p => p !== old);
+            old.expire();
+        }
+
         const t = Object.assign({}, times);
         t[n.id] = new Date();
         times = t;

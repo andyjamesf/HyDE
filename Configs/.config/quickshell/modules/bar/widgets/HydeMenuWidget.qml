@@ -6,11 +6,11 @@ import qs.services
 BarItem {
     icon: "palette"
     iconColor: Theme.primary
-    tooltip: `Opções do HyDE e da shell\nLayout: ${BarLayout.preset.label ?? BarLayout.current}`
+    tooltip: `HyDE and shell options\nLayout: ${BarLayout.preset.label ?? BarLayout.current}`
     menuOnLeftClick: true
     menu: [
         {
-            label: "󰕮  Layout da barra",
+            label: "󰕮  Bar layout",
             items: BarLayout.names.map(name => ({
                         label: BarLayout.presets[name].label ?? name,
                         checked: name === BarLayout.current,
@@ -18,7 +18,7 @@ BarItem {
                     }))
         },
         {
-            label: "󰆧  Ilhas da barra",
+            label: "󰆧  Bar islands",
             items: BarLayout.pillStyles.map(s => ({
                         label: s.label,
                         checked: s.id === BarLayout.pillStyle,
@@ -28,26 +28,52 @@ BarItem {
                     sep: true
                 }
             ], [1, 0.85, 0.7, 0.5].map(v => ({
-                        label: `Opacidade ${Math.round(v * 100)}%`,
+                        label: `Opacity ${Math.round(v * 100)}%`,
                         checked: Math.abs(BarLayout.opacity - v) < 0.01,
                         action: () => BarLayout.setPillOpacity(v)
                     })))
         },
         {
-            label: "󰏘  Cores da shell",
+            label: "󰁌  Bar height",
             items: [
                 {
-                    label: "Tema do HyDE (cores da barra)",
+                    label: `Layout default (${BarLayout.layoutHeight} px)`,
+                    checked: Prefs.barHeight === 0,
+                    action: () => BarLayout.setHeight(0)
+                }
+            ].concat(BarLayout.heights.map(h => ({
+                        label: `${h.label} (${h.value} px)`,
+                        checked: Prefs.barHeight === h.value,
+                        action: () => BarLayout.setHeight(h.value)
+                    })), [
+                {
+                    sep: true
+                },
+                {
+                    label: "Taller (+2 px)",
+                    action: () => BarLayout.adjustHeight(2)
+                },
+                {
+                    label: "Shorter (−2 px)",
+                    action: () => BarLayout.adjustHeight(-2)
+                }
+            ])
+        },
+        {
+            label: "󰏘  Shell colors",
+            items: [
+                {
+                    label: "HyDE theme (bar colors)",
                     checked: Theme.source === "hyde",
                     action: () => Theme.setColorSource("hyde")
                 },
                 {
-                    label: "Paleta do tema (wallbash)",
+                    label: "Theme palette (wallbash)",
                     checked: Theme.source === "wallbash",
                     action: () => Theme.setColorSource("wallbash")
                 },
                 {
-                    label: "Cores do wallpaper",
+                    label: "Wallpaper colors",
                     checked: Theme.source === "wallpaper",
                     action: () => Theme.setColorSource("wallpaper")
                 },
@@ -55,7 +81,7 @@ BarItem {
                     sep: true
                 },
                 {
-                    label: "Modo wallbash do HyDE (sistema)…",
+                    label: "HyDE wallbash mode (system)…",
                     cmd: "hyde-shell wallbashtoggle.sh -m"
                 }
             ]

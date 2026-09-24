@@ -18,7 +18,7 @@ Singleton {
     readonly property var discovered: devices.filter(d => !d.paired && !d.bonded && d.deviceName !== "")
 
     readonly property string icon: !enabled ? "bluetooth_disabled" : connected.length > 0 ? "bluetooth_connected" : "bluetooth"
-    readonly property string summary: !enabled ? "Desligado" : connected.length === 1 ? connected[0].name : connected.length > 1 ? `${connected.length} dispositivos` : "Ligado"
+    readonly property string summary: !enabled ? "Off" : connected.length === 1 ? connected[0].name : connected.length > 1 ? `${connected.length} devices` : "On"
 
     function setEnabled(on) {
         if (adapter)

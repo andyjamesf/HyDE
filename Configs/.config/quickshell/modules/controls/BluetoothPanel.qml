@@ -31,7 +31,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: Bluetooth.enabled && Bluetooth.paired.length > 0
-        text: "Os meus dispositivos"
+        text: "My devices"
     }
 
     Repeater {
@@ -43,7 +43,7 @@ ColumnLayout {
             icon: Bluetooth.iconFor(modelData)
             iconFill: modelData.connected ? 1 : 0
             title: modelData.name
-            subtitle: modelData.state === QsBluetooth.BluetoothDeviceState.Connecting ? "A ligar…" : modelData.connected ? "Ligado" + (modelData.batteryAvailable ? ` · ${Math.round(modelData.battery * 100)}% bateria` : "") : "Desligado"
+            subtitle: modelData.state === QsBluetooth.BluetoothDeviceState.Connecting ? "Connecting…" : modelData.connected ? "Connected" + (modelData.batteryAvailable ? ` · ${Math.round(modelData.battery * 100)}% bateria` : "") : "Disconnected"
             highlighted: modelData.connected
             busy: modelData.state === QsBluetooth.BluetoothDeviceState.Connecting || modelData.state === QsBluetooth.BluetoothDeviceState.Disconnecting
             onClicked: Bluetooth.activate(modelData)
@@ -63,7 +63,7 @@ ColumnLayout {
         Layout.fillWidth: true
 
         SectionLabel {
-            text: Bluetooth.scanning ? "À procura…" : "Outros dispositivos"
+            text: Bluetooth.scanning ? "Searching…" : "Other devices"
         }
 
         IconButton {
@@ -94,7 +94,7 @@ ColumnLayout {
                     width: found.width
                     icon: Bluetooth.iconFor(modelData)
                     title: modelData.name
-                    subtitle: modelData.pairing ? "A emparelhar…" : "Clique para emparelhar"
+                    subtitle: modelData.pairing ? "Pairing…" : "Click to pair"
                     busy: modelData.pairing
                     onClicked: Bluetooth.activate(modelData)
                 }
@@ -105,7 +105,7 @@ ColumnLayout {
     StyledText {
         visible: Bluetooth.enabled && !Bluetooth.scanning && Bluetooth.discovered.length === 0
         Layout.fillWidth: true
-        text: "Toque na lupa para procurar dispositivos novos."
+        text: "Tap the magnifier to search for new devices."
         font.pixelSize: Theme.labelSmall
         color: Theme.textFaint
         wrapMode: Text.WordWrap
@@ -114,7 +114,7 @@ ColumnLayout {
     ListRow {
         Layout.fillWidth: true
         icon: "settings"
-        title: "Definições de Bluetooth"
+        title: "Bluetooth settings"
         onClicked: Utils.run("blueman-manager")
     }
 }

@@ -8,7 +8,7 @@ BarItem {
     shown: Bluetooth.available
     icon: Bluetooth.icon
     iconColor: Bluetooth.enabled ? Theme.text : Theme.textFaint
-    tooltip: !Bluetooth.enabled ? "Bluetooth desligado" : Bluetooth.connected.length > 0 ? Bluetooth.connected.map(d => d.name + (d.batteryAvailable ? ` (${Math.round(d.battery * 100)}%)` : "")).join("\n") : "Bluetooth ligado, sem dispositivos"
+    tooltip: !Bluetooth.enabled ? "Bluetooth off" : Bluetooth.connected.length > 0 ? Bluetooth.connected.map(d => d.name + (d.batteryAvailable ? ` (${Math.round(d.battery * 100)}%)` : "")).join("\n") : "Bluetooth on, no devices"
 
     popoutName: "bluetooth"
     popout: Component {

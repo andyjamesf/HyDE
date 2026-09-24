@@ -5,13 +5,15 @@ import qs.services
 // Menu em popup ancorado a um item da barra.
 // Entradas: { label, cmd } | { label, action: função } | { label, items } | { sep: true };
 // `checked: true` mostra um visto à direita (para opções exclusivas, como o layout atual).
-// Um submenu substitui a lista no mesmo sítio, com uma linha "Voltar" no topo.
+// Um submenu substitui a lista no mesmo sítio, com uma linha "Back" no topo.
 PopupWindow {
     id: menu
 
     required property Item target
     required property var items
     property var stack: [items]
+    // Submenus a abrir logo ao criar (índices em cada nível); usado pelos testes por IPC.
+    property var path: []
     readonly property var current: stack[stack.length - 1]
     readonly property bool below: BarLayout.atTop
 
@@ -26,11 +28,39 @@ PopupWindow {
     grabFocus: true
     visible: true
     color: "transparent"
-    implicitWidth: 240
+    // Largura à medida do texto mais comprido do nível atual (entre 200 e 360 px).
+    implicitWidth: {
+        let widest = 0;
+        for (const item of current)
+            if (!item.sep)
+                widest = Math.max(widest, measure(item.label ?? ""));
+        return Math.round(Math.min(360, Math.max(200, widest + 2 * Theme.space3 + 18 + Theme.space2 + 2 * (Theme.space1 + 1))));
+    }
+
+    function measure(text) {
+        return metrics.advanceWidth(text);
+    }
+
+    FontMetrics {
+        id: metrics
+        font.family: Config.appearance.font
+        font.pixelSize: Theme.bodyMedium
+    }
     implicitHeight: list.implicitHeight + 2 * Theme.space1 + 2
 
     onVisibleChanged: if (!visible)
         dismissed()
+
+    Component.onCompleted: {
+        let s = [items];
+        for (const i of path) {
+            const entry = s[s.length - 1][i];
+            if (!entry?.items)
+                break;
+            s.push(entry.items);
+        }
+        stack = s;
+    }
 
     function activate(item) {
         if (item.back) {
@@ -105,7 +135,7 @@ PopupWindow {
                             anchors.leftMargin: row.modelData.back ? Theme.space2 : Theme.space3
                             font.pixelSize: Theme.bodyMedium
                             anchors.verticalCenter: parent.verticalCenter
-                            text: row.modelData.back ? "Voltar" : (row.modelData.label ?? "")
+                            text: row.modelData.back ? "Back" : (row.modelData.label ?? "")
                         }
 
                         MaterialIcon {

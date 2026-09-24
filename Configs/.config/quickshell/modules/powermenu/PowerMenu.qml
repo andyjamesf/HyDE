@@ -18,42 +18,42 @@ PanelWindow {
     readonly property var actions: [
         {
             icon: "lock",
-            label: "Bloquear",
+            label: "Lock",
             key: Qt.Key_B,
             cmd: "loginctl lock-session",
             confirm: false
         },
         {
             icon: "bedtime",
-            label: "Suspender",
+            label: "Suspend",
             key: Qt.Key_S,
             cmd: "systemctl suspend",
             confirm: false
         },
         {
             icon: "downloading",
-            label: "Hibernar",
+            label: "Hibernate",
             key: Qt.Key_H,
             cmd: "systemctl hibernate",
             confirm: false
         },
         {
             icon: "logout",
-            label: "Sair",
+            label: "Log out",
             key: Qt.Key_L,
             cmd: "hyprctl dispatch 'hl.dsp.exit()'",
             confirm: true
         },
         {
             icon: "restart_alt",
-            label: "Reiniciar",
+            label: "Restart",
             key: Qt.Key_R,
             cmd: "systemctl reboot",
             confirm: true
         },
         {
             icon: "power_settings_new",
-            label: "Desligar",
+            label: "Shut down",
             key: Qt.Key_D,
             cmd: "systemctl poweroff",
             confirm: true
@@ -262,7 +262,7 @@ PanelWindow {
 
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
-                text: win.armed >= 0 ? "Carrega outra vez para confirmar" : "← → escolher · Enter · Esc"
+                text: win.armed >= 0 ? "Press again to confirm" : "← → choose · Enter · Esc"
                 font.pixelSize: Theme.labelMedium
                 color: win.armed >= 0 ? Theme.error : Theme.textFaint
             }

@@ -25,7 +25,7 @@ Singleton {
     }
 
     readonly property int profile: PowerProfiles.profile
-    readonly property string profileName: ["Poupança", "Equilibrado", "Desempenho"][profile] ?? ""
+    readonly property string profileName: ["Power saver", "Balanced", "Performance"][profile] ?? ""
     readonly property string profileIcon: ["energy_savings_leaf", "balance", "speed"][profile] ?? "balance"
 
     function setProfile(p) {

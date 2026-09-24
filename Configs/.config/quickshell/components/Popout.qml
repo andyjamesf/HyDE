@@ -37,9 +37,19 @@ PopupWindow {
         visible = false;
     }
 
+    // A grab só começa depois de a popout estar no ecrã: ao trocar de popout, a da anterior ainda
+    // está a sair e o Hyprland cancelava logo a nova (a popout abria e fechava no mesmo instante).
+    property bool grabReady: false
+
+    Timer {
+        running: popout.visible && !popout.grabReady
+        interval: 60
+        onTriggered: popout.grabReady = true
+    }
+
     HyprlandFocusGrab {
         windows: popout.barWindow ? [popout, popout.barWindow] : [popout]
-        active: popout.visible
+        active: popout.visible && popout.grabReady
         onCleared: popout.close()
     }
 

@@ -28,7 +28,7 @@ ColumnLayout {
         visible: !root.player
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
-        text: "Nada a tocar"
+        text: "Nothing playing"
         color: Theme.textDim
         padding: 12
     }
@@ -70,7 +70,7 @@ ColumnLayout {
 
             StyledText {
                 Layout.fillWidth: true
-                text: Media.title || "Sem título"
+                text: Media.title || "Untitled"
                 font.pixelSize: Theme.titleMedium
                 font.weight: Font.DemiBold
             }

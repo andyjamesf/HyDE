@@ -23,8 +23,8 @@ ColumnLayout {
         onBack: root.back()
         visible: root.showHeader
         icon: Notifs.dnd ? "notifications_off" : "notifications"
-        title: "Notificações"
-        subtitle: Notifs.count === 0 ? "Nenhuma" : Notifs.count === 1 ? "1 notificação" : `${Notifs.count} notificações`
+        title: "Notifications"
+        subtitle: Notifs.count === 0 ? "None" : Notifs.count === 1 ? "1 notification" : `${Notifs.count} notifications`
 
         IconButton {
             icon: "do_not_disturb_on"
@@ -46,7 +46,7 @@ ColumnLayout {
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
         padding: 16
-        text: Notifs.dnd ? "Não incomodar está ligado" : "Tudo em dia"
+        text: Notifs.dnd ? "Do not disturb is on" : "All caught up"
         color: Theme.textFaint
     }
 

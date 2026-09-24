@@ -10,7 +10,7 @@ BarItem {
     icon: Brightness.icon
     iconFill: 1
     text: cfg.showPercent ? `${Brightness.percent}%` : ""
-    tooltip: `Brilho: ${Brightness.percent}%`
+    tooltip: `Brightness: ${Brightness.percent}%`
 
     onScrolled: direction => Brightness.change(direction * cfg.step)
     popoutName: "brightness"

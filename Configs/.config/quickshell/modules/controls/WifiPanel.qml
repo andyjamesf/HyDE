@@ -25,7 +25,7 @@ ColumnLayout {
         onBack: root.back()
         icon: Network.wired ? "lan" : Network.icon
         title: "Wi-Fi"
-        subtitle: Network.wired ? "Ligado por cabo" : Network.activeWifi ? `Ligado a ${Network.name}` : Network.wifiEnabled ? "Sem ligação" : "Desligado"
+        subtitle: Network.wired ? "Wired connection" : Network.activeWifi ? `Connected to ${Network.name}` : Network.wifiEnabled ? "Not connected" : "Desligado"
         hasSwitch: true
         checked: Network.wifiEnabled
         onToggled: Network.setWifiEnabled(!Network.wifiEnabled)
@@ -53,7 +53,7 @@ ColumnLayout {
 
             StyledText {
                 Layout.fillWidth: true
-                text: `Palavra-passe de ${Network.pendingNetwork?.name ?? ""}`
+                text: `Password for ${Network.pendingNetwork?.name ?? ""}`
                 font.weight: Font.DemiBold
             }
 
@@ -61,7 +61,7 @@ ColumnLayout {
                 id: password
                 Layout.fillWidth: true
                 icon: "key"
-                placeholder: "Palavra-passe"
+                placeholder: "Password"
                 echoMode: TextInput.Password
                 onAccepted: connect.clicked()
                 onVisibleChanged: if (visible) {
@@ -112,7 +112,7 @@ ColumnLayout {
                     icon: Network.signalIcon(modelData.signalStrength)
                     iconFill: 1
                     title: modelData.name
-                    subtitle: modelData.connected ? "Ligado" : modelData.stateChanging ? "A ligar…" : modelData.known ? "Guardada" : Network.isSecure(modelData) ? "Protegida" : "Aberta"
+                    subtitle: modelData.connected ? "Ligado" : modelData.stateChanging ? "A ligar…" : modelData.known ? "Guardada" : Network.isSecure(modelData) ? "Secured" : "Open"
                     highlighted: modelData.connected
                     busy: modelData.stateChanging
                     onClicked: {
@@ -144,7 +144,7 @@ ColumnLayout {
         visible: Network.wifiEnabled && Network.networks.length === 0
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
-        text: "À procura de redes…"
+        text: "Searching for networks…"
         color: Theme.textDim
         padding: 8
     }
@@ -152,7 +152,7 @@ ColumnLayout {
     ListRow {
         Layout.fillWidth: true
         icon: "settings"
-        title: "Definições de rede"
+        title: "Network settings"
         onClicked: Utils.run("nm-connection-editor")
     }
 }

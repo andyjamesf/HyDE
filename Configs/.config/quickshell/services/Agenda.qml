@@ -91,7 +91,7 @@ Singleton {
         command: ["python3", Quickshell.shellPath("scripts/ical_events.py")]
         stderr: StdioCollector {
             onStreamFinished: if (text.trim() !== "")
-                console.warn("calendário:", text.trim())
+                console.warn("calendar:", text.trim())
         }
     }
 

@@ -9,7 +9,7 @@ BarItem {
     icon: Audio.micIcon
     iconFill: Audio.micMuted ? 0 : 1
     iconColor: Audio.micMuted ? Theme.textFaint : Theme.text
-    tooltip: `${Audio.nameOf(Audio.source)}\n${Audio.micMuted ? "Microfone desligado" : Math.round(Audio.micVolume * 100) + "%"}`
+    tooltip: `${Audio.nameOf(Audio.source)}\n${Audio.micMuted ? "Microphone muted" : Math.round(Audio.micVolume * 100) + "%"}`
 
     onRightClicked: Audio.toggleMicMute()
     popout: Component {

@@ -25,6 +25,22 @@ Singleton {
     property var popoutOwner: null
     property string requestedPopoutScreen: ""
 
+    // Menus e tooltips da barra pedidos por IPC (para testar sem rato): "nome" ou "nome:i:j" abre
+    // o menu do widget e entra nos submenus i, j…; vazio fecha.
+    property string requestedMenu: ""
+    property string requestedTooltip: ""
+
+    function requestMenu(spec) {
+        requestedPopoutScreen = Hyprland.focusedMonitor?.name ?? "";
+        requestedMenu = "";
+        requestedMenu = spec;
+    }
+
+    function requestTooltip(name) {
+        requestedPopoutScreen = Hyprland.focusedMonitor?.name ?? "";
+        requestedTooltip = name;
+    }
+
     function requestPopout(name) {
         requestedPopoutScreen = Hyprland.focusedMonitor?.name ?? "";
         requestedPopout = "";

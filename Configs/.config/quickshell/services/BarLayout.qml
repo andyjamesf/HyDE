@@ -28,7 +28,29 @@ Singleton {
     readonly property bool islands: style === "islands"
     readonly property string position: preset.position ?? Config.bar.position
     readonly property bool atTop: position !== "bottom"
-    readonly property int height: preset.height ?? 28
+    // Altura escolhida no menu/IPC, ou a do layout. O texto, os ícones e o raio acompanham-na.
+    readonly property int layoutHeight: preset.height ?? 28
+    readonly property int height: Prefs.barHeight > 0 ? Prefs.barHeight : layoutHeight
+    readonly property int minHeight: 16
+    readonly property int maxHeight: 40
+    readonly property var heights: [
+        {
+            label: "Short",
+            value: 19
+        },
+        {
+            label: "Normal",
+            value: 23
+        },
+        {
+            label: "Tall",
+            value: 27
+        },
+        {
+            label: "Extra tall",
+            value: 32
+        }
+    ]
     readonly property int margin: islands ? (preset.margin ?? 4) : 0
     readonly property int spacing: preset.spacing ?? 4
     readonly property int radius: Math.min(preset.radius ?? hyprRounding, Math.floor(height / 2))
@@ -38,27 +60,27 @@ Singleton {
     readonly property var pillStyles: [
         {
             id: "surface",
-            label: "Fundo do tema"
+            label: "Theme background"
         },
         {
             id: "tint",
-            label: "Fundo com acento"
+            label: "Accent tint"
         },
         {
             id: "container",
-            label: "Destacado"
+            label: "Raised"
         },
         {
             id: "accent",
-            label: "Cor de acento"
+            label: "Accent color"
         },
         {
             id: "glass",
-            label: "Vidro"
+            label: "Glass"
         },
         {
             id: "outline",
-            label: "Só contorno"
+            label: "Outline only"
         }
     ]
     readonly property string pillStyle: Prefs.pillStyle || preset.pillStyle || Config.bar.pillStyle
@@ -101,6 +123,16 @@ Singleton {
         Prefs.save();
     }
 
+    // 0 volta à altura do layout.
+    function setHeight(value) {
+        Prefs.barHeight = value > 0 ? Math.max(minHeight, Math.min(maxHeight, Math.round(value))) : 0;
+        Prefs.save();
+    }
+
+    function adjustHeight(step) {
+        setHeight(height + step);
+    }
+
     function setPillOpacity(value) {
         Prefs.pillOpacity = value;
         Prefs.save();
@@ -114,12 +146,12 @@ Singleton {
 
     function select(name) {
         if (!presets[name]) {
-            console.warn(`layout desconhecido: "${name}"`);
+            console.warn(`unknown layout: "${name}"`);
             return;
         }
         Prefs.layout = name;
         Prefs.save();
-        Utils.run(`notify-send -a "Quickshell" -r 91 -t 1500 -h int:transient:1 -i preferences-desktop "Layout da barra" "${presets[name].label ?? name}"`);
+        Utils.run(`notify-send -a "Quickshell" -r 91 -t 1500 -h int:transient:1 -i preferences-desktop "Bar layout" "${presets[name].label ?? name}"`);
     }
 
     function cycle(step) {
@@ -135,7 +167,7 @@ Singleton {
             try {
                 root.presets = JSON.parse(text());
             } catch (e) {
-                console.warn("layouts.json inválido:", e);
+                console.warn("invalid layouts.json:", e);
             }
         }
     }

@@ -69,7 +69,7 @@ Item {
         StyledText {
             Layout.alignment: Qt.AlignHCenter
             // Só a primeira letra em maiúscula ("Quarta-feira, 23 de setembro").
-            text: Utils.formatDate(clock.date, "dddd, d 'de' MMMM").replace(/^./, c => c.toUpperCase())
+            text: Utils.formatDate(clock.date, "dddd, d MMMM").replace(/^./, c => c.toUpperCase())
             font.pixelSize: Theme.titleLarge
             color: Theme.textDim
         }
@@ -195,7 +195,7 @@ Item {
                 StyledText {
                     visible: input.text === ""
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Lock.authenticating ? "A verificar…" : "Palavra-passe"
+                    text: Lock.authenticating ? "Checking…" : "Password"
                     color: Theme.textFaint
                     font.pixelSize: Theme.titleMedium
                     font.letterSpacing: 0

@@ -195,8 +195,20 @@ ShellRoot {
             BarLayout.cycle(-1);
         }
         // "calendar", "media", "audio", "network", "bluetooth", "battery" ou "brightness"
+        // Abre a popout de um widget; "" fecha a que estiver aberta.
         function popout(name: string): void {
-            ShellState.requestPopout(name);
+            if (name === "")
+                ShellState.popoutOwner = null;
+            else
+                ShellState.requestPopout(name);
+        }
+        // Abre o menu de um widget ("hyde", "hyde:0" entra no 1.º submenu); "" fecha.
+        function menu(spec: string): void {
+            ShellState.requestMenu(spec);
+        }
+        // Mostra a tooltip de um widget (o id do layout, ex.: "clock"); "" esconde.
+        function tooltip(name: string): void {
+            ShellState.requestTooltip(name);
         }
         // Fundo das ilhas: surface, tint, container, accent, glass, outline ou "#rrggbb".
         function pill(style: string): void {
@@ -204,6 +216,16 @@ ShellRoot {
         }
         function opacity(value: real): void {
             BarLayout.setPillOpacity(value);
+        }
+        // Altura da barra em px (0 volta à do layout); taller/shorter mudam 2 px.
+        function height(value: int): void {
+            BarLayout.setHeight(value);
+        }
+        function taller(): void {
+            BarLayout.adjustHeight(2);
+        }
+        function shorter(): void {
+            BarLayout.adjustHeight(-2);
         }
         // Mostra/recolhe o uso dos agentes de IA na barra.
         function agents(): void {

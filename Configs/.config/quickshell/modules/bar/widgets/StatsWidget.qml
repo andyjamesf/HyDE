@@ -17,7 +17,7 @@ Row {
         height: root.height
         icon: "memory"
         text: `${Math.round(SystemStats.cpu * 100)}%`
-        tooltip: "Utilização do CPU"
+        tooltip: "CPU usage"
         onClicked: Utils.run("hyde-shell system.monitor.sh")
     }
 
@@ -26,7 +26,7 @@ Row {
         height: root.height
         icon: "memory_alt"
         text: `${Math.round(SystemStats.memory * 100)}%`
-        tooltip: `Memória: ${Utils.formatBytes(SystemStats.memUsedBytes)}`
+        tooltip: `Memory: ${Utils.formatBytes(SystemStats.memUsedBytes)}`
         onClicked: Utils.run("hyde-shell system.monitor.sh")
     }
 
@@ -36,7 +36,7 @@ Row {
         icon: "thermostat"
         text: `${Math.round(SystemStats.temperature)}°`
         textColor: SystemStats.temperature >= 85 ? Theme.error : Theme.text
-        tooltip: "Temperatura do CPU"
+        tooltip: "CPU temperature"
     }
 
     BarItem {

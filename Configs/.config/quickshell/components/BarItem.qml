@@ -31,6 +31,13 @@ Item {
     property Component popout: null
     // Nome para abrir esta popout por IPC (`qs ipc call bar popout <nome>`).
     property string popoutName
+    // Nome para os menus/tooltips pedidos por IPC (`bar menu <nome>`, `bar tooltip <nome>`); o
+    // WidgetLoader preenche-o com o id do widget.
+    property string ipcName
+    // Submenus a abrir logo (índices), quando o menu é aberto por IPC.
+    property var menuPath: []
+    readonly property bool ipcScreenOk: !root.bar?.screen || ShellState.requestedPopoutScreen === "" || ShellState.requestedPopoutScreen === root.bar.screen.name
+    readonly property bool tipForced: ipcName !== "" && ShellState.requestedTooltip === ipcName && ipcScreenOk && visible
     property var bar
 
     // Só uma popout aberta de cada vez: abrir esta fecha a anterior.
@@ -123,7 +130,7 @@ Item {
     }
 
     Loader {
-        active: root.hovered && !tipDelay.running && root.tooltip !== "" && !root.menuOpen && !root.popoutOpen
+        active: (root.hovered && !tipDelay.running || root.tipForced) && root.tooltip !== "" && !root.menuOpen && !root.popoutOpen
         sourceComponent: Tooltip {
             target: root
             text: root.tooltip
@@ -135,7 +142,11 @@ Item {
         sourceComponent: MenuPopup {
             target: root
             items: root.menu
-            onDismissed: root.menuOpen = false
+            path: root.menuPath
+            onDismissed: {
+                root.menuOpen = false;
+                root.menuPath = [];
+            }
         }
     }
 
@@ -154,7 +165,17 @@ Item {
 
     Connections {
         target: ShellState
-        enabled: root.popoutName !== ""
+        enabled: root.popoutName !== "" || root.ipcName !== ""
+        function onRequestedMenuChanged() {
+            const parts = ShellState.requestedMenu.split(":");
+            if (parts[0] === root.ipcName && root.menu && root.ipcScreenOk && root.visible) {
+                root.menuPath = parts.slice(1).map(n => parseInt(n));
+                root.menuOpen = false;
+                root.menuOpen = true;
+            } else if (ShellState.requestedMenu === "") {
+                root.menuOpen = false;
+            }
+        }
         function onRequestedPopoutChanged() {
             const screenOk = !root.bar?.screen || ShellState.requestedPopoutScreen === "" || ShellState.requestedPopoutScreen === root.bar.screen.name;
             if (ShellState.requestedPopout === root.popoutName && screenOk && root.visible)

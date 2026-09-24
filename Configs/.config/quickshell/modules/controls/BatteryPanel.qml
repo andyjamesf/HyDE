@@ -31,7 +31,7 @@ ColumnLayout {
             }
 
             StyledText {
-                text: (Battery.charging ? "A carregar" : Battery.plugged ? "Ligado à corrente" : "Em bateria") + (Battery.secondsLeft > 0 ? ` · ${Utils.formatDuration(Battery.secondsLeft)} ${Battery.charging ? "até carregar" : "restantes"}` : "")
+                text: (Battery.charging ? "Charging" : Battery.plugged ? "Plugged in" : "On battery") + (Battery.secondsLeft > 0 ? ` · ${Utils.formatDuration(Battery.secondsLeft)} ${Battery.charging ? "until full" : "left"}` : "")
                 color: Theme.textDim
             }
         }
@@ -39,13 +39,13 @@ ColumnLayout {
 
     StyledText {
         visible: Battery.device?.healthSupported ?? false
-        text: `Saúde da bateria: ${Math.round(Battery.device?.healthPercentage ?? 0)}%`
+        text: `Battery health: ${Math.round(Battery.device?.healthPercentage ?? 0)}%`
         font.pixelSize: Theme.labelSmall
         color: Theme.textFaint
     }
 
     SectionLabel {
-        text: "Perfil de energia"
+        text: "Power profile"
     }
 
     RowLayout {
@@ -84,7 +84,7 @@ ColumnLayout {
 
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
-                        text: ["Poupança", "Equilibrado", "Desempenho"][seg.modelData]
+                        text: ["Power saver", "Balanced", "Performance"][seg.modelData]
                         font.pixelSize: Theme.labelSmall
                         color: seg.current ? Theme.onPrimary : Theme.text
                     }
@@ -102,7 +102,7 @@ ColumnLayout {
     StyledText {
         visible: PowerProfiles.degradationReason !== PerformanceDegradationReason.None
         Layout.fillWidth: true
-        text: "Desempenho limitado pelo sistema (temperatura ou portátil ao colo)."
+        text: "Performance limited by the system (temperature or laptop on lap)."
         font.pixelSize: Theme.labelSmall
         color: Theme.warning
         wrapMode: Text.WordWrap

@@ -92,7 +92,7 @@ Singleton {
             required property var modelData
             target: modelData
             function onConnectionFailed(reason) {
-                root.lastError = `Não foi possível ligar a ${modelData.name}`;
+                root.lastError = `Could not connect to ${modelData.name}`;
                 if (!modelData.known)
                     root.pendingNetwork = modelData;
             }

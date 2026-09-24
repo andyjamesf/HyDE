@@ -37,9 +37,13 @@ Loader {
     visible: wanted
     asynchronous: false
 
-    onLoaded: if ("bar" in item)
-        item.bar = Qt.binding(() => root.bar)
+    onLoaded: {
+        if ("bar" in item)
+            item.bar = Qt.binding(() => root.bar);
+        if ("ipcName" in item)
+            item.ipcName = root.name;
+    }
 
     Component.onCompleted: if (!files[name])
-        console.warn(`config.json: widget desconhecido "${name}"`)
+        console.warn(`config.json: unknown widget "${name}"`)
 }

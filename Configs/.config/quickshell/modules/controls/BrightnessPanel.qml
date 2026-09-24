@@ -12,8 +12,8 @@ ColumnLayout {
 
     PanelHeader {
         icon: Brightness.icon
-        title: "Ecrã"
-        subtitle: `Brilho ${Brightness.percent}%`
+        title: "Display"
+        subtitle: `Brightness ${Brightness.percent}%`
     }
 
     StyledSlider {
@@ -27,8 +27,8 @@ ColumnLayout {
         Layout.fillWidth: true
         icon: "nightlight"
         iconFill: NightLight.active ? 1 : 0
-        title: "Luz noturna"
-        subtitle: NightLight.active ? "Ligada" : "Desligada"
+        title: "Night light"
+        subtitle: NightLight.active ? "On" : "Off"
         onClicked: NightLight.toggle()
 
         StyledSwitch {

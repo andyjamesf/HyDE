@@ -33,15 +33,15 @@ Singleton {
         return list[Math.max(0, Math.min(list.length - 1, Math.floor(percent * list.length / 101)))];
     }
 
-    // "agora", "há 5 min", "há 2 h", ou a hora/data para coisas mais antigas.
+    // "now", "há 5 min", "há 2 h", ou a hora/data para coisas mais antigas.
     function relativeTime(date) {
         const s = (Date.now() - date.getTime()) / 1000;
         if (s < 60)
-            return "agora";
+            return "now";
         if (s < 3600)
-            return `há ${Math.floor(s / 60)} min`;
+            return `${Math.floor(s / 60)} min ago`;
         if (s < 6 * 3600)
-            return `há ${Math.floor(s / 3600)} h`;
+            return `${Math.floor(s / 3600)} h ago`;
         const today = new Date();
         return date.toDateString() === today.toDateString() ? formatDate(date, "HH:mm") : formatDate(date, "d MMM, HH:mm");
     }

@@ -5,7 +5,7 @@ import qs.services
 BarItem {
     icon: "power_settings_new"
     iconColor: Theme.error
-    tooltip: "Sessão (clique direito: menu rápido)"
+    tooltip: "Session (right click: quick menu)"
     menu: HydeActions.power
 
     onClicked: ShellState.togglePowerMenu()

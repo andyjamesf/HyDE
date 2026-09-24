@@ -31,7 +31,7 @@ PanelWindow {
         {
             id: "calc",
             icon: "calculate",
-            label: "Calculadora"
+            label: "Calculator"
         }
     ]
 
@@ -78,7 +78,7 @@ PanelWindow {
 
     screen: modelData
     visible: true
-    implicitWidth: 620
+    implicitWidth: 480
     implicitHeight: 560
     exclusiveZone: 0
     color: "transparent"
@@ -256,7 +256,7 @@ PanelWindow {
                     StyledText {
                         visible: input.text === ""
                         anchors.verticalCenter: parent.verticalCenter
-                        text: win.mode === "clipboard" ? "Procurar no clipboard…" : win.mode === "calc" ? "Escreve uma conta, ex.: (2+3)*4^2" : "Procurar apps ou fazer contas…"
+                        text: win.mode === "clipboard" ? "Search clipboard…" : win.mode === "calc" ? "Type a calculation, e.g. (2+3)*4^2" : "Search apps or calculate…"
                         color: Theme.textFaint
                         font.pixelSize: Theme.titleMedium
                     }
@@ -315,7 +315,7 @@ PanelWindow {
                 }
 
                 StyledText {
-                    text: "Tab muda de modo"
+                    text: "Tab switches mode"
                     font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
                 }
@@ -340,7 +340,7 @@ PanelWindow {
                 StyledText {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignRight
-                    text: win.calcResult !== null ? "Enter copia o resultado" : "Funções: sqrt, sin, cos, tan, log, ln, abs, round… · constantes pi, e · 20% de 50: 50*20%"
+                    text: win.calcResult !== null ? "Enter copies the result" : "Functions: sqrt, sin, cos, tan, log, ln, abs, round… · constants pi, e · 20% of 50: 50*20%"
                     font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
                     wrapMode: Text.WordWrap
@@ -426,7 +426,7 @@ PanelWindow {
 
                         StyledText {
                             Layout.fillWidth: true
-                            text: row.modelData.kind === "app" ? row.modelData.value.name : row.modelData.kind === "calc" ? `= ${Calculator.format(row.modelData.value)}` : row.modelData.value.image ? "Imagem" : row.modelData.value.text
+                            text: row.modelData.kind === "app" ? row.modelData.value.name : row.modelData.kind === "calc" ? `= ${Calculator.format(row.modelData.value)}` : row.modelData.value.image ? "Image" : row.modelData.value.text
                             font.pixelSize: Theme.titleSmall
                             font.weight: row.selected ? Font.DemiBold : Font.Normal
                             color: row.selected ? Theme.onPrimaryContainer : Theme.text
@@ -436,7 +436,7 @@ PanelWindow {
                         StyledText {
                             Layout.fillWidth: true
                             visible: text !== ""
-                            text: row.modelData.kind === "app" ? (row.modelData.value.genericName || row.modelData.value.comment || "") : row.modelData.kind === "calc" ? "Calculadora · Enter copia" : row.modelData.value.image ? row.modelData.value.text : ""
+                            text: row.modelData.kind === "app" ? (row.modelData.value.genericName || row.modelData.value.comment || "") : row.modelData.kind === "calc" ? "Calculator · Enter copies" : row.modelData.value.image ? row.modelData.value.text : ""
                             font.pixelSize: Theme.labelSmall
                             color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.75) : Theme.textDim
                         }
@@ -471,7 +471,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 padding: 16
-                text: win.mode === "clipboard" ? (Clipboard.loading ? "A carregar…" : "Clipboard vazio") : "Sem resultados"
+                text: win.mode === "clipboard" ? (Clipboard.loading ? "Loading…" : "Clipboard is empty") : "No results"
                 color: Theme.textFaint
             }
         }

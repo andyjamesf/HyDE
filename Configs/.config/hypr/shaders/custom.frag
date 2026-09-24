@@ -68,7 +68,7 @@ Example:
 #define INVERT_COLORS_ENABLED 0// Set to 1 to enable color inversion
 #endif
 #ifndef COLOR_VISION_ENABLED
-#define COLOR_VISION_ENABLED true// Set to 1 to enable color vision deficiency simulation
+#define COLOR_VISION_ENABLED 0// Set to 1 to enable color vision deficiency simulation
 #endif
 
 // Blue Light Filter defines

@@ -19,7 +19,7 @@ ColumnLayout {
         backButton: root.backButton
         onBack: root.back()
         icon: Audio.icon
-        title: "Som"
+        title: "Sound"
         subtitle: Audio.nameOf(Audio.sink)
 
         IconButton {
@@ -40,7 +40,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: Audio.sinks.length > 1
-        text: "Saída"
+        text: "Output"
     }
 
     Repeater {
@@ -57,7 +57,7 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Microfone"
+        text: "Microphone"
     }
 
     StyledSlider {

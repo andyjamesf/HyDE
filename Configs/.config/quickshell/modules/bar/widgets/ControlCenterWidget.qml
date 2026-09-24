@@ -7,7 +7,7 @@ BarItem {
     iconFill: ShellState.controlCenterOpen ? 1 : 0
     iconColor: Theme.primary
     active: ShellState.controlCenterOpen
-    tooltip: "Centro de controlo"
+    tooltip: "Control center"
 
     onClicked: ShellState.toggleControlCenter("")
 }

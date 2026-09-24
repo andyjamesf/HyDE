@@ -12,7 +12,7 @@ BarItem {
     iconFill: Audio.muted ? 0 : 1
     iconColor: Audio.muted ? Theme.textFaint : Theme.text
     text: cfg.showPercent && !Audio.muted ? `${Math.round(Audio.volume * 100)}%` : ""
-    tooltip: `${Audio.nameOf(Audio.sink)}\n${Audio.muted ? "Sem som" : Math.round(Audio.volume * 100) + "%"}`
+    tooltip: `${Audio.nameOf(Audio.sink)}\n${Audio.muted ? "Muted" : Math.round(Audio.volume * 100) + "%"}`
 
     popoutName: "audio"
     popout: Component {

@@ -46,7 +46,7 @@ Singleton {
         timeout: 20
         respectInhibitors: false
         onIsIdleChanged: {
-            console.debug("osd: inativo =", isIdle);
+            console.debug("osd: idle =", isIdle);
             if (!isIdle)
                 resumeGrace.restart();
         }
@@ -103,7 +103,7 @@ Singleton {
             const previous = root.lastBrightness;
             root.lastBrightness = Brightness.percent;
             if (previous >= 0 && (previous <= 2 || Brightness.percent <= 2)) {
-                console.debug("osd: brilho", previous, "→", Brightness.percent, "ignorado (escurecimento)");
+                console.debug("osd: brightness", previous, "→", Brightness.percent, "ignored (dimming)");
                 return;
             }
             root.show("brightness");

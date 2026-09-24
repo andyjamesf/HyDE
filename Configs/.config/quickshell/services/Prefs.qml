@@ -18,6 +18,8 @@ Singleton {
     property alias pillStyle: adapter.pillStyle
     // Opacidade do fundo das ilhas escolhida no menu (negativo: usa a do layout/config.json).
     property alias pillOpacity: adapter.pillOpacity
+    // Altura da barra (das ilhas) em px; 0: usa a do layout.
+    property alias barHeight: adapter.barHeight
     // "Não incomodar": sem popups de notificações (exceto as críticas).
     property alias dnd: adapter.dnd
     // AI usage da barra aberto (true) ou recolhido atrás do botão (false).
@@ -42,6 +44,7 @@ Singleton {
             property string colorSource: "hyde"
             property string pillStyle: ""
             property real pillOpacity: -1
+            property int barHeight: 0
             property bool dnd: false
             property bool aiExpanded: false
         }

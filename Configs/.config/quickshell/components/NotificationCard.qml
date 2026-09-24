@@ -89,7 +89,7 @@ Rectangle {
 
                 StyledText {
                     Layout.fillWidth: true
-                    text: root.notification?.appName || "Notificação"
+                    text: root.notification?.appName || "Notification"
                     font.pixelSize: Theme.labelMedium
                     color: Theme.textDim
                 }

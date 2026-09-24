@@ -8,7 +8,7 @@ BarItem {
     icon: Network.icon
     iconFill: 1
     iconColor: Network.wifiEnabled || Network.wired ? Theme.text : Theme.textFaint
-    tooltip: Network.wired ? "Ligado por cabo" : Network.activeWifi ? `${Network.name}\nSinal: ${Math.round(Network.signal * 100)}%` : Network.wifiEnabled ? "Wi-Fi sem ligação" : "Wi-Fi desligado"
+    tooltip: Network.wired ? "Wired connection" : Network.activeWifi ? `${Network.name}\nSinal: ${Math.round(Network.signal * 100)}%` : Network.wifiEnabled ? "Wi-Fi not connected" : "Wi-Fi off"
 
     popoutName: "network"
     popout: Component {

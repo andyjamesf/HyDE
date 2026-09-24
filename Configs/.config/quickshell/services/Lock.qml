@@ -13,7 +13,9 @@ import Quickshell.Services.Pam
 Singleton {
     id: root
 
-    property bool locked: false
+    // O estado sobrevive a um reload da shell: o WlSessionLock novo retoma o bloqueio. Sem isto, um
+    // reload com o ecrã bloqueado largava o lock e o Hyprland mostrava "lockscreen app died".
+    property alias locked: persist.locked
     property bool authenticating: pam.active
     property string error: ""
     property int failures: 0
@@ -46,6 +48,12 @@ Singleton {
         pam.start();
     }
 
+    PersistentProperties {
+        id: persist
+        reloadableId: "lockState"
+        property bool locked: false
+    }
+
     PamContext {
         id: pam
         config: "hyprlock"
@@ -65,13 +73,13 @@ Singleton {
                 root.unlock();
             } else {
                 root.failures++;
-                root.error = result === PamResult.MaxTries ? "Demasiadas tentativas, espera um pouco" : "Palavra-passe errada";
+                root.error = result === PamResult.MaxTries ? "Too many attempts, wait a moment" : "Wrong password";
             }
         }
 
         onError: err => {
             root.pending = "";
-            root.error = `Erro de autenticação (${PamError.toString(err)})`;
+            root.error = `Authentication error (${PamError.toString(err)})`;
         }
     }
 }

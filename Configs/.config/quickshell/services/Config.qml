@@ -25,7 +25,7 @@ Singleton {
 
             property JsonObject bar: JsonObject {
                 // Layout por omissão (um dos nomes em config/layouts.json).
-                property string layout: "ilhas"
+                property string layout: "islands"
                 // "top" | "bottom" (os layouts podem impor a sua própria posição)
                 property string position: "top"
                 property real opacity: 0.92
@@ -38,7 +38,7 @@ Singleton {
 
             property JsonObject appearance: JsonObject {
                 // Língua das datas (nomes dos meses e dias da semana).
-                property string locale: "pt_PT"
+                property string locale: "en_GB"
                 property string font: "Inter"
                 property string monoFont: "JetBrainsMono Nerd Font"
                 property string iconFont: "Material Symbols Rounded"

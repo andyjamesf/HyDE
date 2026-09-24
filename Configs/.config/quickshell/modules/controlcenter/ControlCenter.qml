@@ -185,7 +185,7 @@ PanelWindow {
             StyledText {
                 Layout.fillWidth: true
                 // Só as horas quando já passa de uma (os minutos não cabiam).
-                text: `Ligado há ${SysInfo.uptime.replace(/^(\d+ h) \d+ min$/, "$1")}`
+                text: `Up for ${SysInfo.uptime.replace(/^(\d+ h) \d+ min$/, "$1")}`
                 font.pixelSize: Theme.bodySmall
                 color: Theme.textDim
             }
@@ -198,7 +198,7 @@ PanelWindow {
                 icon: "settings"
                 size: 40
                 tonal: true
-                tooltip: "Definições da shell"
+                tooltip: "Shell settings"
                 onClicked: {
                     ShellState.closeControlCenter();
                     Utils.run(`xdg-open ${Quickshell.shellPath("config/config.json")}`);
@@ -209,7 +209,7 @@ PanelWindow {
                 icon: "lock"
                 size: 40
                 tonal: true
-                tooltip: "Bloquear"
+                tooltip: "Lock"
                 onClicked: {
                     ShellState.closeControlCenter();
                     Utils.run("loginctl lock-session");
@@ -221,7 +221,7 @@ PanelWindow {
                 size: 40
                 background: Theme.alpha(Theme.error, 0.16)
                 color: Theme.error
-                tooltip: "Sessão"
+                tooltip: "Session"
                 onClicked: ShellState.togglePowerMenu()
             }
         }
@@ -283,7 +283,7 @@ PanelWindow {
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: Media.title || "Sem título"
+                        text: Media.title || "Untitled"
                         font.pixelSize: Theme.titleSmall
                         font.weight: Font.DemiBold
                     }
@@ -421,7 +421,7 @@ PanelWindow {
                 QuickToggle {
                     Layout.fillWidth: true
                     icon: Notifs.dnd ? "notifications_off" : "notifications"
-                    label: "Silêncio"
+                    label: "Silent"
                     checked: Notifs.dnd
                     onToggled: Notifs.toggleDnd()
                 }
@@ -429,7 +429,7 @@ PanelWindow {
                 QuickToggle {
                     Layout.fillWidth: true
                     icon: "nightlight"
-                    label: "Luz noturna"
+                    label: "Night light"
                     checked: NightLight.active
                     onToggled: NightLight.toggle()
                 }
@@ -446,7 +446,7 @@ PanelWindow {
                 QuickToggle {
                     Layout.fillWidth: true
                     icon: "coffee"
-                    label: "Cafeína"
+                    label: "Caffeine"
                     checked: ShellState.idleInhibited
                     onToggled: ShellState.idleInhibited = !ShellState.idleInhibited
                 }
@@ -454,7 +454,7 @@ PanelWindow {
                 QuickToggle {
                     Layout.fillWidth: true
                     icon: Audio.micIcon
-                    label: "Microfone"
+                    label: "Microphone"
                     checked: !Audio.micMuted
                     expandable: true
                     onToggled: Audio.toggleMicMute()
@@ -464,7 +464,7 @@ PanelWindow {
                 QuickToggle {
                     Layout.fillWidth: true
                     icon: "wallpaper"
-                    label: "Cores"
+                    label: "Colors"
                     checked: Prefs.colorSource === "wallpaper"
                     onToggled: Theme.setColorSource(Prefs.colorSource === "wallpaper" ? "hyde" : "wallpaper")
                 }
@@ -476,7 +476,7 @@ PanelWindow {
 
                 ColumnLayout {
                     width: parent.width
-                    spacing: Theme.space1
+                    spacing: Theme.space2
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -494,7 +494,7 @@ PanelWindow {
                             icon: "chevron_right"
                             size: 32
                             color: Theme.textDim
-                            tooltip: "Saídas e aplicações"
+                            tooltip: "Outputs and apps"
                             onClicked: ShellState.controlCenterPage = "audio"
                         }
                     }
@@ -538,7 +538,7 @@ PanelWindow {
                     spacing: Theme.space2
 
                     StyledText {
-                        text: "Notificações"
+                        text: "Notifications"
                         font.pixelSize: Theme.titleSmall
                         font.weight: Font.DemiBold
                     }
@@ -566,13 +566,13 @@ PanelWindow {
 
                     TextButton {
                         visible: Notifs.count > notifSection.limit
-                        text: "Ver todas"
+                        text: "See all"
                         onClicked: ShellState.controlCenterPage = "notifications"
                     }
 
                     TextButton {
                         visible: Notifs.count > 0
-                        text: "Limpar"
+                        text: "Clear"
                         onClicked: Notifs.clear()
                     }
                 }
@@ -582,7 +582,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 48
                     horizontalAlignment: Text.AlignHCenter
-                    text: Notifs.dnd ? "Silêncio ligado" : "Sem notificações"
+                    text: Notifs.dnd ? "Silent mode on" : "No notifications"
                     font.pixelSize: Theme.bodyMedium
                     color: Theme.textFaint
                 }
@@ -605,32 +605,32 @@ PanelWindow {
                     model: [
                         {
                             icon: "skip_next",
-                            label: "Wallpaper seguinte",
+                            label: "Next wallpaper",
                             cmd: "hyde-shell app -t scope -- wallpaper.sh --next --global"
                         },
                         {
                             icon: "image",
-                            label: "Escolher wallpaper",
+                            label: "Choose wallpaper",
                             cmd: "hyde-shell app -t scope -- wallpaper.sh --select --global"
                         },
                         {
                             icon: "palette",
-                            label: "Escolher tema",
+                            label: "Choose theme",
                             cmd: "hyde-shell app -t scope -- theme.select.sh"
                         },
                         {
                             icon: "view_quilt",
-                            label: "Layout da barra seguinte",
+                            label: "Next bar layout",
                             action: () => BarLayout.cycle(1)
                         },
                         {
                             icon: "animation",
-                            label: "Animações",
+                            label: "Animations",
                             cmd: "hyde-shell animations --select"
                         },
                         {
                             icon: "keyboard",
-                            label: "Atalhos de teclado",
+                            label: "Keybindings",
                             cmd: "hyde-shell keybinds_hint"
                         }
                     ]

@@ -49,7 +49,7 @@ ColumnLayout {
         }
 
         StyledText {
-            text: Utils.formatDate(root.now, "dddd, d 'de' MMMM 'de' yyyy")
+            text: Utils.formatDate(root.now, "dddd, d MMMM yyyy")
             color: Theme.textDim
         }
     }
@@ -181,7 +181,7 @@ ColumnLayout {
             Layout.fillWidth: true
 
             SectionLabel {
-                text: root.selected.toDateString() === root.now.toDateString() ? "Hoje" : Utils.formatDate(root.selected, "dddd, d 'de' MMMM")
+                text: root.selected.toDateString() === root.now.toDateString() ? "Today" : Utils.formatDate(root.selected, "dddd, d MMMM")
             }
 
             IconButton {
@@ -198,12 +198,12 @@ ColumnLayout {
             wrapMode: Text.WordWrap
             font.pixelSize: Theme.labelSmall
             color: Theme.textFaint
-            text: "Para ver os eventos do Google Calendar, junta o endereço iCal privado do calendário a ~/.local/share/quickshell/calendars.json."
+            text: "To see your Google Calendar events, add the calendar's private iCal address to ~/.local/share/quickshell/calendars.json."
         }
 
         StyledText {
             visible: Agenda.configured && root.selectedEvents.length === 0
-            text: "Sem eventos"
+            text: "No events"
             font.pixelSize: Theme.labelSmall
             color: Theme.textFaint
         }
@@ -248,7 +248,7 @@ ColumnLayout {
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: (ev.modelData.allDay ? "Dia todo" : `${Utils.formatDate(ev.modelData.start, "HH:mm")} – ${Utils.formatDate(ev.modelData.end, "HH:mm")}`) + (ev.modelData.location ? `  ·  ${ev.modelData.location}` : "")
+                        text: (ev.modelData.allDay ? "All day" : `${Utils.formatDate(ev.modelData.start, "HH:mm")} – ${Utils.formatDate(ev.modelData.end, "HH:mm")}`) + (ev.modelData.location ? `  ·  ${ev.modelData.location}` : "")
                         font.pixelSize: Theme.labelSmall
                         color: Theme.textDim
                     }
@@ -268,7 +268,7 @@ ColumnLayout {
             wrapMode: Text.WordWrap
             font.pixelSize: Theme.labelSmall
             color: Theme.warning
-            text: "Não foi possível atualizar: " + Agenda.errors.join("; ")
+            text: "Could not update: " + Agenda.errors.join("; ")
         }
     }
 }
