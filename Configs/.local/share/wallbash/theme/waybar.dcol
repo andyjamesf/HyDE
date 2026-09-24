@@ -1,4 +1,5 @@
-$HOME/.config/waybar/theme.css|pgrep -x waybar > /dev/null 2>&1 && hyde-shell waybar --update
+${cacheDir}/wallbash/bar.css
+/* Bar colours for the Quickshell shell (also used by themes' waybar.theme files, matched by name). */
 @define-color bar-bg <wallbash_pry1_rgba(0.01)>;
 @define-color main-bg <wallbash_pry1_rgba(0.8)>;
 @define-color main-fg <wallbash_1xa8_rgba(0.8)>;

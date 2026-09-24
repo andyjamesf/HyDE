@@ -49,7 +49,9 @@ if [ -f "$config_json" ] && command -v jq &>/dev/null; then
     if jq --argjson t "$gap_top" --argjson r "$gap_right" --argjson b "$gap_bottom" --argjson l "$gap_left" \
         '."control-center-margin-top"=$t | ."control-center-margin-right"=$r | ."control-center-margin-bottom"=$b | ."control-center-margin-left"=$l' \
         "$config_json" >"$config_tmp"; then
-        mv "$config_tmp" "$config_json"
+        # Write through the file (not mv over it): config.json may be a symlink into a dotfiles repo.
+        cmp -s "$config_tmp" "$config_json" || cat "$config_tmp" >"$config_json"
+        rm -f "$config_tmp"
     else
         rm -f "$config_tmp"
     fi
@@ -62,4 +64,8 @@ if [ -f "$theme_css" ]; then
     sed -i -E "s#border-radius: [0-9]+px;([[:space:]]*/\* hyde:rounding \*/)#border-radius: ${rounding}px;\1#" "$theme_css"
 fi
 
-swaync-client -R && swaync-client -rs
+# swaync-client blocks forever when the daemon is not running (another notification daemon,
+# e.g. the Quickshell shell, may own the bus name): only reload a running swaync.
+if pgrep -x swaync >/dev/null; then
+    swaync-client -R && swaync-client -rs
+fi
