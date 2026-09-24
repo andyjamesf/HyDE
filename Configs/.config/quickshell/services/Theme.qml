@@ -64,7 +64,42 @@ Singleton {
 
     // Camadas de estado (hover/press) por cima de qualquer superfície.
     readonly property color hover: Qt.alpha(text, 0.08)
-    readonly property color pressed: Qt.alpha(text, 0.14)
+    readonly property color pressed: Qt.alpha(text, 0.12)
+
+    // --- Sistema de design ---------------------------------------------------------------------
+    // Todos os painéis usam estes valores (nada de números soltos): o mesmo ritmo de espaços, a
+    // mesma escala de letra e as mesmas formas em toda a shell. A barra tem a sua própria escala,
+    // que acompanha a altura escolhida (BarLayout).
+
+    // Espaçamento, numa grelha de 4.
+    readonly property int space1: 4
+    readonly property int space2: 8
+    readonly property int space3: 12
+    readonly property int space4: 16
+    readonly property int space5: 20
+    readonly property int space6: 24
+
+    // Escala tipográfica (tamanhos em px lógicos).
+    readonly property int labelSmall: 11
+    readonly property int labelMedium: 12
+    readonly property int labelLarge: 13
+    readonly property int bodySmall: 12
+    readonly property int bodyMedium: 13
+    readonly property int titleSmall: 14
+    readonly property int titleMedium: 16
+    readonly property int titleLarge: 20
+    readonly property int headline: 24
+    readonly property int displaySmall: 36
+    readonly property int display: 56
+
+    // Formas: raios dos cantos, do mais pequeno (linhas de lista) aos painéis inteiros.
+    readonly property int shapeSmall: 10
+    readonly property int shapeMedium: 14
+    readonly property int shapeLarge: 20
+    readonly property int shapeXL: 28
+
+    // Contorno fino, igual em todas as superfícies flutuantes.
+    readonly property color border: Qt.alpha(outlineVariant, 0.6)
 
     function alpha(color, a) {
         return Qt.alpha(color, a);

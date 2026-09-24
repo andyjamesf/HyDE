@@ -8,6 +8,9 @@ import qs.services
 // da barra, escolher uma dessas redes abre o centro de controlo nesta página.
 ColumnLayout {
     id: root
+    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    property bool backButton: false
+    signal back
 
     property bool canType: false
 
@@ -18,6 +21,8 @@ ColumnLayout {
     Component.onDestruction: Network.scanUsers--
 
     PanelHeader {
+        backButton: root.backButton
+        onBack: root.back()
         icon: Network.wired ? "lan" : Network.icon
         title: "Wi-Fi"
         subtitle: Network.wired ? "Ligado por cabo" : Network.activeWifi ? `Ligado a ${Network.name}` : Network.wifiEnabled ? "Sem ligação" : "Desligado"
@@ -31,7 +36,7 @@ ColumnLayout {
         Layout.fillWidth: true
         text: Network.lastError
         color: Theme.error
-        font.pixelSize: 11
+        font.pixelSize: Theme.labelSmall
         wrapMode: Text.WordWrap
     }
 

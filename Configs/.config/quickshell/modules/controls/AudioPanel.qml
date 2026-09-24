@@ -8,11 +8,16 @@ import qs.services
 // Som: volume de saída e de entrada, escolha do dispositivo e volume de cada app.
 ColumnLayout {
     id: root
+    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    property bool backButton: false
+    signal back
 
     width: 320
     spacing: 10
 
     PanelHeader {
+        backButton: root.backButton
+        onBack: root.back()
         icon: Audio.icon
         title: "Som"
         subtitle: Audio.nameOf(Audio.sink)
@@ -107,13 +112,13 @@ ColumnLayout {
                 StyledText {
                     Layout.fillWidth: true
                     text: Audio.appNameOf(stream.modelData)
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.labelSmall
                     color: Theme.textDim
                 }
 
                 StyledSlider {
                     Layout.fillWidth: true
-                    implicitHeight: 22
+                    trackHeight: 16
                     value: stream.modelData.audio?.muted ? 0 : (stream.modelData.audio?.volume ?? 0)
                     onMoved: v => Audio.setNodeVolume(stream.modelData, v)
                 }

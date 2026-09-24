@@ -40,7 +40,7 @@ PanelWindow {
         radius: height / 2
         color: Theme.alpha(Theme.surfaceContainer, 0.96)
         border.width: 1
-        border.color: Theme.alpha(Theme.outlineVariant, 0.8)
+        border.color: Theme.border
 
         Behavior on y {
             NumberAnim {
@@ -57,7 +57,7 @@ PanelWindow {
             id: iconBg
             width: 36
             height: 36
-            radius: 18
+            radius: height / 2
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter

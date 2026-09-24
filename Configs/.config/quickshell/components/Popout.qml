@@ -46,15 +46,15 @@ PopupWindow {
     Rectangle {
         id: bg
 
-        implicitWidth: loader.implicitWidth + 32
-        implicitHeight: loader.implicitHeight + 32
+        implicitWidth: loader.implicitWidth + 2 * Theme.space5
+        implicitHeight: loader.implicitHeight + 2 * Theme.space5
         width: parent.width
         height: implicitHeight
         y: popout.below ? 0 : 10
-        radius: BarLayout.hyprRounding + 10
+        radius: Theme.shapeLarge + 4
         color: Theme.alpha(Theme.surfaceContainer, 0.97)
         border.width: 1
-        border.color: Theme.alpha(Theme.outlineVariant, 0.8)
+        border.color: Theme.border
         focus: true
         Keys.onEscapePressed: popout.close()
 

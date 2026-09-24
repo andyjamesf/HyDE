@@ -27,7 +27,7 @@ PopupWindow {
     visible: true
     color: "transparent"
     implicitWidth: 240
-    implicitHeight: list.implicitHeight + 12
+    implicitHeight: list.implicitHeight + 2 * Theme.space1 + 2
 
     onVisibleChanged: if (!visible)
         dismissed()
@@ -48,17 +48,17 @@ PopupWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: 14
+        radius: Theme.shapeMedium
         color: Theme.surfaceContainer
         border.width: 1
-        border.color: Theme.outlineVariant
+        border.color: Theme.border
         focus: true
         Keys.onEscapePressed: menu.visible = false
 
         Column {
             id: list
             anchors.fill: parent
-            anchors.margins: 6
+            anchors.margins: Theme.space1 + 1
 
             Repeater {
                 model: (menu.stack.length > 1 ? [
@@ -73,7 +73,7 @@ PopupWindow {
                     required property var modelData
 
                     width: list.width
-                    height: modelData.sep ? 9 : 30
+                    height: modelData.sep ? 9 : 34
 
                     Rectangle {
                         visible: row.modelData.sep === true
@@ -86,23 +86,24 @@ PopupWindow {
                     StateLayer {
                         visible: !row.modelData.sep
                         anchors.fill: parent
-                        radius: 9
+                        radius: Theme.shapeSmall
                         onClicked: menu.activate(row.modelData)
 
                         MaterialIcon {
                             id: backIcon
                             visible: row.modelData.back === true
                             anchors.left: parent.left
-                            anchors.leftMargin: 8
+                            anchors.leftMargin: Theme.space3
                             anchors.verticalCenter: parent.verticalCenter
                             icon: "arrow_back"
-                            size: 16
+                            size: 18
                         }
 
                         StyledText {
                             anchors.left: row.modelData.back ? backIcon.right : parent.left
                             anchors.right: arrow.left
-                            anchors.leftMargin: row.modelData.back ? 6 : 12
+                            anchors.leftMargin: row.modelData.back ? Theme.space2 : Theme.space3
+                            font.pixelSize: Theme.bodyMedium
                             anchors.verticalCenter: parent.verticalCenter
                             text: row.modelData.back ? "Voltar" : (row.modelData.label ?? "")
                         }
@@ -110,10 +111,10 @@ PopupWindow {
                         MaterialIcon {
                             id: arrow
                             anchors.right: parent.right
-                            anchors.rightMargin: 8
+                            anchors.rightMargin: Theme.space3
                             anchors.verticalCenter: parent.verticalCenter
                             icon: row.modelData.items ? "chevron_right" : row.modelData.checked ? "check" : ""
-                            size: 16
+                            size: 18
                             color: row.modelData.checked ? Theme.primary : Theme.textDim
                         }
                     }

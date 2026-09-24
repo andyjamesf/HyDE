@@ -7,7 +7,7 @@ import qs.services
 StyledText {
     Layout.fillWidth: true
     Layout.topMargin: 4
-    font.pixelSize: 11
+    font.pixelSize: Theme.labelSmall
     font.weight: Font.Bold
     font.capitalization: Font.AllUppercase
     font.letterSpacing: 0.6

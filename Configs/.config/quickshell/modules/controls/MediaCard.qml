@@ -41,7 +41,7 @@ ColumnLayout {
         ClippingRectangle {
             implicitWidth: 76
             implicitHeight: 76
-            radius: 14
+            radius: Theme.shapeMedium
             color: Theme.surfaceContainerHighest
 
             MaterialIcon {
@@ -71,7 +71,7 @@ ColumnLayout {
             StyledText {
                 Layout.fillWidth: true
                 text: Media.title || "Sem título"
-                font.pixelSize: 15
+                font.pixelSize: Theme.titleMedium
                 font.weight: Font.DemiBold
             }
 
@@ -86,14 +86,14 @@ ColumnLayout {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: root.player?.trackAlbum ?? ""
-                font.pixelSize: 11
+                font.pixelSize: Theme.labelSmall
                 color: Theme.textFaint
             }
 
             StyledText {
                 Layout.fillWidth: true
                 text: root.player?.identity ?? ""
-                font.pixelSize: 10
+                font.pixelSize: Theme.labelSmall
                 color: Theme.primary
             }
         }
@@ -136,7 +136,7 @@ ColumnLayout {
 
             StyledText {
                 text: root.fmt(root.player?.position ?? 0)
-                font.pixelSize: 10
+                font.pixelSize: Theme.labelSmall
                 color: Theme.textDim
             }
 
@@ -146,7 +146,7 @@ ColumnLayout {
 
             StyledText {
                 text: root.fmt(root.player?.length ?? 0)
-                font.pixelSize: 10
+                font.pixelSize: Theme.labelSmall
                 color: Theme.textDim
             }
         }
@@ -211,14 +211,14 @@ ColumnLayout {
 
                 implicitWidth: chipText.implicitWidth + 20
                 implicitHeight: 26
-                radius: 13
+                radius: height / 2
                 color: current ? Theme.primaryContainer : Theme.surfaceContainerHighest
 
                 StyledText {
                     id: chipText
                     anchors.centerIn: parent
                     text: chip.modelData.identity
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.labelSmall
                     color: chip.current ? Theme.onPrimaryContainer : Theme.text
                 }
 

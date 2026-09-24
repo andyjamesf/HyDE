@@ -4,11 +4,11 @@ import qs.services
 // Superfície arrumada em cartão, para agrupar conteúdo nos painéis.
 Rectangle {
     default property alias content: inner.data
-    property int padding: 14
+    property int padding: Theme.space4
 
     implicitWidth: inner.implicitWidth + 2 * padding
     implicitHeight: inner.implicitHeight + 2 * padding
-    radius: BarLayout.hyprRounding + 8
+    radius: Theme.shapeLarge
     color: Theme.surfaceContainerHigh
 
     Item {

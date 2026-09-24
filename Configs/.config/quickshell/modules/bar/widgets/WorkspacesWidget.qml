@@ -18,6 +18,8 @@ Item {
 
     implicitWidth: row.implicitWidth + 8
     implicitHeight: BarLayout.height
+    // Altura do indicador do workspace ativo; os ícones das apps ficam 3 px dentro dele.
+    readonly property int indicatorHeight: Math.round(height * 0.72)
 
     WheelHandler {
         property real acc: 0
@@ -37,7 +39,7 @@ Item {
 
         x: row.x + (target?.x ?? 0)
         width: target?.width ?? 0
-        height: Math.round(root.height * 0.64)
+        height: root.indicatorHeight
         anchors.verticalCenter: parent.verticalCenter
         radius: height / 2
         color: BarLayout.readable(Theme.primary, 1.8)
@@ -76,13 +78,13 @@ Item {
                 readonly property bool occupied: toplevels.length > 0
                 readonly property bool showIcons: root.cfg.appIcons && occupied
 
-                width: Math.max(Math.round(row.height * 0.64), content.implicitWidth + Math.round(row.height * 0.5))
+                width: Math.max(root.indicatorHeight, content.implicitWidth + Math.round(row.height * 0.5))
                 height: row.height
 
                 StateLayer {
                     anchors.fill: parent
-                    anchors.topMargin: Math.round(row.height * 0.18)
-                    anchors.bottomMargin: Math.round(row.height * 0.18)
+                    anchors.topMargin: Math.round((row.height - root.indicatorHeight) / 2)
+                    anchors.bottomMargin: Math.round((row.height - root.indicatorHeight) / 2)
                     highlight: ws.isActive ? "transparent" : Theme.hover
                     onClicked: Hypr.dispatchFocusWorkspace(ws.wsId)
                 }
@@ -98,7 +100,7 @@ Item {
                         IconImage {
                             required property var modelData
                             anchors.verticalCenter: parent.verticalCenter
-                            implicitSize: Math.round(BarLayout.iconSize * 0.9)
+                            implicitSize: Math.min(Math.round(BarLayout.iconSize * 0.9), root.indicatorHeight - 6)
                             source: Apps.iconFor(Hypr.appIdOf(modelData))
                         }
                     }

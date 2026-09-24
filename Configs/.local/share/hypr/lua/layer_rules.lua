@@ -49,6 +49,7 @@ hl.layer_rule({
   name         = "hyde_layer_quickshell",
   match        = { namespace = "^quickshell:.*$" },
   blur         = true,
+  blur_popups  = true, -- the bar popouts are popups of the bar layer
   ignore_alpha = 0.1,
   no_anim      = true,
 })

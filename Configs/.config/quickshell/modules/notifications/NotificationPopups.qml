@@ -40,7 +40,7 @@ PanelWindow {
     Column {
         id: column
         width: parent.width
-        spacing: 8
+        spacing: Theme.space2
 
         Repeater {
             model: win.active ? Notifs.popups : []

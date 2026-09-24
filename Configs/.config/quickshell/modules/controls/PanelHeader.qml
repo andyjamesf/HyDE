@@ -3,7 +3,8 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 
-// Cabeçalho de um painel: ícone, título e, opcionalmente, um switch à direita.
+// Cabeçalho de um painel: ícone, título e, opcionalmente, um switch à direita. Dentro do centro de
+// controlo (`backButton`), o ícone dá lugar ao botão de voltar.
 RowLayout {
     id: root
 
@@ -12,17 +13,28 @@ RowLayout {
     property string subtitle
     property bool hasSwitch: false
     property bool checked: false
+    property bool backButton: false
     default property alias extra: extraRow.data
 
     signal toggled
+    signal back
 
     Layout.fillWidth: true
     spacing: 12
 
+    IconButton {
+        visible: root.backButton
+        icon: "arrow_back"
+        size: 40
+        tonal: true
+        onClicked: root.back()
+    }
+
     Rectangle {
+        visible: !root.backButton
         implicitWidth: 38
         implicitHeight: 38
-        radius: 19
+        radius: height / 2
         color: root.hasSwitch && !root.checked ? Theme.surfaceContainerHighest : Theme.primaryContainer
 
         MaterialIcon {
@@ -41,7 +53,7 @@ RowLayout {
         StyledText {
             Layout.fillWidth: true
             text: root.title
-            font.pixelSize: 15
+            font.pixelSize: Theme.titleMedium
             font.weight: Font.DemiBold
         }
 
@@ -49,7 +61,7 @@ RowLayout {
             visible: root.subtitle !== ""
             Layout.fillWidth: true
             text: root.subtitle
-            font.pixelSize: 11
+            font.pixelSize: Theme.bodySmall
             color: Theme.textDim
         }
     }

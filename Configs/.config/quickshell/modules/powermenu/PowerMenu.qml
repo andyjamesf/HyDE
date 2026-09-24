@@ -62,6 +62,7 @@ PanelWindow {
     property int current: 0
     // A seleção só segue o rato quando ele se mexe (não quando o menu abre por baixo do cursor).
     property point lastMouse: Qt.point(-1, -1)
+    property real openedAt: 0
     // Ação à espera de confirmação (índice), ou -1.
     property int armed: -1
 
@@ -90,6 +91,7 @@ PanelWindow {
             current = 0;
             armed = -1;
             lastMouse = Qt.point(-1, -1);
+            openedAt = Date.now();
             focusTimer.restart();
         }
     }
@@ -141,10 +143,10 @@ PanelWindow {
         id: card
 
         anchors.fill: parent
-        radius: BarLayout.hyprRounding + 14
-        color: Theme.alpha(Theme.surface, 0.96)
+        radius: Theme.shapeXL
+        color: Theme.alpha(Theme.surfaceContainer, 0.96)
         border.width: 1
-        border.color: Theme.alpha(Theme.outlineVariant, 0.8)
+        border.color: Theme.border
         opacity: win.open ? 1 : 0
         scale: win.open ? 1 : 0.94
         // Visível logo ao abrir, para a área de cliques não estar vazia quando a focus grab começa.
@@ -232,9 +234,16 @@ PanelWindow {
                                 radius: parent.radius
                                 onPositionChanged: mouse => {
                                     const g = mapToGlobal(mouse.x, mouse.y);
-                                    if (win.lastMouse.x >= 0 && (Math.abs(g.x - win.lastMouse.x) > 1 || Math.abs(g.y - win.lastMouse.y) > 1))
+                                    // Ignora os eventos falsos da animação de entrada (cursor parado).
+                                    if (Date.now() - win.openedAt < 300) {
+                                        win.lastMouse = g;
+                                        return;
+                                    }
+                                    const moved = win.lastMouse.x >= 0 && (Math.abs(g.x - win.lastMouse.x) > 3 || Math.abs(g.y - win.lastMouse.y) > 3);
+                                    if (moved)
                                         win.current = btn.index;
-                                    win.lastMouse = g;
+                                    if (moved || win.lastMouse.x < 0)
+                                        win.lastMouse = g;
                                 }
                                 onClicked: win.trigger(btn.index)
                             }
@@ -243,7 +252,7 @@ PanelWindow {
                         StyledText {
                             Layout.alignment: Qt.AlignHCenter
                             text: btn.isArmed ? "Confirmar?" : btn.modelData.label
-                            font.pixelSize: 12
+                            font.pixelSize: Theme.labelLarge
                             font.weight: btn.selected ? Font.DemiBold : Font.Normal
                             color: btn.isArmed ? Theme.error : btn.selected ? Theme.text : Theme.textDim
                         }
@@ -254,7 +263,7 @@ PanelWindow {
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 text: win.armed >= 0 ? "Carrega outra vez para confirmar" : "← → escolher · Enter · Esc"
-                font.pixelSize: 11
+                font.pixelSize: Theme.labelMedium
                 color: win.armed >= 0 ? Theme.error : Theme.textFaint
             }
         }

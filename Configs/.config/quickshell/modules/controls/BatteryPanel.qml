@@ -26,7 +26,7 @@ ColumnLayout {
 
             StyledText {
                 text: `${Battery.percent}%`
-                font.pixelSize: 28
+                font.pixelSize: Theme.headline
                 font.weight: Font.Light
             }
 
@@ -40,7 +40,7 @@ ColumnLayout {
     StyledText {
         visible: Battery.device?.healthSupported ?? false
         text: `Saúde da bateria: ${Math.round(Battery.device?.healthPercentage ?? 0)}%`
-        font.pixelSize: 11
+        font.pixelSize: Theme.labelSmall
         color: Theme.textFaint
     }
 
@@ -63,7 +63,7 @@ ColumnLayout {
 
                 Layout.fillWidth: true
                 implicitHeight: 58
-                radius: 16
+                radius: Theme.shapeLarge
                 color: current ? Theme.primary : Theme.surfaceContainerHighest
 
                 Behavior on color {
@@ -85,7 +85,7 @@ ColumnLayout {
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
                         text: ["Poupança", "Equilibrado", "Desempenho"][seg.modelData]
-                        font.pixelSize: 11
+                        font.pixelSize: Theme.labelSmall
                         color: seg.current ? Theme.onPrimary : Theme.text
                     }
                 }
@@ -103,7 +103,7 @@ ColumnLayout {
         visible: PowerProfiles.degradationReason !== PerformanceDegradationReason.None
         Layout.fillWidth: true
         text: "Desempenho limitado pelo sistema (temperatura ou portátil ao colo)."
-        font.pixelSize: 11
+        font.pixelSize: Theme.labelSmall
         color: Theme.warning
         wrapMode: Text.WordWrap
     }

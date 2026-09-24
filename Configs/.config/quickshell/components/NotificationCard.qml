@@ -12,6 +12,8 @@ Rectangle {
 
     required property Notification notification
     property bool popup: false
+    // Versão resumida (centro de controlo): título e corpo numa linha, sem botões de ação.
+    property bool compact: false
     readonly property bool critical: notification?.urgency === NotificationUrgency.Critical
     readonly property var actions: (notification?.actions ?? []).filter(a => a.identifier !== "default")
     readonly property var defaultAction: (notification?.actions ?? []).find(a => a.identifier === "default") ?? null
@@ -21,11 +23,11 @@ Rectangle {
     signal closed
 
     implicitWidth: 360
-    implicitHeight: content.implicitHeight + 24
-    radius: BarLayout.hyprRounding + 8
+    implicitHeight: content.implicitHeight + 2 * Theme.space3
+    radius: popup ? Theme.shapeLarge : Theme.shapeMedium
     color: popup ? Theme.alpha(Theme.surfaceContainer, 0.97) : Theme.surfaceContainerHigh
-    border.width: critical ? 2 : 1
-    border.color: critical ? Theme.error : Theme.alpha(Theme.outlineVariant, 0.8)
+    border.width: critical ? 2 : popup ? 1 : 0
+    border.color: critical ? Theme.error : Theme.border
 
     MouseArea {
         id: area
@@ -47,21 +49,21 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 12
-        spacing: 12
+        anchors.margins: Theme.space3
+        spacing: Theme.space3
 
         ClippingRectangle {
             Layout.alignment: Qt.AlignTop
-            implicitWidth: 44
-            implicitHeight: 44
-            radius: 12
+            implicitWidth: 40
+            implicitHeight: 40
+            radius: Theme.shapeSmall
             color: Theme.surfaceContainerHighest
 
             MaterialIcon {
                 anchors.centerIn: parent
                 visible: img.status !== Image.Ready
                 icon: root.critical ? "priority_high" : "notifications"
-                size: 22
+                size: 20
                 fill: 1
                 color: root.critical ? Theme.error : Theme.primary
             }
@@ -72,8 +74,8 @@ Rectangle {
                 source: Notifs.imageOf(root.notification)
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
-                sourceSize.width: 88
-                sourceSize.height: 88
+                sourceSize.width: 80
+                sourceSize.height: 80
             }
         }
 
@@ -83,24 +85,25 @@ Rectangle {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 6
+                spacing: Theme.space2
 
                 StyledText {
                     Layout.fillWidth: true
                     text: root.notification?.appName || "Notificação"
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.labelMedium
                     color: Theme.textDim
                 }
 
                 StyledText {
                     text: Utils.relativeTime(Notifs.timeOf(root.notification))
-                    font.pixelSize: 10
+                    font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
                 }
 
                 IconButton {
                     icon: "close"
-                    size: 22
+                    size: 24
+                    color: Theme.textDim
                     onClicked: {
                         root.closed();
                         root.notification.dismiss();
@@ -112,9 +115,10 @@ Rectangle {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: root.notification?.summary ?? ""
+                font.pixelSize: Theme.titleSmall
                 font.weight: Font.DemiBold
                 wrapMode: Text.WordWrap
-                maximumLineCount: 2
+                maximumLineCount: root.compact ? 1 : 2
             }
 
             StyledText {
@@ -123,9 +127,9 @@ Rectangle {
                 text: (root.notification?.body ?? "").replace(/<img[^>]*>/g, "")
                 textFormat: Text.StyledText
                 color: Theme.textDim
-                font.pixelSize: 12
+                font.pixelSize: Theme.bodyMedium
                 wrapMode: Text.WordWrap
-                maximumLineCount: root.popup ? 4 : 6
+                maximumLineCount: root.compact ? 1 : root.popup ? 4 : 6
                 elide: Text.ElideRight
                 linkColor: Theme.primary
                 onLinkActivated: link => Qt.openUrlExternally(link)
@@ -133,9 +137,9 @@ Rectangle {
 
             Flow {
                 Layout.fillWidth: true
-                Layout.topMargin: 6
-                visible: root.actions.length > 0
-                spacing: 6
+                Layout.topMargin: Theme.space2
+                visible: root.actions.length > 0 && !root.compact
+                spacing: Theme.space2
 
                 Repeater {
                     model: root.actions
@@ -145,16 +149,17 @@ Rectangle {
 
                         required property var modelData
 
-                        implicitWidth: actionText.implicitWidth + 24
-                        implicitHeight: 30
-                        radius: 15
+                        implicitWidth: actionText.implicitWidth + 2 * Theme.space4
+                        implicitHeight: 32
+                        radius: height / 2
                         color: Theme.primaryContainer
 
                         StyledText {
                             id: actionText
                             anchors.centerIn: parent
                             text: action.modelData.text
-                            font.pixelSize: 12
+                            font.pixelSize: Theme.labelLarge
+                            font.weight: Font.Medium
                             color: Theme.onPrimaryContainer
                         }
 

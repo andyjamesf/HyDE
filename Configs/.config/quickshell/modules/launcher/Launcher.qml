@@ -39,12 +39,20 @@ PanelWindow {
     property int current: 0
     // Última posição do rato (global). A seleção só segue o rato quando ele se mexe mesmo: ao abrir
     // por baixo do cursor, ou quando a lista muda ao escrever, o "hover" não conta.
+    // Durante a animação de entrada o cartão escala por baixo do cursor parado, o que gera
+    // eventos de movimento falsos: ignoram-se os primeiros 300 ms e deslocações até 3 px.
     property point lastMouse: Qt.point(-1, -1)
+    property real openedAt: 0
 
     function mouseMoved(item, x, y) {
         const g = item.mapToGlobal(x, y);
-        const moved = lastMouse.x >= 0 && (Math.abs(g.x - lastMouse.x) > 1 || Math.abs(g.y - lastMouse.y) > 1);
-        lastMouse = g;
+        if (Date.now() - openedAt < 300) {
+            lastMouse = g;
+            return false;
+        }
+        const moved = lastMouse.x >= 0 && (Math.abs(g.x - lastMouse.x) > 3 || Math.abs(g.y - lastMouse.y) > 3);
+        if (moved || lastMouse.x < 0)
+            lastMouse = g;
         return moved;
     }
     readonly property var calcResult: mode !== "clipboard" ? Calculator.evaluate(query) : null
@@ -91,6 +99,7 @@ PanelWindow {
             input.text = "";
             current = 0;
             lastMouse = Qt.point(-1, -1);
+            openedAt = Date.now();
             if (mode === "clipboard")
                 Clipboard.refresh();
             focusTimer.restart();
@@ -159,10 +168,10 @@ PanelWindow {
 
         width: parent.width
         height: Math.min(parent.height, column.implicitHeight + 28)
-        radius: BarLayout.hyprRounding + 14
-        color: Theme.alpha(Theme.surface, 0.96)
+        radius: Theme.shapeXL
+        color: Theme.alpha(Theme.surfaceContainer, 0.96)
         border.width: 1
-        border.color: Theme.alpha(Theme.outlineVariant, 0.8)
+        border.color: Theme.border
         opacity: win.open ? 1 : 0
         scale: win.open ? 1 : 0.96
         // Visível logo ao abrir (a opacidade ainda está a 0): sem isso a área de cliques da janela
@@ -183,14 +192,14 @@ PanelWindow {
         ColumnLayout {
             id: column
             anchors.fill: parent
-            anchors.margins: 14
-            spacing: 10
+            anchors.margins: Theme.space4
+            spacing: Theme.space3
 
             // Pesquisa
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                radius: 24
+                radius: height / 2
                 color: Theme.surfaceContainerHigh
                 border.width: 2
                 border.color: Theme.alpha(Theme.primary, 0.6)
@@ -216,7 +225,7 @@ PanelWindow {
                     selectionColor: Theme.primary
                     selectedTextColor: Theme.onPrimary
                     font.family: Config.appearance.font
-                    font.pixelSize: 16
+                    font.pixelSize: Theme.titleMedium
                     clip: true
                     onTextChanged: win.query = text
 
@@ -249,7 +258,7 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         text: win.mode === "clipboard" ? "Procurar no clipboard…" : win.mode === "calc" ? "Escreve uma conta, ex.: (2+3)*4^2" : "Procurar apps ou fazer contas…"
                         color: Theme.textFaint
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.titleMedium
                     }
                 }
             }
@@ -270,7 +279,7 @@ PanelWindow {
 
                         implicitWidth: chipRow.implicitWidth + 24
                         implicitHeight: 30
-                        radius: 15
+                        radius: height / 2
                         color: current ? Theme.primary : Theme.surfaceContainerHigh
 
                         Row {
@@ -289,7 +298,7 @@ PanelWindow {
                             StyledText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: chip.modelData.label
-                                font.pixelSize: 12
+                                font.pixelSize: Theme.labelMedium
                                 color: chip.current ? Theme.onPrimary : Theme.text
                             }
                         }
@@ -307,7 +316,7 @@ PanelWindow {
 
                 StyledText {
                     text: "Tab muda de modo"
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
                 }
             }
@@ -323,7 +332,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignRight
                     text: win.calcResult !== null ? `= ${Calculator.format(win.calcResult)}` : win.query ? "…" : ""
-                    font.pixelSize: 34
+                    font.pixelSize: Theme.displaySmall
                     font.weight: Font.Light
                     color: Theme.primary
                 }
@@ -332,7 +341,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignRight
                     text: win.calcResult !== null ? "Enter copia o resultado" : "Funções: sqrt, sin, cos, tan, log, ln, abs, round… · constantes pi, e · 20% de 50: 50*20%"
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.labelSmall
                     color: Theme.textFaint
                     wrapMode: Text.WordWrap
                 }
@@ -348,13 +357,7 @@ PanelWindow {
                 model: win.rows
                 currentIndex: win.current
                 boundsBehavior: Flickable.StopAtBounds
-                highlightMoveDuration: Anim.fast
                 spacing: 2
-
-                highlight: Rectangle {
-                    radius: 14
-                    color: Theme.primaryContainer
-                }
 
                 delegate: Item {
                     id: row
@@ -365,6 +368,19 @@ PanelWindow {
 
                     width: list.width
                     height: 52
+
+                    // Fundo da linha selecionada, por baixo do ícone e do texto.
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.shapeMedium
+                        color: row.selected ? Theme.primaryContainer : "transparent"
+
+                        Behavior on color {
+                            ColorAnim {
+                                duration: Anim.fast
+                            }
+                        }
+                    }
 
                     MouseArea {
                         anchors.fill: parent
@@ -411,7 +427,7 @@ PanelWindow {
                         StyledText {
                             Layout.fillWidth: true
                             text: row.modelData.kind === "app" ? row.modelData.value.name : row.modelData.kind === "calc" ? `= ${Calculator.format(row.modelData.value)}` : row.modelData.value.image ? "Imagem" : row.modelData.value.text
-                            font.pixelSize: 14
+                            font.pixelSize: Theme.titleSmall
                             font.weight: row.selected ? Font.DemiBold : Font.Normal
                             color: row.selected ? Theme.onPrimaryContainer : Theme.text
                             maximumLineCount: 1
@@ -421,7 +437,7 @@ PanelWindow {
                             Layout.fillWidth: true
                             visible: text !== ""
                             text: row.modelData.kind === "app" ? (row.modelData.value.genericName || row.modelData.value.comment || "") : row.modelData.kind === "calc" ? "Calculadora · Enter copia" : row.modelData.value.image ? row.modelData.value.text : ""
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.labelSmall
                             color: row.selected ? Theme.alpha(Theme.onPrimaryContainer, 0.75) : Theme.textDim
                         }
                     }

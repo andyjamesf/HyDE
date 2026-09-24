@@ -18,17 +18,17 @@ Item {
     signal clicked
 
     implicitWidth: 300
-    implicitHeight: subtitle !== "" ? 50 : 40
+    implicitHeight: subtitle !== "" ? 56 : 44
 
     Rectangle {
         anchors.fill: parent
-        radius: 12
+        radius: Theme.shapeMedium
         color: root.highlighted ? Theme.primaryContainer : "transparent"
     }
 
     StateLayer {
         anchors.fill: parent
-        radius: 12
+        radius: Theme.shapeMedium
         onClicked: root.clicked()
     }
 
@@ -62,7 +62,7 @@ Item {
             anchors.centerIn: parent
             width: 30
             height: 30
-            radius: 15
+            radius: height / 2
             color: "transparent"
             border.width: 2
             border.color: Theme.primary
@@ -105,7 +105,7 @@ Item {
             visible: root.subtitle !== ""
             width: parent.width
             text: root.subtitle
-            font.pixelSize: 11
+            font.pixelSize: Theme.bodySmall
             color: root.highlighted ? Theme.alpha(Theme.onPrimaryContainer, 0.8) : Theme.textDim
         }
     }

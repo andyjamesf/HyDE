@@ -80,7 +80,6 @@ Row {
             rich: true
             text: stream.text
             tooltip: stream.tooltip
-            fontFamily: Config.appearance.monoFont
             opacity: cls === "syncing" ? 0.6 : 1
             textColor: cls.includes("critical") ? Theme.error : cls.endsWith("-low") ? Theme.success : cls.endsWith("-mid") ? Theme.warning : cls.endsWith("-high") ? Theme.error : Theme.text
 

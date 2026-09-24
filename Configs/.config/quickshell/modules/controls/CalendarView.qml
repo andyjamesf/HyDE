@@ -43,7 +43,7 @@ ColumnLayout {
 
         StyledText {
             text: Utils.formatDate(root.now, "HH:mm")
-            font.pixelSize: 40
+            font.pixelSize: Theme.displaySmall
             font.weight: Font.Light
             color: Theme.primary
         }
@@ -60,7 +60,7 @@ ColumnLayout {
         StyledText {
             Layout.fillWidth: true
             text: Utils.formatDate(root.month, "MMMM yyyy")
-            font.pixelSize: 14
+            font.pixelSize: Theme.titleSmall
             font.weight: Font.DemiBold
             font.capitalization: Font.Capitalize
         }
@@ -102,7 +102,7 @@ ColumnLayout {
                 width: (root.width - 12) / 7
                 horizontalAlignment: Text.AlignHCenter
                 text: Utils.dayName(modelData, Locale.ShortFormat).slice(0, 3)
-                font.pixelSize: 11
+                font.pixelSize: Theme.labelSmall
                 font.weight: Font.Bold
                 color: modelData === 0 || modelData === 6 ? Theme.tertiary : Theme.textDim
             }
@@ -128,7 +128,7 @@ ColumnLayout {
                     y: 1
                     width: 30
                     height: 30
-                    radius: 15
+                    radius: height / 2
                     color: day.today ? Theme.primary : "transparent"
                     border.width: day.isSelected && !day.today ? 2 : 0
                     border.color: Theme.primary
@@ -165,7 +165,7 @@ ColumnLayout {
 
                 StateLayer {
                     anchors.fill: parent
-                    radius: 10
+                    radius: Theme.shapeSmall
                     onClicked: root.selected = day.modelData
                 }
             }
@@ -196,7 +196,7 @@ ColumnLayout {
             visible: !Agenda.configured
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
-            font.pixelSize: 11
+            font.pixelSize: Theme.labelSmall
             color: Theme.textFaint
             text: "Para ver os eventos do Google Calendar, junta o endereço iCal privado do calendário a ~/.local/share/quickshell/calendars.json."
         }
@@ -204,7 +204,7 @@ ColumnLayout {
         StyledText {
             visible: Agenda.configured && root.selectedEvents.length === 0
             text: "Sem eventos"
-            font.pixelSize: 11
+            font.pixelSize: Theme.labelSmall
             color: Theme.textFaint
         }
 
@@ -218,7 +218,7 @@ ColumnLayout {
 
                 Layout.fillWidth: true
                 implicitHeight: evText.implicitHeight + 14
-                radius: 10
+                radius: Theme.shapeSmall
                 color: Theme.surfaceContainerHigh
 
                 Rectangle {
@@ -249,7 +249,7 @@ ColumnLayout {
                     StyledText {
                         Layout.fillWidth: true
                         text: (ev.modelData.allDay ? "Dia todo" : `${Utils.formatDate(ev.modelData.start, "HH:mm")} – ${Utils.formatDate(ev.modelData.end, "HH:mm")}`) + (ev.modelData.location ? `  ·  ${ev.modelData.location}` : "")
-                        font.pixelSize: 11
+                        font.pixelSize: Theme.labelSmall
                         color: Theme.textDim
                     }
                 }
@@ -266,7 +266,7 @@ ColumnLayout {
             visible: Agenda.errors.length > 0
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
-            font.pixelSize: 10
+            font.pixelSize: Theme.labelSmall
             color: Theme.warning
             text: "Não foi possível atualizar: " + Agenda.errors.join("; ")
         }

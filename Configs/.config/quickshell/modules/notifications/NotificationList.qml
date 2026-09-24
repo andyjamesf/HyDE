@@ -7,14 +7,20 @@ import qs.modules.controls
 // Histórico de notificações (centro de controlo). Com `limit` mostra só as mais recentes.
 ColumnLayout {
     id: root
+    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    property bool backButton: false
+    signal back
 
     property int limit: 0
     property bool showHeader: true
+    property bool compact: false
     readonly property var items: limit > 0 ? Notifs.list.slice(0, limit) : Notifs.list
 
-    spacing: 8
+    spacing: Theme.space2
 
     PanelHeader {
+        backButton: root.backButton
+        onBack: root.back()
         visible: root.showHeader
         icon: Notifs.dnd ? "notifications_off" : "notifications"
         title: "Notificações"
@@ -51,6 +57,7 @@ ColumnLayout {
             required property var modelData
             Layout.fillWidth: true
             notification: modelData
+            compact: root.compact
         }
     }
 }

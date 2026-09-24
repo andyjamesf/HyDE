@@ -61,7 +61,7 @@ Item {
         StyledText {
             Layout.alignment: Qt.AlignHCenter
             text: Utils.formatDate(clock.date, "HH:mm")
-            font.pixelSize: 110
+            font.pixelSize: Theme.display * 2
             font.weight: Font.Light
             color: Theme.text
         }
@@ -70,7 +70,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             // Só a primeira letra em maiúscula ("Quarta-feira, 23 de setembro").
             text: Utils.formatDate(clock.date, "dddd, d 'de' MMMM").replace(/^./, c => c.toUpperCase())
-            font.pixelSize: 20
+            font.pixelSize: Theme.titleLarge
             color: Theme.textDim
         }
 
@@ -82,7 +82,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             implicitWidth: 84
             implicitHeight: 84
-            radius: 42
+            radius: height / 2
             color: Theme.primaryContainer
 
             MaterialIcon {
@@ -108,7 +108,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: 8
             text: SysInfo.user
-            font.pixelSize: 18
+            font.pixelSize: Theme.titleLarge
             font.weight: Font.DemiBold
         }
 
@@ -119,7 +119,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             implicitWidth: 320
             implicitHeight: 52
-            radius: 26
+            radius: height / 2
             color: Theme.alpha(Theme.surfaceContainerHigh, 0.9)
             border.width: 2
             border.color: Lock.error !== "" ? Theme.error : input.activeFocus ? Theme.primary : Theme.outlineVariant
@@ -183,7 +183,7 @@ Item {
                 passwordCharacter: "●"
                 color: Theme.text
                 font.family: Config.appearance.font
-                font.pixelSize: 16
+                font.pixelSize: Theme.titleMedium
                 font.letterSpacing: 2
                 clip: true
                 enabled: !Lock.authenticating
@@ -197,7 +197,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Lock.authenticating ? "A verificar…" : "Palavra-passe"
                     color: Theme.textFaint
-                    font.pixelSize: 15
+                    font.pixelSize: Theme.titleMedium
                     font.letterSpacing: 0
                 }
             }
@@ -208,7 +208,7 @@ Item {
             Layout.preferredHeight: 20
             text: Lock.error
             color: Theme.error
-            font.pixelSize: 13
+            font.pixelSize: Theme.bodyMedium
         }
     }
 
@@ -223,7 +223,7 @@ Item {
             visible: Battery.available
             implicitWidth: battRow.implicitWidth + 28
             implicitHeight: 44
-            radius: 22
+            radius: height / 2
             color: Theme.alpha(Theme.surfaceContainer, 0.85)
 
             RowLayout {
@@ -248,7 +248,7 @@ Item {
             visible: Media.active !== null && Media.title !== ""
             implicitWidth: Math.min(420, mediaRow.implicitWidth + 28)
             implicitHeight: 44
-            radius: 22
+            radius: height / 2
             color: Theme.alpha(Theme.surfaceContainer, 0.85)
 
             RowLayout {

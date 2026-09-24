@@ -8,6 +8,9 @@ import qs.services
 // dispositivos novos para emparelhar.
 ColumnLayout {
     id: root
+    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    property bool backButton: false
+    signal back
 
     width: 320
     spacing: 8
@@ -16,6 +19,8 @@ ColumnLayout {
     Component.onDestruction: Bluetooth.setScanning(false)
 
     PanelHeader {
+        backButton: root.backButton
+        onBack: root.back()
         icon: Bluetooth.icon
         title: "Bluetooth"
         subtitle: Bluetooth.summary
@@ -101,7 +106,7 @@ ColumnLayout {
         visible: Bluetooth.enabled && !Bluetooth.scanning && Bluetooth.discovered.length === 0
         Layout.fillWidth: true
         text: "Toque na lupa para procurar dispositivos novos."
-        font.pixelSize: 11
+        font.pixelSize: Theme.labelSmall
         color: Theme.textFaint
         wrapMode: Text.WordWrap
     }
