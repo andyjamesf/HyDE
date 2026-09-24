@@ -48,6 +48,10 @@ Singleton {
     }
 
     // Launcher: aberto em que ecrã e em que modo ("apps", "clipboard" ou "calc").
+    // Editor da fotografia: a imagem escolhida (vazio = fechado) e o ecrã onde abre.
+    property string avatarSource: ""
+    property string avatarScreen: ""
+
     property bool launcherOpen: false
     property string launcherScreen: ""
     property string launcherMode: "apps"

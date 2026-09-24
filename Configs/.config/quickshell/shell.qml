@@ -13,6 +13,7 @@ import qs.modules.osd
 import qs.modules.launcher
 import qs.modules.powermenu
 import qs.modules.lock
+import qs.modules.avatar
 
 ShellRoot {
     // Os singletons só são criados quando alguém os usa; estes têm de existir desde o arranque
@@ -20,6 +21,21 @@ ShellRoot {
     readonly property var rofi: Rofi
     readonly property var agenda: Agenda
     readonly property var notifs: Notifs
+
+    // Editor da fotografia do utilizador (só existe enquanto está aberto).
+    Variants {
+        model: Quickshell.screens
+
+        LazyLoader {
+            id: avatarLoader
+            required property ShellScreen modelData
+            active: ShellState.avatarSource !== "" && (ShellState.avatarScreen === "" || ShellState.avatarScreen === modelData.name)
+
+            AvatarEditor {
+                modelData: avatarLoader.modelData
+            }
+        }
+    }
 
     Variants {
         model: Quickshell.screens
@@ -288,6 +304,11 @@ ShellRoot {
         // Escolher a fotografia do utilizador (a mesma ação que clicar na foto do centro de controlo).
         function avatar(): void {
             SysInfo.chooseAvatar();
+        }
+        // Abre o editor com uma imagem já escolhida ("" fecha).
+        function editAvatar(path: string): void {
+            ShellState.avatarScreen = Hyprland.focusedMonitor?.name ?? "";
+            ShellState.avatarSource = path;
         }
     }
 }

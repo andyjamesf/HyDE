@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 
 // Utilizador, máquina e tempo ligado (para o cabeçalho do centro de controlo).
 Singleton {
@@ -36,7 +37,7 @@ Singleton {
     }
 
     // Mudar a foto: o seletor de ficheiros do sistema (portal) e a imagem escolhida fica copiada para
-    // ~/.face (onde os gestores de sessão e o lockscreen também a procuram).
+    // ~/.face (onde os gestores de sessão e o lockscreen também a procuram), depois de posicionada no editor.
     function chooseAvatar() {
         if (!picker.running)
             picker.running = true;
@@ -48,8 +49,11 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const src = text.trim();
-                if (src !== "")
-                    Quickshell.execDetached(["cp", "-f", "--", src, face.path]);
+                // A imagem abre no editor, para a posicionar no círculo antes de gravar.
+                if (src !== "") {
+                    ShellState.avatarScreen = Hyprland.focusedMonitor?.name ?? "";
+                    ShellState.avatarSource = src;
+                }
             }
         }
     }
