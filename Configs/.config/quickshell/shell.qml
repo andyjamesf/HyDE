@@ -285,5 +285,9 @@ ShellRoot {
         function reload(): void {
             Quickshell.reload(true);
         }
+        // Escolher a fotografia do utilizador (a mesma ação que clicar na foto do centro de controlo).
+        function avatar(): void {
+            SysInfo.chooseAvatar();
+        }
     }
 }

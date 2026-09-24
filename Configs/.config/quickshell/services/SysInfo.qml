@@ -25,9 +25,33 @@ Singleton {
     }
 
     FileView {
+        id: face
         path: `${Quickshell.env("HOME")}/.face`
         printErrors: false
-        onLoaded: root.avatar = `file://${path}`
+        watchChanges: true
+        onFileChanged: reload()
+        // O número no fim obriga a Image a ler a foto nova (senão mostrava a que tinha em cache).
+        onLoaded: root.avatar = `file://${path}?v=${Date.now()}`
+        onLoadFailed: root.avatar = ""
+    }
+
+    // Mudar a foto: o seletor de ficheiros do sistema (portal) e a imagem escolhida fica copiada para
+    // ~/.face (onde os gestores de sessão e o lockscreen também a procuram).
+    function chooseAvatar() {
+        if (!picker.running)
+            picker.running = true;
+    }
+
+    Process {
+        id: picker
+        command: ["python3", Quickshell.shellPath("scripts/pick_file.py"), "Choose your photo", "Images:*.png;*.jpg;*.jpeg;*.webp;*.bmp", `${Quickshell.env("HOME")}/Pictures`]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const src = text.trim();
+                if (src !== "")
+                    Quickshell.execDetached(["cp", "-f", "--", src, face.path]);
+            }
+        }
     }
 
     FileView {

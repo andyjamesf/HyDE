@@ -168,6 +168,16 @@ PanelWindow {
                 fillMode: Image.PreserveAspectCrop
                 sourceSize.width: 80
                 sourceSize.height: 80
+                cache: false
+            }
+
+            // Clicar na foto: escolher outra.
+            StateLayer {
+                anchors.fill: parent
+                onClicked: {
+                    ShellState.closeControlCenter();
+                    SysInfo.chooseAvatar();
+                }
             }
         }
 
@@ -201,7 +211,10 @@ PanelWindow {
                 tooltip: "Shell settings"
                 onClicked: {
                     ShellState.closeControlCenter();
-                    Utils.run(`xdg-open ${Quickshell.shellPath("config/config.json")}`);
+                    // A pasta da shell e o config.json num editor de código (o primeiro que existir).
+                    const dir = Quickshell.shellPath("");
+                    const cfg = Quickshell.shellPath("config/config.json");
+                    Utils.run(`for e in code codium zeditor; do command -v $e >/dev/null && exec $e "${dir}" "${cfg}"; done; exec kitty nvim "${cfg}"`);
                 }
             }
 
