@@ -1,3 +1,18 @@
+> [!NOTE]
+> **Edição Quickshell** deste fork (`andyjamesf/HyDE`). Instala-se exatamente como o HyDE original,
+> mas a barra, as notificações, o OSD, o launcher (apps, clipboard, calculadora), o centro de
+> controlo, o power menu e o lockscreen são uma shell em [Quickshell](https://quickshell.org)
+> (`Configs/.config/quickshell/`, documentação no `README.md` dessa pasta) em vez da Waybar, do dunst
+> e do wlogout. O rofi (menus do HyDE) e o hyprlock (lockscreen de reserva) continuam instalados.
+>
+> ```sh
+> git clone --depth 1 https://github.com/andyjamesf/HyDE ~/HyDE
+> cd ~/HyDE/Scripts && ./install.sh
+> ```
+>
+> Acompanhar o HyDE oficial: `git fetch upstream && git rebase upstream/master` (as alterações da
+> edição estão em poucos commits isolados, no topo do ramo).
+
 <div align = center>
   
 <a href="https://discord.gg/AYbJ9MJez7">
