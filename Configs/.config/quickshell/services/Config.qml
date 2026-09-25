@@ -101,6 +101,13 @@ Singleton {
                     property bool showPercent: true
                     property int step: 5
                 }
+                property JsonObject tray: JsonObject {
+                    // Tray icons to hide, by app id (the StatusNotifierItem "Id"). The apps keep
+                    // running: nm-applet still asks for Wi-Fi passwords and blueman still handles
+                    // PIN pairing, but their icons would repeat the bar's own network/Bluetooth
+                    // widgets and open GTK menus. Remove an id to show that icon again.
+                    property var hidden: ["nm-applet", "blueman", "udiskie"]
+                }
             }
         }
     }

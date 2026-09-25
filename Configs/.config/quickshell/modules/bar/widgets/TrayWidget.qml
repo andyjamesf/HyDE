@@ -7,12 +7,13 @@ import qs.components
 import qs.services
 
 // Tray: click activates, right click opens the app's menu, middle click runs the secondary action.
-// "Passive" items are hidden, as in Waybar. Monochrome icons (network,
-// Bluetooth, disks…) are painted with the text color, so they are visible with any theme.
+// "Passive" items are hidden, as in Waybar, and so are the apps listed in config.json
+// (widgets.tray.hidden: by default the network, Bluetooth and disk applets, which the bar already
+// covers). Monochrome icons are painted with the text color, so they are visible with any theme.
 Row {
     id: root
 
-    readonly property var items: SystemTray.items.values.filter(i => i.status !== Status.Passive)
+    readonly property var items: SystemTray.items.values.filter(i => i.status !== Status.Passive && !(Config.widgets.tray.hidden ?? []).includes(i.id))
     property bool shown: items.length > 0
 
     spacing: 2

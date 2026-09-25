@@ -64,10 +64,14 @@ Row {
                     });
             } else {
                 const c = /(?:foreground|fgcolor|color)=['"]([^'"]+)['"]/.exec(m[1]);
+                // A span may hold the icon and a value together: the errors are
+                // "<span …>󰜡 Auth Err</span>". Only the Nerd Font glyphs (Private Use Area) at the start
+                // are the icon; the rest is text (in the fixed-width icon box it covered its neighbours).
+                const g = /^((?:[\uE000-\uF8FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF])*)\s*([\s\S]*)$/.exec(m[2].trim());
                 out.push({
-                    glyph: m[2].trim(),
+                    glyph: g[1],
                     color: c ? c[1] : "",
-                    text: ""
+                    text: g[2]
                 });
             }
         }
