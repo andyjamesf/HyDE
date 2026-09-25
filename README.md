@@ -65,7 +65,7 @@ git fetch upstream && git rebase upstream/master
 | Logout menu | wlogout | shell power menu |
 | Lock screen | hyprlock | shell lock screen (hyprlock stays as fallback) |
 | Control center | — | new |
-| Theme/wallpaper/animation pickers, emoji, glyphs, window switcher | rofi | HyDE shell: still rofi, restyled with the shell colors; Morphing Island: its own pickers |
+| Theme/wallpaper/animation pickers, emoji, glyphs, window switcher, files, web search, games… | rofi | the shells' own launcher pickers (17, no rofi) |
 | A second shell | — | the Morphing Island, switchable live with `Super+Alt+I` |
 
 The installer (`Scripts/dots/quickshell.toml` in the `core` group) installs the shell and its

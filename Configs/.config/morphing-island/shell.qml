@@ -89,6 +89,12 @@ ShellRoot {
         function caffeine(): void {
             Caffeine.toggle();
         }
+        // Night light (hyprsunset through HyDE's script); toggles. Returns "turning on" or "turning off"
+        // (HyDE's state file, and so NightLight.active, updates a moment later).
+        function nightlight(): string {
+            NightLight.toggle();
+            return NightLight.active ? "turning off" : "turning on";
+        }
         // Number of notifications in the history.
         function notifications(): string {
             return String(Notifications.count);

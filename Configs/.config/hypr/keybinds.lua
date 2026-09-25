@@ -26,7 +26,7 @@ local M = {}
 -- goes to whichever shell is running:
 --   island   arguments for `qs -p ~/.config/morphing-island ipc call island …`
 --            (see ~/.config/morphing-island/README.md, "IPC"). nil = the key does nothing there.
---   hyde     a shell command for the HyDE Quickshell shell / HyDE's rofi menus. nil = nothing.
+--   hyde     a shell command for the HyDE Quickshell shell (`qs ipc call …`). nil = nothing.
 --   desc     "[Category] what it does": the category groups it in the keybindings list.
 M.shell = {
 	-- Launcher and its modes.
@@ -42,23 +42,23 @@ M.shell = {
 	{ keys = "$mod + ALT + comma", island = "open settings", hyde = nil, desc = "[Morphing Island] settings" },
 
 	-- Theme and wallpaper.
-	{ keys = "$mod + SHIFT + T", island = "open theme", hyde = hyde.sh.menu.themes(), desc = "[Theming and Wallpaper] select a theme" },
-	{ keys = "$mod + SHIFT + W", island = "open wallpaper", hyde = hyde.sh.menu.wallpapers(), desc = "[Theming and Wallpaper] select a global wallpaper" },
+	{ keys = "$mod + SHIFT + T", island = "open theme", hyde = "qs ipc call launcher pick themes", desc = "[Theming and Wallpaper] select a theme" },
+	{ keys = "$mod + SHIFT + W", island = "open wallpaper", hyde = "qs ipc call launcher pick wallpapers", desc = "[Theming and Wallpaper] select a global wallpaper" },
 
-	-- HyDE's rofi menus. In the island they open as launcher pickers (`pick <name>`; names in
-	-- ~/.config/morphing-island/services/Pickers.qml); with the HyDE shell they stay rofi.
-	{ keys = "$mod + TAB", island = "pick windows", hyde = hyde.sh.menu.windows(), desc = "[Launcher|Rofi menus] window switcher" },
-	{ keys = "$mod + SHIFT + E", island = "pick files", hyde = hyde.sh.menu.files(), desc = "[Launcher|Rofi menus] file finder" },
-	{ keys = "$mod + period", island = "pick glyph", hyde = hyde.sh.menu.glyph(), desc = "[Launcher|Rofi menus] glyph picker" },
-	{ keys = "$mod + SHIFT + comma", island = "pick emoji", hyde = hyde.sh.menu.emoji(), desc = "[Launcher|Rofi menus] emoji picker" },
-	{ keys = "$mod + SHIFT + slash", island = "pick web", hyde = hyde.sh.menu.search(), desc = "[Launcher|Rofi menus] web search" },
-	{ keys = "$mod + SHIFT + backslash", island = "pick web", hyde = hyde.sh.menu.search(), desc = "[Launcher|Rofi menus] web search" },
-	{ keys = "$mod + SHIFT + R", island = "pick wallbash", hyde = hyde.sh.menu.wallbash(), desc = "[Theming and Wallpaper] wallbash mode selector" },
-	{ keys = "$mod + SHIFT + Y", island = "pick animations", hyde = "hyde-shell animations --select", desc = "[Theming and Wallpaper] select animations" },
-	{ keys = "$mod + SHIFT + U", island = "pick hyprlock", hyde = "hyde-shell hyprlock --select", desc = "[Theming and Wallpaper] select Hyprlock layout" },
-	{ keys = "$mod + SHIFT + G", island = "pick games", hyde = "hyde-shell gamelauncher", desc = "[Utilities] game launcher" },
+	-- HyDE's rofi menus, ported to both shells: launcher pickers (`pick <name>`; the island's are in
+	-- ~/.config/morphing-island/services/Pickers.qml, the HyDE shell's in ~/.config/quickshell/pickers/).
+	{ keys = "$mod + TAB", island = "pick windows", hyde = "qs ipc call launcher pick windows", desc = "[Launcher|Pickers] window switcher" },
+	{ keys = "$mod + SHIFT + E", island = "pick files", hyde = "qs ipc call launcher pick files", desc = "[Launcher|Pickers] file finder" },
+	{ keys = "$mod + period", island = "pick glyph", hyde = "qs ipc call launcher pick glyph", desc = "[Launcher|Pickers] glyph picker" },
+	{ keys = "$mod + SHIFT + comma", island = "pick emoji", hyde = "qs ipc call launcher pick emoji", desc = "[Launcher|Pickers] emoji picker" },
+	{ keys = "$mod + SHIFT + slash", island = "pick web", hyde = "qs ipc call launcher pick web", desc = "[Launcher|Pickers] web search" },
+	{ keys = "$mod + SHIFT + backslash", island = "pick web", hyde = "qs ipc call launcher pick web", desc = "[Launcher|Pickers] web search" },
+	{ keys = "$mod + SHIFT + R", island = "pick wallbash", hyde = "qs ipc call launcher pick wallbash", desc = "[Theming and Wallpaper] wallbash mode selector" },
+	{ keys = "$mod + SHIFT + Y", island = "pick animations", hyde = "qs ipc call launcher pick animations", desc = "[Theming and Wallpaper] select animations" },
+	{ keys = "$mod + SHIFT + U", island = "pick hyprlock", hyde = "qs ipc call launcher pick hyprlock", desc = "[Theming and Wallpaper] select Hyprlock layout" },
+	{ keys = "$mod + SHIFT + G", island = "pick games", hyde = "qs ipc call launcher pick games", desc = "[Utilities] game launcher" },
 	-- Every picker in one list (workflows, shaders, layouts, HyDE themes… have no key of their own).
-	{ keys = "$mod + SHIFT + A", island = "pick menu", hyde = hyde.sh.menu.select(), desc = "[Launcher] HyDE menus" },
+	{ keys = "$mod + SHIFT + A", island = "pick menu", hyde = "qs ipc call launcher pick menu", desc = "[Launcher] HyDE menus" },
 
 	-- Bar.
 	{ keys = "$mod + comma", island = "hide", hyde = "qs ipc call bar toggle", desc = "[Window Management] hide or show the bar" },

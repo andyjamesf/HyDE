@@ -2,7 +2,8 @@ pragma Singleton
 import Quickshell
 
 // HyDE actions (the same entries and commands as HyDE's Waybar menus:
-// ~/.local/share/waybar/menus/*.xml + the modules' "menu-actions"). Format for MenuPopup:
+// ~/.local/share/waybar/menus/*.xml + the modules' "menu-actions"), except that the "Select …"
+// entries open the launcher's pickers (pickers/) instead of rofi. Format for MenuPopup:
 // { label, cmd } | { label, items: [...] } | { sep: true }.
 Singleton {
     readonly property var hyprsunset: [
@@ -102,7 +103,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Animation",
-                    "cmd": "hyde-shell animations --select"
+                    "cmd": "qs ipc call launcher pick animations"
                 }
             ]
         },
@@ -111,7 +112,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Wallpaper",
-                    "cmd": "hyde-shell app -t scope -- wallpaper.sh --select --global"
+                    "cmd": "qs ipc call launcher pick wallpapers"
                 },
                 {
                     "label": "  Next Wallpaper",
@@ -132,7 +133,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Theme",
-                    "cmd": "hyde-shell app -t scope -- theme.select.sh"
+                    "cmd": "qs ipc call launcher pick themes"
                 },
                 {
                     "label": "  Next Theme",
@@ -153,7 +154,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Layout",
-                    "cmd": "hyde-shell layouts --select"
+                    "cmd": "qs ipc call launcher pick layouts"
                 }
             ]
         },
@@ -162,7 +163,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Workflow",
-                    "cmd": "hyde-shell workflows --select"
+                    "cmd": "qs ipc call launcher pick workflows"
                 }
             ]
         },
@@ -171,7 +172,7 @@ Singleton {
             "items": [
                 {
                     "label": "  Select Lockscreen",
-                    "cmd": "hyde-shell lockscreen --select"
+                    "cmd": "qs ipc call launcher pick hyprlock"
                 }
             ]
         },
@@ -270,7 +271,7 @@ Singleton {
         },
         {
             "label": "  Shaders",
-            "cmd": "hyde-shell shaders --select"
+            "cmd": "qs ipc call launcher pick shaders"
         },
         {
             "sep": true

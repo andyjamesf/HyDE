@@ -40,7 +40,8 @@ Singleton {
     readonly property int sliderThrottleMs: 60
     // Bluetooth discovery stops by itself after this long. Milliseconds, default 30000.
     readonly property int btDiscoveryMs: 30000
-    // Night light colour temperature when turned on (hyprsunset). Kelvin, 1000–20000 (lower =
-    // warmer), default 4000.
+    // Night light colour temperature (hyprsunset, through HyDE's script), used when turning it on while
+    // HyDE's saved temperature is neutral (≥ 6000 K); otherwise HyDE's own saved temperature is kept.
+    // Kelvin, 1000–20000 (lower = warmer), default 4000.
     readonly property int nightLightTemperature: 4000
 }

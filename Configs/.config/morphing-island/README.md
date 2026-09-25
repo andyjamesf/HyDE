@@ -127,7 +127,7 @@ island ipc close | pin | mode
 island ipc launcher "<query>"   e.g. "=2+2", ":"
 island ipc pick <name>           windows | files | web | emoji | glyph | bookmarks | quickapps | games |
                                 wallbash | animations | hyprlock | workflows | shaders | layouts | menu
-island ipc hide | peace | caffeine | notifications | clearNotifications
+island ipc hide | peace | caffeine | nightlight | notifications | clearNotifications
 qs -p ~/.config/morphing-island ipc call lock lock | unlock | isLocked
 ```
 

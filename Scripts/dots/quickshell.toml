@@ -1,6 +1,7 @@
 # Quickshell shell: bar, notification server, OSD, launcher (apps/clipboard/calculator),
 # control center, power menu and lockscreen. Replaces waybar, dunst and wlogout in this edition;
-# rofi (HyDE's pickers) and hyprlock (lockscreen fallback) are still installed by their own dots.
+# rofi (still used by some HyDE scripts; the shells have their own pickers) and hyprlock (lockscreen
+# fallback) are still installed by their own dots.
 [quickshell]
 description = "Quickshell desktop shell for HyDE (bar, notifications, launcher, control center, lockscreen)"
 
@@ -26,7 +27,7 @@ paru = [
 action = "sync"
 source_root = "Configs/.config/quickshell"
 target_root = "${XDG_CONFIG_HOME}/quickshell"
-paths = ["shell.qml", "README.md", "components", "services", "modules", "scripts"]
+paths = ["shell.qml", "README.md", "components", "services", "modules", "pickers", "scripts"]
 
 # The user's settings (config.json, layouts.json): only copied when missing, never overwritten.
 [[quickshell.files]]

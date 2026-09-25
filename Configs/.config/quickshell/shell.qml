@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import qs.services
+import qs.pickers
 import qs.modules.bar
 import qs.modules.controlcenter
 import qs.modules.notifications
@@ -123,6 +124,12 @@ ShellRoot {
         // Hyprland keybindings (replaces HyDE's keybinds_hint).
         function keys(): void {
             ShellState.toggleLauncher("keys");
+        }
+        // Opens a picker (pickers/Pickers.qml): themes, wallpapers, windows, files, web, emoji, glyph,
+        // bookmarks, quickapps, games, wallbash, animations, hyprlock, workflows, shaders, layouts,
+        // menu. Pressing the same key again closes it; an unknown or disabled name opens the apps.
+        function pick(name: string): void {
+            ShellState.toggleLauncher(Pickers.get(name) !== null ? "pick:" + name : "apps");
         }
         function close(): void {
             ShellState.launcherOpen = false;

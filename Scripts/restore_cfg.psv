@@ -140,7 +140,7 @@ S|${HOME}/.config|MangoHud|mangohud
  Launcher 
 P|${HOME}/.config|rofi|rofi
 S|${HOME}/.config|wlogout|wlogout
-S|${HOME}/.config/quickshell|shell.qml README.md components services modules scripts|quickshell
+S|${HOME}/.config/quickshell|shell.qml README.md components services modules pickers scripts|quickshell
 P|${HOME}/.config/quickshell|config|quickshell
 S|${HOME}/.config/morphing-island|shell.qml README.md components core icons services theme|quickshell
 P|${HOME}/.config/morphing-island|config|quickshell

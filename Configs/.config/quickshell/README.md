@@ -16,6 +16,7 @@ documented in the repository's main [README](https://github.com/andyjamesf/HyDE#
 | `services/` | singletons with the logic (colors, audio, network, Bluetooth, notifications, launcher, keybindings, lock, rofi colors…) |
 | `components/` | reusable visual pieces (buttons, sliders, cards, popouts, menus, tooltips) |
 | `modules/` | bar, control center, notifications, OSD, launcher, power menu, lock screen |
+| `pickers/` | the launcher's pickers, HyDE's rofi menus ported to the shell: windows, files, web, emoji, glyphs, bookmarks, games, HyDE themes, wallpapers, wallbash, animations, lock screen, workflows, shaders, layouts (`qs ipc call launcher pick <name>`; settings in `config.json` → `pickers`) |
 | `config/config.json` | your settings (only what you change; defaults in `services/Config.qml`) |
 | `config/layouts.json` | bar layout presets (add your own) |
 | `scripts/ical_events.py` | iCal reader for the calendar (Google Calendar) |
