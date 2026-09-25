@@ -301,6 +301,10 @@ EOF
 		fi
 	fi
 	nvidia_detect --verbose
+	# Intel/AMD: CPU microcode, Vulkan and video decoding (hw_detect.sh)
+	"${scrDir}/hw_detect.sh" | while read -r pkg; do
+		[ -n "${pkg}" ] && echo "\"${pkg}\","
+	done >> "${core_toml}"
 	echo "]" >> "${core_toml}"
 
 	#--------------------------------#
@@ -358,6 +362,9 @@ EOF
 			[ -n "${pkg}" ] && echo "\"${pkg}\","
 		done >> "${core_toml}"
 	fi
+	"${scrDir}/hw_detect.sh" | while read -r pkg; do
+		[ -n "${pkg}" ] && echo "\"${pkg}\","
+	done >> "${core_toml}"
 	echo "]" >> "${core_toml}"
 
 	#------------------------------------------#
@@ -481,6 +488,8 @@ EOF
 	fi
 
 	"${scrDir}/restore_thm.sh"
+	# Quickshell Edition: first-install theme, animations and shell (keeps existing choices)
+	[ "${flg_DryRun}" -eq 1 ] || "${scrDir}/edition_defaults.sh"
 	print_log -g "[generate] " "cache ::" "Wallpapers..."
 	if [ "${flg_DryRun}" -ne 1 ]; then
 		export PATH="$HOME/.local/lib/hyde:$HOME/.local/bin:${PATH}"

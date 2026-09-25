@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Switches between HyDE's Quickshell shell (~/.config/quickshell) and the Morphing Island
+# (~/.config/morphing-island). Only one can be active: both want to be the notification
+# server, and the island is also the polkit agent.
+#
+#   island on | off | toggle | status
+#   island ipc <function> [args]   e.g. island ipc open launcher
+set -euo pipefail
+
+cfg="$HOME/.config/morphing-island"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/morphing-island"
+active="$state_dir/active"
+desk="${XDG_SESSION_DESKTOP:-Hyprland}"
+qsbar="hyde-${desk}-qsbar.service"
+unit="morphing-island.service"
+
+is_on() { [[ -e "$active" ]]; }
+
+polkit_units() { systemctl --user list-units --plain --no-legend 'app-*-polkitkdeauth.sh@*.service' | awk '{print $1}'; }
+
+on() {
+    mkdir -p "$state_dir"
+    touch "$active"
+    systemctl --user stop "$qsbar" 2>/dev/null || true
+    # HyDE's polkit agent goes away: the island registers itself as the agent.
+    for u in $(polkit_units); do systemctl --user stop "$u" || true; done
+    systemctl --user reset-failed "$unit" 2>/dev/null || true
+    hyde-shell app -u "$unit" -t service -- qs -p "$cfg"
+    hyprctl eval 'MorphingIsland.set(true)' >/dev/null
+    echo "Morphing Island active."
+}
+
+off() {
+    rm -f "$active"
+    systemctl --user stop "$unit" 2>/dev/null || true
+    hyprctl eval 'MorphingIsland.set(false)' >/dev/null
+    systemctl --user reset-failed "$qsbar" 2>/dev/null || true
+    hyde-shell app -u "$qsbar" -t service -- qs
+    [[ -n "$(polkit_units)" ]] || hyde-shell app -t service -- polkitkdeauth.sh
+    echo "HyDE shell active."
+}
+
+case "${1:-status}" in
+    on) is_on && systemctl --user is-active -q "$unit" && { echo "Already active."; exit 0; }; on ;;
+    off) off ;;
+    toggle) if is_on; then off; else on; fi ;;
+    status) if is_on; then echo "island"; else echo "hyde"; fi ;;
+    ipc) shift; exec qs -p "$cfg" ipc call island "$@" ;;
+    *) sed -n '2,8p' "$0"; exit 1 ;;
+esac

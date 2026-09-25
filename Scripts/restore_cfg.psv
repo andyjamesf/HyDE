@@ -142,6 +142,10 @@ P|${HOME}/.config|rofi|rofi
 S|${HOME}/.config|wlogout|wlogout
 S|${HOME}/.config/quickshell|shell.qml README.md components services modules scripts|quickshell
 P|${HOME}/.config/quickshell|config|quickshell
+S|${HOME}/.config/morphing-island|shell.qml README.md components core icons services theme|quickshell
+P|${HOME}/.config/morphing-island|config|quickshell
+S|${HOME}/.local/bin|island|quickshell
+P|${HOME}/.config/hypr|keybinds.lua|hyprland
 
  Lock Screen 
 S|${HOME}/.config|swaylock|swaylock-effects

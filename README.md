@@ -1,9 +1,21 @@
 # HyDE — Quickshell Edition
 
 A fork of [HyDE](https://github.com/HyDE-Project/HyDE) (the Hyprland desktop environment) in which
-the bar, notifications, OSD, launcher, control center, power menu and lock screen are a single
-desktop shell written from scratch in [Quickshell](https://quickshell.org) (QML). Everything else is
-still HyDE: the installer, themes, wallbash, wallpapers, scripts and Hyprland configuration.
+the bar, notifications, OSD, launcher, control center, power menu and lock screen are desktop shells
+written from scratch in [Quickshell](https://quickshell.org) (QML). Two shells are included, and
+exactly one runs at a time:
+- the **HyDE Quickshell shell**, a full bar;
+- the **Morphing Island**, a single island at the top of the screen that becomes whatever you need.
+
+`Super+Alt+I` switches between them live. Everything else is still HyDE: the installer, themes,
+wallbash, wallpapers, scripts and Hyprland configuration.
+
+## Install
+
+It works on any PC with Arch Linux:
+- a fresh install;
+- over an existing HyDE;
+- any CPU or GPU: Intel, AMD, NVIDIA or a virtual machine.
 
 It installs exactly like the original HyDE:
 
@@ -11,6 +23,13 @@ It installs exactly like the original HyDE:
 git clone --depth 1 https://github.com/andyjamesf/HyDE ~/HyDE
 cd ~/HyDE/Scripts && ./install.sh
 ```
+
+- **Drivers:** HyDE's installer handles NVIDIA. On top of that, `Scripts/hw_detect.sh` adds what a
+  plain Arch install leaves out on Intel and AMD: CPU microcode, Vulkan and, on Intel, hardware video
+  decoding.
+- **First install:** the Drawbridge theme, macOS-like animations and the Morphing Island as the
+  active shell (`Scripts/edition_defaults.sh`).
+- **Over an existing HyDE:** your theme, animations and shell choice are kept.
 
 > The original HyDE README (features, themes, community, credits) is in
 > [`README.HyDE.md`](README.HyDE.md).
@@ -46,14 +65,15 @@ git fetch upstream && git rebase upstream/master
 | Logout menu | wlogout | shell power menu |
 | Lock screen | hyprlock | shell lock screen (hyprlock stays as fallback) |
 | Control center | — | new |
-| Theme/wallpaper/animation pickers, emoji, glyphs, window switcher | rofi | still rofi, restyled with the shell colors |
+| Theme/wallpaper/animation pickers, emoji, glyphs, window switcher | rofi | HyDE shell: still rofi, restyled with the shell colors; Morphing Island: its own pickers |
+| A second shell | — | the Morphing Island, switchable live with `Super+Alt+I` |
 
 The installer (`Scripts/dots/quickshell.toml` in the `core` group) installs the shell and its
 dependencies and no longer installs `waybar`, `dunst` or `wlogout`. The shell's code is updated by
 HyDE updates; your settings in `config/` are only copied when missing and are never overwritten.
 
 Dependencies: `quickshell`, `inter-font`, `upower`, `power-profiles-daemon`, `wl-clipboard`,
-`python` and `ttf-material-symbols-variable-git` (AUR).
+`python` and `ttf-material-symbols-variable-git` (AUR); the Morphing Island adds `wtype`.
 
 ## Features
 
@@ -144,22 +164,52 @@ ask for a second press. The lock screen uses `ext-session-lock` with PAM (the sa
   now `0`.
 - **Blur**: blur for the shell's layers and for the bar popouts (`blur_popups`).
 
+## The Morphing Island
+
+A second shell in `~/.config/morphing-island` (code in
+[`Configs/.config/morphing-island/`](Configs/.config/morphing-island/)). One island at the top of the
+screen morphs, with critically damped springs, into each of these:
+- the clock and an expanded bar;
+- the volume, microphone and brightness OSDs;
+- notifications;
+- the launcher, with 16 pickers that replace HyDE's rofi menus;
+- the control center (Wi-Fi, Bluetooth, audio, media, night light, caffeine);
+- the theme, wallpaper and settings screens;
+- the power menu, the polkit prompt and the lock screen.
+
+| | |
+|---|---|
+| Switch shells | `Super+Alt+I`, or `island on \| off \| toggle \| status` in a terminal |
+| Settings | one documented QML file per area in `~/.config/morphing-island/config/` (pill, clock, OSD, notifications, launcher, pickers, control center, theme, lock screen…); edits apply live. See its `README.md`. |
+| Keys | `~/.config/hypr/keybinds.lua`: see below |
+
+Only one shell runs because both are notification servers, and the island is also the polkit agent.
+Its README lists every mode, its IPC and its known limits.
+
 ## Keybindings
 
-The shell's own binds (all others are HyDE's; press `Super+/` for the full list):
+The keys this edition adds or changes live in **`~/.config/hypr/keybinds.lua`**. It is your file:
+it is documented inside, and HyDE updates never overwrite it. Each shell key names what it does in
+the island and what it does in the HyDE shell, so the same keys work in both. The file can also
+remove or reassign any of HyDE's own binds. Apply changes with `hyprctl reload`. Press `Super+/`
+(or `Super+\`) for the full list, HyDE's binds included.
 
 | Keys | Action |
 |---|---|
 | `Super+A` | launcher (apps; type a calculation to compute it) |
 | `Super+V` | clipboard |
 | `Super+Shift+K` | calculator |
-| `Super+/` | keybindings |
+| `Super+/` or `Super+\` | keybindings |
+| `Super+Alt+I` | switch shells (island ⇄ HyDE shell) |
+| `Super+Tab`, `Super+Shift+E`, `Super+.`, `Super+Shift+,` | window switcher, file finder, glyphs, emoji |
+| `Super+Shift+T` / `Super+Shift+W` | theme / wallpaper picker |
+| `Super+Shift+A` | every picker in one list |
 | `Super+Alt+C` | control center |
 | `Super+N` | notification history |
 | `Super+Alt+↑` / `↓` | next / previous bar layout |
-| `Super+Ctrl+B` | hide / show the bar |
+| `Super+,` or `Super+Ctrl+B` | hide / show the bar (or the island) |
 | `Super+L` | lock |
-| `Ctrl+Alt+Delete` | power menu |
+| `Ctrl+Alt+Delete` or `Super+Delete` | power menu (asks before logging out, rebooting or powering off) |
 
 ## Configuration
 
@@ -240,6 +290,12 @@ Hyprland shows "the lockscreen app died", run
 | `…/modules/` | bar, control center, notifications, OSD, launcher, power menu, lock screen |
 | `…/config/` | `config.json` and `layouts.json` (user settings; never overwritten) |
 | `Scripts/dots/quickshell.toml` | installer entry (packages and files) |
+| `Configs/.config/morphing-island/` | the Morphing Island (`config/`: user settings, never overwritten) |
+| `Configs/.local/bin/island` | shell switch |
+| `Configs/.config/hypr/keybinds.lua` | the edition's keys (user file, never overwritten) |
+| `Configs/.local/share/hypr/lua/morphing_island.lua` | applies `keybinds.lua`, routes each key to the active shell, starts the island at login |
+| `Scripts/dots/morphing-island.toml` | installer entry for the island |
+| `Scripts/hw_detect.sh`, `Scripts/edition_defaults.sh` | Intel/AMD drivers; first-install theme, animations and shell |
 | `Configs/.local/share/hypr/lua/` | HyDE's Lua config: shell autostart, binds, layer rules |
 | `Configs/.local/share/hyde/wallbash/` | wallbash templates (shell palette, bar colors) |
 

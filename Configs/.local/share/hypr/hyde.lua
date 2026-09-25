@@ -64,6 +64,8 @@ require("layer_rules")
 require("env")
 -- * Binds
 require("key_binds")
+-- * Desktop shell switch (HyDE shell / Morphing Island) and the keys in ~/.config/hypr/keybinds.lua
+require("morphing_island")
 --* Dynamic Stuff example theming and variable handlings
 require("dynamic")
 -- * Event handlers for more DE like experience

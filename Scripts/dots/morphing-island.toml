@@ -1,0 +1,48 @@
+# Morphing Island: a second Quickshell desktop shell, a single island at the top of the screen that
+# becomes the clock, bar, OSD, notifications, launcher, pickers, control center, settings, power
+# menu, polkit prompt and lock screen. Exactly one shell runs at a time: `island on|off|toggle` (or
+# Super+Alt+I) switches between it and the HyDE Quickshell shell. The same keys drive both
+# (~/.config/hypr/keybinds.lua, applied by lua/morphing_island.lua).
+[morphing-island]
+description = "Morphing Island desktop shell (Quickshell), switchable with the HyDE Quickshell shell"
+
+[[morphing-island.dependency]]
+pacman = [
+    "quickshell",      # the shell runtime (QML)
+    "wtype",           # direct paste from the emoji, glyph and clipboard pickers
+    "cliphist",        # clipboard history
+    "wl-clipboard",    # wl-copy / wl-paste
+    "brightnessctl",   # brightness
+    "hyprsunset",      # night light
+    "python-gobject",  # system file chooser (xdg-desktop-portal) for the user photo
+    "jq",              # scripts
+]
+
+# The island's code: kept in sync with HyDE (updates overwrite it).
+[[morphing-island.files]]
+action = "sync"
+source_root = "Configs/.config/morphing-island"
+target_root = "${XDG_CONFIG_HOME}/morphing-island"
+paths = ["shell.qml", "README.md", "components", "core", "icons", "services", "theme"]
+
+# The user's settings (one documented file per area): only copied when missing, never overwritten.
+[[morphing-island.files]]
+action = "preserve"
+source_root = "Configs/.config/morphing-island"
+target_root = "${XDG_CONFIG_HOME}/morphing-island"
+paths = ["config"]
+
+# Shell switch: island on | off | toggle | status.
+[[morphing-island.files]]
+action = "sync"
+source_root = "Configs/.local/bin"
+target_root = "${HOME}/.local/bin"
+paths = ["island"]
+post_command = "chmod +x ${HOME}/.local/bin/island"
+
+# The keybindings this edition adds or changes: the user's file, never overwritten.
+[[morphing-island.files]]
+action = "preserve"
+source_root = "Configs/.config/hypr"
+target_root = "${XDG_CONFIG_HOME}/hypr"
+paths = ["keybinds.lua"]
