@@ -1,7 +1,7 @@
 import qs.components
 import qs.services
 
-// Inibidor de inatividade ("cafeína"): impede o ecrã de se apagar e o sistema de suspender.
+// Idle inhibitor ("caffeine"): keeps the screen from turning off and the system from suspending.
 BarItem {
     icon: "coffee"
     iconFill: ShellState.idleInhibited ? 1 : 0

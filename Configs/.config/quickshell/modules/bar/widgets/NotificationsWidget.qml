@@ -1,8 +1,8 @@
 import qs.components
 import qs.services
 
-// Notificações. Nesta fase ainda são do swaync (fase 3: servidor próprio).
-// Clique abre o painel, clique direito liga/desliga o "Não incomodar".
+// Notifications. At this stage they still come from swaync (phase 3: own server).
+// Click opens the panel, right click toggles "Do not disturb".
 BarItem {
     shown: Notifs.available
     icon: Notifs.dnd ? "notifications_off" : Notifs.count > 0 ? "notifications_unread" : "notifications"

@@ -3,26 +3,26 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Preferências escolhidas em runtime (menus, IPC), guardadas em ~/.local/state/quickshell/…/prefs.json.
-// Ficam fora do config.json de propósito: esse vive no repositório de dotfiles e não deve ser
-// reescrito pela shell.
+// Preferences chosen at runtime (menus, IPC), stored in ~/.local/state/quickshell/…/prefs.json.
+// They are kept out of config.json on purpose: that one lives in the dotfiles repository and must not be
+// rewritten by the shell.
 Singleton {
     id: root
 
-    // Layout da barra escolhido (vazio: usa o "layout" do config.json).
+    // Chosen bar layout (empty: use the "layout" from config.json).
     property alias layout: adapter.layout
-    // Origem das cores: "hyde" segue o HyDE (tema ou wallbash, conforme o modo do HyDE);
-    // "wallpaper" usa sempre as cores extraídas do wallpaper atual.
+    // Color source: "hyde" follows HyDE (theme or wallbash, depending on HyDE's mode);
+    // "wallpaper" always uses the colors extracted from the current wallpaper.
     property alias colorSource: adapter.colorSource
-    // Estilo do fundo das ilhas (ver BarLayout.pillStyles); vazio: usa o do config.json.
+    // Island background style (see BarLayout.pillStyles); empty: use the one from config.json.
     property alias pillStyle: adapter.pillStyle
-    // Opacidade do fundo das ilhas escolhida no menu (negativo: usa a do layout/config.json).
+    // Island background opacity chosen in the menu (negative: use the layout/config.json one).
     property alias pillOpacity: adapter.pillOpacity
-    // Altura da barra (das ilhas) em px; 0: usa a do layout.
+    // Bar (island) height in px; 0: use the layout's.
     property alias barHeight: adapter.barHeight
-    // "Não incomodar": sem popups de notificações (exceto as críticas).
+    // "Do not disturb": no notification popups (except critical ones).
     property alias dnd: adapter.dnd
-    // AI usage da barra aberto (true) ou recolhido atrás do botão (false).
+    // Bar AI usage expanded (true) or collapsed behind the button (false).
     property alias aiExpanded: adapter.aiExpanded
 
     function save() {

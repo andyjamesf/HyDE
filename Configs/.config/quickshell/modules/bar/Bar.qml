@@ -4,7 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.services
 
-// A barra de um ecrã. As secções (esquerda, centro, direita) e as ilhas vêm do config.json.
+// The bar of one screen. The sections (left, center, right) and the islands come from config.json.
 PanelWindow {
     id: bar
 
@@ -33,7 +33,7 @@ PanelWindow {
         enabled: ShellState.idleInhibited
     }
 
-    // Fundo do estilo "continuous".
+    // Background of the "continuous" style.
     Rectangle {
         anchors.fill: parent
         visible: !bar.islands
@@ -54,8 +54,8 @@ PanelWindow {
             islandList: BarLayout.left
         }
 
-        // Centrado, mas desviado quando os lados precisam do espaço (como o CenterBox do GTK).
-        // Se não couber de todo entre os lados, esconde-se em vez de ficar por cima deles.
+        // Centered, but pushed aside when the sides need the space (like GTK's CenterBox).
+        // If it doesn't fit between the sides at all, it hides instead of overlapping them.
         Section {
             visible: parent.width - leftSection.width - rightSection.width - 2 * BarLayout.spacing >= implicitWidth
             x: Math.max(leftSection.width + BarLayout.spacing, Math.min((parent.width - width) / 2, rightSection.x - width - BarLayout.spacing))

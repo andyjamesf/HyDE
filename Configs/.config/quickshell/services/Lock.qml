@@ -3,23 +3,23 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
 
-// Bloqueio de sessão da shell (ext-session-lock) com autenticação PAM — a mesma configuração do
-// hyprlock (/etc/pam.d/hyprlock), por isso aceita as mesmas credenciais.
+// The shell's session lock (ext-session-lock) with PAM authentication — the same configuration as
+// hyprlock (/etc/pam.d/hyprlock), so it accepts the same credentials.
 //
-// Entradas: `qs ipc call lock lock` (usado pelo hypridle e por `loginctl lock-session`) e
-// `qs ipc call lock unlock` (usado pelo `loginctl unlock-session`; é a saída de emergência e tem o
-// mesmo nível de confiança: qualquer processo do utilizador já pode fazer unlock-session).
-// Com `lock.enabled: false` no config.json, bloquear usa o hyprlock do HyDE.
+// Entry points: `qs ipc call lock lock` (used by hypridle and by `loginctl lock-session`) and
+// `qs ipc call lock unlock` (used by `loginctl unlock-session`; it is the emergency exit and has the
+// same trust level: any user process can already do unlock-session).
+// With `lock.enabled: false` in config.json, locking uses HyDE's hyprlock.
 Singleton {
     id: root
 
-    // O estado sobrevive a um reload da shell: o WlSessionLock novo retoma o bloqueio. Sem isto, um
-    // reload com o ecrã bloqueado largava o lock e o Hyprland mostrava "lockscreen app died".
+    // The state survives a shell reload: the new WlSessionLock resumes the lock. Without this, a
+    // reload with the screen locked dropped the lock and Hyprland showed "lockscreen app died".
     property alias locked: persist.locked
     property bool authenticating: pam.active
     property string error: ""
     property int failures: 0
-    // Palavra-passe à espera de ser pedida pelo PAM (só existe durante a autenticação).
+    // Password waiting to be requested by PAM (only exists during authentication).
     property string pending: ""
 
     function lock() {

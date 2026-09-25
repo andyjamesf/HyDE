@@ -3,8 +3,8 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 
-// Cabeçalho de um painel: ícone, título e, opcionalmente, um switch à direita. Dentro do centro de
-// controlo (`backButton`), o ícone dá lugar ao botão de voltar.
+// Panel header: icon, title and, optionally, a switch on the right. Inside the control
+// center (`backButton`), the icon is replaced by the back button.
 RowLayout {
     id: root
 

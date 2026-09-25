@@ -2,8 +2,8 @@ import QtQuick
 import qs.components
 import qs.services
 
-// Um grupo de widgets. No estilo "islands" tem fundo próprio arredondado; no "continuous" é só
-// um contentor sobre o fundo da barra. Esconde-se quando nenhum dos widgets tem nada a mostrar.
+// A group of widgets. In the "islands" style it has its own rounded background; in "continuous" it is just
+// a container over the bar background. It hides when none of its widgets has anything to show.
 Item {
     id: root
 
@@ -11,7 +11,7 @@ Item {
     required property var bar
     readonly property bool islands: BarLayout.islands
 
-    // Visível se algum widget quiser aparecer (ver WidgetLoader.wanted).
+    // Visible if any widget wants to appear (see WidgetLoader.wanted).
     visible: {
         for (let i = 0; i < repeater.count; i++)
             if (repeater.itemAt(i)?.wanted)
@@ -20,7 +20,7 @@ Item {
     }
     implicitWidth: row.implicitWidth + (islands ? Math.round(BarLayout.height * 0.25) : 0)
     implicitHeight: BarLayout.height
-    // Só corta o conteúdo enquanto a largura anima (senão letras e símbolos à beira ficavam cortados).
+    // Only clips the content while the width animates (otherwise letters and symbols at the edge got cut off).
     clip: widthAnim.running
 
     Behavior on implicitWidth {

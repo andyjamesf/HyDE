@@ -3,12 +3,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
 
-// Leitores de media (MPRIS nativo). O leitor "ativo" é o que está a tocar; se nenhum estiver,
-// o último que tocou; se não houver histórico, o primeiro da lista.
+// Media players (native MPRIS). The "active" player is the one playing; if none is,
+// the last one that played; if there is no history, the first in the list.
 Singleton {
     id: root
 
-    // O playerctld é um proxy para os outros leitores; mostrá-lo duplicaria o leitor ativo.
+    // playerctld is a proxy for the other players; showing it would duplicate the active player.
     readonly property var players: Mpris.players.values.filter(p => !p.dbusName.includes("playerctld"))
     property MprisPlayer lastPlaying: null
     readonly property MprisPlayer active: players.find(p => p.isPlaying) ?? (players.includes(lastPlaying) ? lastPlaying : players[0] ?? null)

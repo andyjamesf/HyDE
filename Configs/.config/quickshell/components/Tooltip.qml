@@ -2,14 +2,14 @@ import QtQuick
 import Quickshell
 import qs.services
 
-// Tooltip ancorada a um item (da barra ou de um painel); aceita markup Pango (é o que os scripts
-// do HyDE produzem). Textos longos quebram a linha em vez de sair do ecrã.
+// Tooltip anchored to an item (on the bar or in a panel); accepts Pango markup (which is what HyDE's
+// scripts produce). Long texts wrap instead of running off the screen.
 PopupWindow {
     id: tip
 
     required property Item target
     property string text
-    // Na barra, abre para dentro do ecrã; nos painéis, quem a usa escolhe o lado.
+    // On the bar it opens towards the inside of the screen; in panels the caller picks the side.
     property bool below: BarLayout.atTop
 
     anchor.item: target
@@ -50,7 +50,7 @@ PopupWindow {
             }
         }
 
-        // Largura natural até 360 px; a partir daí, quebra a linha.
+        // Natural width up to 360 px; beyond that, it wraps.
         StyledText {
             id: body
             anchors.centerIn: parent

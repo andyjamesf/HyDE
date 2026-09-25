@@ -2,7 +2,7 @@ import QtQuick
 import qs.components
 import qs.services
 
-// CPU, memória, temperatura e tráfego de rede (cada um ativável no config.json).
+// CPU, memory, temperature and network traffic (each one can be enabled in config.json).
 Row {
     id: root
 

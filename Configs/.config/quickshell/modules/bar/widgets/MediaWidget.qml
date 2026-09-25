@@ -3,8 +3,8 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Media (MPRIS): título e artista, com o visualizador cava opcional enquanto toca.
-// Clique: painel do leitor; meio: tocar/pausar; scroll: faixa seguinte/anterior.
+// Media (MPRIS): title and artist, with the optional cava visualizer while playing.
+// Click: player panel; middle: play/pause; scroll: next/previous track.
 BarItem {
     id: root
 
@@ -33,7 +33,7 @@ BarItem {
         font.family: Config.appearance.monoFont
     }
 
-    // O cava.py do HyDE partilha um único processo cava entre todos os clientes.
+    // HyDE's cava.py shares a single cava process between all clients.
     JsonStream {
         id: cava
         exec: "hyde-shell cava.py waybar --json"

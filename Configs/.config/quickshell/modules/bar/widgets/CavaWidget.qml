@@ -1,7 +1,7 @@
 import qs.components
 import qs.services
 
-// Visualizador cava isolado (o widget de media também o pode mostrar embutido).
+// Standalone cava visualizer (the media widget can also show it embedded).
 BarItem {
     shown: stream.text !== ""
     text: stream.text

@@ -6,9 +6,9 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Tray: clique ativa, clique direito abre o menu da app, meio faz a ação secundária.
-// Os itens "passivos" ficam escondidos, como na Waybar. Os ícones monocromáticos (rede,
-// Bluetooth, discos…) são pintados com a cor do texto, para se verem em qualquer tema.
+// Tray: click activates, right click opens the app's menu, middle click runs the secondary action.
+// "Passive" items are hidden, as in Waybar. Monochrome icons (network,
+// Bluetooth, disks…) are painted with the text color, so they are visible with any theme.
 Row {
     id: root
 
@@ -26,25 +26,25 @@ Row {
             id: item
 
             required property SystemTrayItem modelData
-            // Nome do ícone no tema (as apps mandam "image://icon/<nome>" ou uma imagem própria).
+            // Icon name in the theme (apps send "image://icon/<name>" or their own image).
             readonly property string iconName: (/^image:\/\/icon\/([^?]+)/.exec(modelData.icon) ?? [])[1] ?? ""
-            // Apps cujo ícone de estado é colorido, mas que têm equivalente simbólico genérico.
+            // Apps whose status icon is colored but that have a generic symbolic equivalent.
             readonly property var symbolicAliases: ({
                     "blueman-active": "bluetooth-active-symbolic",
                     "blueman-disabled": "bluetooth-disabled-symbolic",
                     "blueman-tray": "bluetooth-symbolic",
                     "blueman": "bluetooth-symbolic"
                 })
-            // Versão simbólica explícita (não se pode perguntar ao tema por "<nome>-symbolic": o Qt
-            // encurta nomes que não existem e devolveria o ícone colorido).
+            // Explicit symbolic version (we can't ask the theme for "<name>-symbolic": Qt
+            // shortens names that don't exist and would return the colored icon).
             readonly property string symbolicName: {
                 const alias = symbolicAliases[iconName] ?? "";
                 return alias !== "" && Quickshell.hasThemeIcon(alias) ? alias : "";
             }
             readonly property bool hasSymbolic: symbolicName !== ""
             readonly property string source: hasSymbolic ? Quickshell.iconPath(symbolicName) : modelData.icon
-            // Monocromáticos (simbólicos, …-panel, rede do nm-applet, discos) são pintados com a cor
-            // do texto; os coloridos ficam com as cores originais.
+            // Monochrome ones (symbolic, …-panel, nm-applet network, disks) are painted with the text
+            // color; colored ones keep their original colors.
             readonly property bool mono: hasSymbolic || /symbolic|-panel|indicator|icon\/nm-|drive-removable|audio-volume|battery-/i.test(modelData.icon)
 
             width: Math.round(BarLayout.height * 0.9)
@@ -64,16 +64,16 @@ Row {
             IconImage {
                 id: trayIcon
                 anchors.centerIn: parent
-                // Os símbolos genéricos (ex.: Bluetooth) ocupam o quadrado todo, sem a margem que os
-                // ícones de painel têm; reduzem-se para ficarem do tamanho dos restantes.
+                // Generic symbols (e.g. Bluetooth) fill the whole square, without the margin that
+                // panel icons have; they are scaled down to match the size of the others.
                 implicitSize: Math.round((BarLayout.iconSize - 1) * (item.hasSymbolic ? 0.78 : 1))
                 source: item.source
                 visible: !item.mono
             }
 
-            // Ícones monocromáticos pintados com a cor do texto. A colorização do MultiEffect
-            // multiplica pela luminosidade do ícone, por isso primeiro leva-se o ícone ao extremo
-            // certo: branco para cores claras, preto para cores escuras (temas claros).
+            // Monochrome icons painted with the text color. MultiEffect's colorization
+            // multiplies by the icon's luminance, so the icon is first pushed to the right
+            // extreme: white for light colors, black for dark colors (light themes).
             MultiEffect {
                 readonly property color target: BarLayout.readable(Theme.text, 3)
                 visible: item.mono

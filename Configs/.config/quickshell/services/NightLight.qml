@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell
 import qs.components
 
-// Luz noturna através do hyprsunset do HyDE (mantém o estado e as predefinições do HyDE).
-// Não há sinal de mudança: o estado é lido no arranque, depois de cada ação e quando algum
-// painel que o mostra abre (refresh()).
+// Night light through HyDE's hyprsunset (keeps HyDE's state and presets).
+// There is no change signal: the state is read at startup, after each action and when some
+// panel showing it opens (refresh()).
 Singleton {
     id: root
 

@@ -4,7 +4,7 @@ import Quickshell.Services.UPower
 import qs.components
 import qs.services
 
-// Bateria: carga, tempo restante, saúde e perfil de energia.
+// Battery: charge, time remaining, health and power profile.
 ColumnLayout {
     id: root
 

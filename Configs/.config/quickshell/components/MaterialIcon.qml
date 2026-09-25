@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Layouts
 import qs.services
 
-// Ícone Material Symbols por nome (ligadura), ex.: MaterialIcon { icon: "volume_up" }.
-// `fill` (0..1) anima o preenchimento através do eixo variável FILL da fonte.
-// A caixa é sempre um quadrado de `size`: ícones lado a lado ficam alinhados, seja qual for o glifo.
+// Material Symbols icon by name (ligature), e.g. MaterialIcon { icon: "volume_up" }.
+// `fill` (0..1) animates the fill through the font's FILL variable axis.
+// The box is always a `size` square: icons side by side stay aligned, whatever the glyph.
 Text {
     id: root
 

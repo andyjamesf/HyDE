@@ -6,10 +6,10 @@ import Quickshell.Hyprland
 import qs.components
 import qs.services
 
-// Power menu compacto: um cartão ao centro com as ações de sessão. As ações que fecham tudo
-// (sair, reiniciar, desligar) pedem um segundo clique/Enter para confirmar.
-// Teclado: ←/→ escolher · Enter executar · Esc fechar · atalhos: B(loquear) S(uspender)
-// H(ibernar) L(ogout/sair) R(einiciar) D(esligar).
+// Compact power menu: a centered card with the session actions. The actions that close everything
+// (log out, reboot, shut down) require a second click/Enter to confirm.
+// Keyboard: ←/→ select · Enter run · Esc close · shortcuts: B (lock) S (suspend)
+// H (hibernate) L (log out) R (reboot) D (shut down).
 PanelWindow {
     id: win
 
@@ -60,10 +60,10 @@ PanelWindow {
         }
     ]
     property int current: 0
-    // A seleção só segue o rato quando ele se mexe (não quando o menu abre por baixo do cursor).
+    // The selection only follows the mouse when it moves (not when the menu opens under the cursor).
     property point lastMouse: Qt.point(-1, -1)
     property real openedAt: 0
-    // Ação à espera de confirmação (índice), ou -1.
+    // Action awaiting confirmation (index), or -1.
     property int armed: -1
 
     screen: modelData
@@ -80,11 +80,11 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // A grab só começa depois de a janela já estar aberta: com foco de teclado exclusivo,
-    // ativá-la no mesmo instante fazia o Hyprland cancelá-la logo (e o menu fechava).
+    // The grab only starts once the window is already open: with exclusive keyboard focus,
+    // activating it in the same instant made Hyprland cancel it at once (and the menu closed).
     property bool grabReady: false
 
-    // Criado só quando abre (poupa memória): a preparação corre ao ser criado e ao reabrir.
+    // Only created when it opens (saves memory): the setup runs on creation and on reopening.
     function init() {
         grabReady = false;
         if (open) {
@@ -149,7 +149,7 @@ PanelWindow {
         border.color: Theme.border
         opacity: win.open ? 1 : 0
         scale: win.open ? 1 : 0.94
-        // Visível logo ao abrir, para a área de cliques não estar vazia quando a focus grab começa.
+        // Visible right when opening, so the input region isn't empty when the focus grab starts.
         visible: win.open || opacity > 0
         focus: win.open
 
@@ -234,7 +234,7 @@ PanelWindow {
                                 radius: parent.radius
                                 onPositionChanged: mouse => {
                                     const g = mapToGlobal(mouse.x, mouse.y);
-                                    // Ignora os eventos falsos da animação de entrada (cursor parado).
+                                    // Ignores the fake events from the enter animation (still cursor).
                                     if (Date.now() - win.openedAt < 300) {
                                         win.lastMouse = g;
                                         return;

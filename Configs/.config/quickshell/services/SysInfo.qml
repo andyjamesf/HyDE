@@ -4,12 +4,12 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 
-// Utilizador, máquina e tempo ligado (para o cabeçalho do centro de controlo).
+// User, host and uptime (for the control center header).
 Singleton {
     id: root
 
     readonly property string user: Quickshell.env("USER") ?? ""
-    // Fotografia do utilizador (~/.face, a convenção dos gestores de sessão); vazio se não existir.
+    // User picture (~/.face, the display managers' convention); empty if it doesn't exist.
     property string avatar: ""
     property string host: ""
     property int uptimeSeconds: 0
@@ -20,7 +20,7 @@ Singleton {
         return d > 0 ? `${d} d ${h} h` : h > 0 ? `${h} h ${m} min` : `${m} min`;
     }
 
-    // Só é lido quando alguém mostra o valor (o centro de controlo chama refresh() ao abrir).
+    // Only read when someone shows the value (the control center calls refresh() when opening).
     function refresh() {
         uptimeFile.reload();
     }
@@ -31,13 +31,13 @@ Singleton {
         printErrors: false
         watchChanges: true
         onFileChanged: reload()
-        // O número no fim obriga a Image a ler a foto nova (senão mostrava a que tinha em cache).
+        // The number at the end forces the Image to load the new picture (otherwise it showed the cached one).
         onLoaded: root.avatar = `file://${path}?v=${Date.now()}`
         onLoadFailed: root.avatar = ""
     }
 
-    // Mudar a foto: o seletor de ficheiros do sistema (portal) e a imagem escolhida fica copiada para
-    // ~/.face (onde os gestores de sessão e o lockscreen também a procuram), depois de posicionada no editor.
+    // Changing the picture: the system file chooser (portal), and the chosen image is copied to
+    // ~/.face (where display managers and the lock screen also look for it), after positioning it in the editor.
     function chooseAvatar() {
         if (!picker.running)
             picker.running = true;
@@ -49,7 +49,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const src = text.trim();
-                // A imagem abre no editor, para a posicionar no círculo antes de gravar.
+                // The image opens in the editor, to position it in the circle before saving.
                 if (src !== "") {
                     ShellState.avatarScreen = Hyprland.focusedMonitor?.name ?? "";
                     ShellState.avatarSource = src;

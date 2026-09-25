@@ -10,15 +10,15 @@ import qs.services
 import qs.modules.controls
 import qs.modules.notifications
 
-// Centro de controlo: painel lateral com toggles rápidos, sliders, media, atalhos do HyDE e
-// páginas de detalhe (Wi-Fi, Bluetooth, som). Abre no ecrã com foco; fecha com Esc ou ao
-// clicar fora. `qs ipc call controlcenter toggle`.
+// Control center: side panel with quick toggles, sliders, media, HyDE shortcuts and
+// detail pages (Wi-Fi, Bluetooth, sound). Opens on the focused screen; closes with Esc or
+// an outside click. `qs ipc call controlcenter toggle`.
 PanelWindow {
     id: panel
 
     required property ShellScreen modelData
     readonly property bool open: ShellState.controlCenterOpen && (ShellState.controlCenterScreen === "" || ShellState.controlCenterScreen === modelData.name)
-    // 0 = aberto, 1 = fechado (fora do ecrã).
+    // 0 = open, 1 = closed (off screen).
     property real slide: open ? 0 : 1
 
     Behavior on slide {
@@ -28,8 +28,8 @@ PanelWindow {
         }
     }
 
-    // A janela fica sempre criada (criar uma layer surface a cada abertura atrasava o painel);
-    // fechada, não tem conteúdo à vista e a máscara vazia deixa passar os cliques.
+    // The window always stays created (creating a layer surface on every open delayed the panel);
+    // when closed it shows no content and the empty mask lets clicks through.
     screen: modelData
     visible: true
     mask: Region {
@@ -52,10 +52,10 @@ PanelWindow {
 
     WlrLayershell.namespace: "quickshell:controlcenter"
     WlrLayershell.layer: WlrLayer.Top
-    // Teclado só a pedido: para escrever a palavra-passe do Wi-Fi e para o Esc.
+    // Keyboard only on demand: for typing the Wi-Fi password and for Esc.
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    // Abre sempre no topo (o Flickable guardava a posição da última vez).
+    // Always opens at the top (the Flickable kept the position from last time).
     onOpenChanged: if (open) {
         flick.contentY = 0;
         SysInfo.refresh();
@@ -112,8 +112,8 @@ PanelWindow {
                             "notifications": notificationsPage
                         })[ShellState.controlCenterPage] ?? mainPage
 
-                    // Troca de página: eixo partilhado (o conteúdo novo entra a deslizar do lado
-                    // para onde se vai, com um fade).
+                    // Page change: shared axis (the new content slides in from the side
+                    // being navigated to, with a fade).
                     onLoaded: {
                         item.opacity = 0;
                         item.x = ShellState.controlCenterPage === "" ? -Theme.space6 : Theme.space6;
@@ -171,7 +171,7 @@ PanelWindow {
                 cache: false
             }
 
-            // Clicar na foto: escolher outra.
+            // Click the picture: choose another one.
             StateLayer {
                 anchors.fill: parent
                 onClicked: {
@@ -194,7 +194,7 @@ PanelWindow {
 
             StyledText {
                 Layout.fillWidth: true
-                // Só as horas quando já passa de uma (os minutos não cabiam).
+                // Only hours once it is past one hour (the minutes didn't fit).
                 text: `Up for ${SysInfo.uptime.replace(/^(\d+ h) \d+ min$/, "$1")}`
                 font.pixelSize: Theme.bodySmall
                 color: Theme.textDim
@@ -211,7 +211,7 @@ PanelWindow {
                 tooltip: "Shell settings"
                 onClicked: {
                     ShellState.closeControlCenter();
-                    // A pasta da shell e o config.json num editor de código (o primeiro que existir).
+                    // The shell folder and config.json in a code editor (the first one that exists).
                     const dir = Quickshell.shellPath("");
                     const cfg = Quickshell.shellPath("config/config.json");
                     Utils.run(`for e in code codium zeditor; do command -v $e >/dev/null && exec $e "${dir}" "${cfg}"; done; exec kitty nvim "${cfg}"`);
@@ -240,7 +240,7 @@ PanelWindow {
         }
     }
 
-    // Leitor compacto: capa, título/artista e os controlos à direita; o progresso em baixo.
+    // Compact player: cover, title/artist and the controls on the right; progress at the bottom.
     component MediaStrip: Card {
         id: strip
 
@@ -248,7 +248,7 @@ PanelWindow {
 
         padding: Theme.space3
 
-        // O MPRIS não avisa quando a posição avança; pede-se uma atualização por segundo.
+        // MPRIS doesn't signal when the position advances; an update is requested every second.
         Timer {
             interval: 1000
             repeat: true
@@ -402,8 +402,8 @@ PanelWindow {
 
             Header {}
 
-            // Atalhos rápidos: 4 por linha. Clique liga/desliga; clique direito, manter premido
-            // ou o selo abre o detalhe (Wi-Fi, Bluetooth).
+            // Quick toggles: 4 per row. Click toggles; right click, press and hold
+            // or the badge opens the detail page (Wi-Fi, Bluetooth).
             GridLayout {
                 Layout.fillWidth: true
                 columns: 4
@@ -537,7 +537,7 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            // Notificações: as mais recentes (menos quando há música, para caber no ecrã).
+            // Notifications: the most recent ones (fewer when music is playing, so it fits on screen).
             ColumnLayout {
                 id: notifSection
 
@@ -609,7 +609,7 @@ PanelWindow {
                 }
             }
 
-            // Atalhos do HyDE: uma linha de botões com tooltip.
+            // HyDE shortcuts: a row of buttons with tooltips.
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 0
@@ -679,7 +679,7 @@ PanelWindow {
         }
     }
 
-    // Botão só de texto, na cor de destaque (ações secundárias de uma secção).
+    // Text-only button in the accent color (secondary actions of a section).
     component TextButton: Item {
         id: tb
 

@@ -3,7 +3,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Volume de saída. Clique abre o painel de som; scroll ajusta; clique direito silencia.
+// Output volume. Click opens the sound panel; scroll adjusts; right click mutes.
 BarItem {
     readonly property var cfg: Config.widgets.audio
 

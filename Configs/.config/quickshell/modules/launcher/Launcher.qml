@@ -7,10 +7,10 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Launcher (substitui o rofi do HyDE): apps com pesquisa fuzzy, favoritos e frecência; clipboard
-// (cliphist); calculadora. Escrever uma conta no modo apps mostra logo o resultado.
-// Teclado: ↑/↓ escolher · Enter abrir/copiar · Tab muda de modo · Ctrl+F favorito ·
-// Delete apaga do clipboard · Esc fecha.
+// Launcher (replaces HyDE's rofi): apps with fuzzy search, favorites and frecency; clipboard
+// (cliphist); calculator. Typing a calculation in apps mode shows the result right away.
+// Keyboard: ↑/↓ select · Enter open/copy · Tab switches mode · Ctrl+F favorite ·
+// Delete removes from clipboard · Esc closes.
 PanelWindow {
     id: win
 
@@ -42,10 +42,10 @@ PanelWindow {
 
     property string query: ""
     property int current: 0
-    // Última posição do rato (global). A seleção só segue o rato quando ele se mexe mesmo: ao abrir
-    // por baixo do cursor, ou quando a lista muda ao escrever, o "hover" não conta.
-    // Durante a animação de entrada o cartão escala por baixo do cursor parado, o que gera
-    // eventos de movimento falsos: ignoram-se os primeiros 300 ms e deslocações até 3 px.
+    // Last mouse position (global). The selection only follows the mouse when it actually moves: when opening
+    // under the cursor, or when the list changes while typing, the "hover" doesn't count.
+    // During the enter animation the card scales under the still cursor, which generates
+    // fake motion events: the first 300 ms and movements of up to 3 px are ignored.
     property point lastMouse: Qt.point(-1, -1)
     property real openedAt: 0
 
@@ -72,7 +72,7 @@ PanelWindow {
             return Keybinds.search(query);
         return [];
     }
-    // Linhas: o resultado da conta (se houver) vem primeiro.
+    // Rows: the calculation result (if any) comes first.
     readonly property var rows: (calcResult !== null ? [
             {
                 kind: "calc",
@@ -97,8 +97,8 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // A janela é criada só quando o launcher abre (poupa memória), por isso a preparação corre
-    // tanto ao ser criada como se voltar a abrir.
+    // The window is only created when the launcher opens (saves memory), so the setup runs
+    // both on creation and when it opens again.
     function init() {
         grabReady = false;
         if (open) {
@@ -150,7 +150,7 @@ PanelWindow {
         else if (row.kind === "calc")
             Quickshell.clipboardText = Calculator.format(row.value);
         close();
-        // O atalho corre depois de o launcher fechar (para agir sobre a janela que tinha o foco).
+        // The keybinding runs after the launcher closes (to act on the window that had focus).
         if (row.kind === "key")
             Keybinds.run(row.value);
     }
@@ -161,8 +161,8 @@ PanelWindow {
         onTriggered: input.forceActiveFocus()
     }
 
-    // A grab só começa depois de a janela já estar aberta no ecrã (com foco de teclado exclusivo,
-    // ativá-la no mesmo instante fazia o Hyprland cancelá-la logo, fechando o launcher).
+    // The grab only starts once the window is already open on screen (with exclusive keyboard focus,
+    // activating it in the same instant made Hyprland cancel it at once, closing the launcher).
     property bool grabReady: false
 
     Timer {
@@ -188,8 +188,8 @@ PanelWindow {
         border.color: Theme.border
         opacity: win.open ? 1 : 0
         scale: win.open ? 1 : 0.96
-        // Visível logo ao abrir (a opacidade ainda está a 0): sem isso a área de cliques da janela
-        // ficava vazia nesse instante e o Hyprland cancelava a focus grab, fechando o launcher.
+        // Visible right when opening (opacity is still 0): without this the window's input region
+        // was empty at that instant and Hyprland cancelled the focus grab, closing the launcher.
         visible: win.open || opacity > 0
 
         Behavior on opacity {
@@ -209,7 +209,7 @@ PanelWindow {
             anchors.margins: Theme.space4
             spacing: Theme.space3
 
-            // Pesquisa
+            // Search
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
@@ -277,7 +277,7 @@ PanelWindow {
                 }
             }
 
-            // Modos
+            // Modes
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 6
@@ -324,8 +324,8 @@ PanelWindow {
                     }
                 }
 
-                // Ocupa só o que sobra dos chips; se não couber inteira, esconde-se (não empurra o
-                // launcher para fora da janela).
+                // Takes only what the chips leave over; if it doesn't fit entirely, it hides (it doesn't push the
+                // launcher out of the window).
                 StyledText {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
@@ -337,7 +337,7 @@ PanelWindow {
                 }
             }
 
-            // Resultado grande do modo calculadora
+            // Large result of calculator mode
             ColumnLayout {
                 visible: win.mode === "calc"
                 Layout.fillWidth: true
@@ -363,7 +363,7 @@ PanelWindow {
                 }
             }
 
-            // Resultados
+            // Results
             ListView {
                 id: list
                 visible: win.mode !== "calc"
@@ -385,7 +385,7 @@ PanelWindow {
                     width: list.width
                     height: 52
 
-                    // Fundo da linha selecionada, por baixo do ícone e do texto.
+                    // Background of the selected row, underneath the icon and text.
                     Rectangle {
                         anchors.fill: parent
                         radius: Theme.shapeMedium
@@ -408,7 +408,7 @@ PanelWindow {
                         onClicked: win.activate(row.modelData)
                     }
 
-                    // Ícone
+                    // Icon
                     Item {
                         id: lead
                         width: 36
@@ -472,7 +472,7 @@ PanelWindow {
                             onClicked: Apps.toggleFavorite(row.modelData.value)
                         }
 
-                        // Teclas do atalho, cada uma num chip; combinações alternativas separadas por "or".
+                        // Keys of the binding, each in a chip; alternative combinations separated by "or".
                         Row {
                             visible: row.modelData.kind === "key"
                             anchors.verticalCenter: parent.verticalCenter

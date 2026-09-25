@@ -3,13 +3,13 @@ import QtQuick
 import Quickshell
 
 Singleton {
-    // Corre um comando de shell sem esperar por ele (como os on-click da Waybar).
+    // Runs a shell command without waiting for it (like Waybar's on-click).
     function run(cmd) {
         Quickshell.execDetached(["sh", "-c", cmd]);
     }
 
-    // Os scripts do HyDE produzem markup Pango; o StyledText do Qt só conhece <font color>.
-    // `mapColor` (opcional) ajusta cada cor embutida (ex.: para ter contraste com o fundo).
+    // HyDE's scripts produce Pango markup; Qt's StyledText only knows <font color>.
+    // `mapColor` (optional) adjusts each embedded color (e.g. to get contrast with the background).
     function pango(s, mapColor) {
         if (!s)
             return "";
@@ -19,7 +19,7 @@ Singleton {
         }).replace(/<\/span>/g, "</font>").replace(/ {2,}/g, m => "&nbsp;".repeat(m.length)).replace(/\n/g, "<br>");
     }
 
-    // Data/hora formatada na língua do config.json (o locale do sistema pode ser inglês).
+    // Date/time formatted in the config.json language (the system locale may be English).
     function formatDate(date, format) {
         return date.toLocaleString(Qt.locale(Config.appearance.locale), format);
     }
@@ -28,12 +28,12 @@ Singleton {
         return Qt.locale(Config.appearance.locale).dayName(day, format);
     }
 
-    // Escolhe um elemento de uma lista ordenada por nível (0..100), como a Waybar faz com format-icons.
+    // Picks an element from a list ordered by level (0..100), like Waybar does with format-icons.
     function level(list, percent) {
         return list[Math.max(0, Math.min(list.length - 1, Math.floor(percent * list.length / 101)))];
     }
 
-    // "now", "há 5 min", "há 2 h", ou a hora/data para coisas mais antigas.
+    // "now", "5 min ago", "2 h ago", or the time/date for older things.
     function relativeTime(date) {
         const s = (Date.now() - date.getTime()) / 1000;
         if (s < 60)

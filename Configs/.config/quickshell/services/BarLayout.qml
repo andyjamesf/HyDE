@@ -3,16 +3,16 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Layout efetivo da barra. Os presets estão em config/layouts.json (podem acrescentar-se outros);
-// cada um define o estilo, as dimensões e que widgets aparecem em cada secção.
+// Effective bar layout. The presets live in config/layouts.json (more can be added);
+// each one defines the style, the dimensions and which widgets appear in each section.
 //
-// Qual se usa, por ordem:
-//   1. o escolhido no menu do HyDE / por IPC (`qs ipc call bar layout <nome>`, `next`, `prev`),
-//      guardado nas Prefs;
-//   2. o "layout" do config.json.
-// Ao mudar de tema no HyDE, se o config.json tiver um layout para esse tema em "themeLayouts",
-// passa a ser esse. O arredondamento das ilhas segue o `decoration:rounding` do Hyprland, que
-// cada tema do HyDE define — a barra acompanha o aspeto das janelas.
+// Which one is used, in order:
+//   1. the one picked in the HyDE menu / over IPC (`qs ipc call bar layout <name>`, `next`, `prev`),
+//      stored in Prefs;
+//   2. the "layout" from config.json.
+// When the HyDE theme changes, if config.json has a layout for that theme in "themeLayouts",
+// that one is used. The island rounding follows Hyprland's `decoration:rounding`, which
+// each HyDE theme sets — the bar matches the look of the windows.
 Singleton {
     id: root
 
@@ -28,7 +28,7 @@ Singleton {
     readonly property bool islands: style === "islands"
     readonly property string position: preset.position ?? Config.bar.position
     readonly property bool atTop: position !== "bottom"
-    // Altura escolhida no menu/IPC, ou a do layout. O texto, os ícones e o raio acompanham-na.
+    // Height picked in the menu/IPC, or the layout's. Text, icons and radius follow it.
     readonly property int layoutHeight: preset.height ?? 28
     readonly property int height: Prefs.barHeight > 0 ? Prefs.barHeight : layoutHeight
     readonly property int minHeight: 16
@@ -56,7 +56,7 @@ Singleton {
     readonly property int radius: Math.min(preset.radius ?? hyprRounding, Math.floor(height / 2))
     readonly property real opacity: Prefs.pillOpacity >= 0 ? Prefs.pillOpacity : preset.opacity ?? Config.bar.opacity
 
-    // Fundo das ilhas. Todas as opções saem das cores do tema, por isso mudam com ele.
+    // Island background. All options derive from the theme colors, so they change with it.
     readonly property var pillStyles: [
         {
             id: "surface",
@@ -100,20 +100,20 @@ Singleton {
         case "outline":
             return "transparent";
         default:
-            // Cor fixa escrita no config.json ("#rrggbb").
+            // Fixed color written in config.json ("#rrggbb").
             return /^#[0-9a-fA-F]{6,8}$/.test(pillStyle) ? Theme.alpha(pillStyle, a) : Theme.alpha(Theme.surface, a);
         }
     }
     readonly property color pillBorder: pillStyle === "outline" ? Theme.alpha(Theme.primary, 0.7) : pillStyle === "glass" ? Theme.alpha(Theme.text, 0.18) : Theme.alpha(Theme.outlineVariant, 0.5)
 
-    // Cor opaca que se vê por trás do texto das ilhas (para garantir contraste). Nos estilos
-    // transparentes não se sabe o que está por trás (o wallpaper); usa-se o fundo do tema.
+    // Opaque color seen behind the island text (to guarantee contrast). With transparent
+    // styles we don't know what is behind (the wallpaper); the theme background is used.
     readonly property color pillBase: {
         const c = Qt.color(pillColor);
         return c.a < 0.5 ? Theme.surface : Qt.rgba(c.r, c.g, c.b, 1);
     }
 
-    // Cor legível sobre as ilhas: texto 4.5:1, ícones e elementos gráficos 3:1.
+    // Readable color over the islands: text 4.5:1, icons and graphical elements 3:1.
     function readable(color, minRatio) {
         return Theme.readable(color, pillBase, minRatio ?? 4.5);
     }
@@ -123,7 +123,7 @@ Singleton {
         Prefs.save();
     }
 
-    // 0 volta à altura do layout.
+    // 0 goes back to the layout height.
     function setHeight(value) {
         Prefs.barHeight = value > 0 ? Math.max(minHeight, Math.min(maxHeight, Math.round(value))) : 0;
         Prefs.save();
@@ -137,7 +137,7 @@ Singleton {
         Prefs.pillOpacity = value;
         Prefs.save();
     }
-    // Texto e ícones acompanham a altura, mas nunca ficam ilegíveis.
+    // Text and icons follow the height, but never become unreadable.
     readonly property int fontSize: preset.fontSize ?? Math.max(11, Math.min(Config.appearance.fontSize, Math.round(height * 0.46)))
     readonly property int iconSize: preset.iconSize ?? Math.max(14, Math.min(Config.appearance.iconSize, Math.round(height * 0.64)))
     readonly property var left: preset.left ?? []
@@ -172,7 +172,7 @@ Singleton {
         }
     }
 
-    // Tema atual do HyDE (reescrito a cada troca de tema).
+    // Current HyDE theme (rewritten on every theme change).
     FileView {
         path: `${Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state"}/hyde/staterc`
         watchChanges: true
@@ -191,7 +191,7 @@ Singleton {
         rounding.running = true;
     }
 
-    // O tema aplica o rounding no Hyprland logo a seguir a mudar o staterc; lê-se com folga.
+    // The theme applies the rounding in Hyprland right after changing staterc; read it with some delay.
     Process {
         id: rounding
         command: ["sh", "-c", "sleep 1; hyprctl getoption decoration:rounding -j"]

@@ -3,15 +3,15 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
-// Estado do Hyprland que os widgets precisam, já filtrado e ordenado.
+// Hyprland state the widgets need, already filtered and sorted.
 Singleton {
     id: root
 
-    // Workspaces normais (os especiais têm id negativo), por ordem.
+    // Normal workspaces (special ones have a negative id), in order.
     readonly property var workspaces: Hyprland.workspaces.values.filter(w => w.id > 0).sort((a, b) => a.id - b.id)
     readonly property HyprlandToplevel activeToplevel: Hyprland.activeToplevel
 
-    // A config do Hyprland está em Lua, onde os dispatchers são expressões `hl.dsp.*`.
+    // The Hyprland config is in Lua, where dispatchers are `hl.dsp.*` expressions.
     function dispatchFocusWorkspace(target) {
         Hyprland.dispatch(Hyprland.usingLua ? `hl.dsp.focus({workspace="${target}"})` : `workspace ${target}`);
     }

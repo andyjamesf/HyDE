@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Networking as QsNet
 
-// Rede via Quickshell.Networking (NetworkManager por D-Bus, sem nmcli).
+// Network via Quickshell.Networking (NetworkManager over D-Bus, no nmcli).
 Singleton {
     id: root
 
@@ -18,7 +18,7 @@ Singleton {
     readonly property real signal: activeWifi?.signalStrength ?? 0
     readonly property bool online: QsNet.Networking.connectivity === QsNet.NetworkConnectivity.Full || wired || activeWifi !== null
 
-    // Redes visíveis, sem nomes repetidos (vários pontos de acesso), a ligada primeiro e depois por sinal.
+    // Visible networks, without repeated names (multiple access points), the connected one first and then by signal.
     readonly property var networks: {
         const best = {};
         for (const n of wifiNetworks) {
@@ -41,7 +41,7 @@ Singleton {
         return signalIcon(signal);
     }
 
-    // Pesquisa de redes: só enquanto algum painel mostra a lista (contador de utilizadores).
+    // Network scanning: only while some panel shows the list (user counter).
     property int scanUsers: 0
     Binding {
         target: root.wifiDevice
@@ -50,7 +50,7 @@ Singleton {
         when: root.wifiDevice !== null
     }
 
-    // Rede à espera de palavra-passe (o centro de controlo mostra o campo).
+    // Network waiting for a password (the control center shows the field).
     property var pendingNetwork: null
     property string lastError: ""
 
@@ -58,7 +58,7 @@ Singleton {
         return Utils.level(["signal_wifi_0_bar", "network_wifi_1_bar", "network_wifi_2_bar", "network_wifi_3_bar", "signal_wifi_4_bar"], s * 100);
     }
 
-    // Redes abertas (e OWE, cifradas sem palavra-passe) ligam sem pedir nada.
+    // Open networks (and OWE, encrypted without a password) connect without asking for anything.
     function isSecure(network) {
         return ![QsNet.WifiSecurityType.Open, QsNet.WifiSecurityType.Owe].includes(network.security);
     }
@@ -67,7 +67,7 @@ Singleton {
         QsNet.Networking.wifiEnabled = on;
     }
 
-    // Redes conhecidas ou abertas ligam logo; as outras pedem a palavra-passe primeiro.
+    // Known or open networks connect right away; the others ask for the password first.
     function activate(network) {
         lastError = "";
         if (network.connected)

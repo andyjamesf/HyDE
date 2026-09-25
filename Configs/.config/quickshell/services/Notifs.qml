@@ -3,14 +3,14 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 
-// Servidor de notificações da shell (substitui o swaync/dunst do HyDE).
+// The shell's notification server (replaces HyDE's swaync/dunst).
 //
-// - Todas as notificações ficam no histórico (até `historySize`), exceto as marcadas como
-//   "transient" pela app, que só aparecem como popup.
-// - Os popups respeitam o "Não incomodar" (só as críticas passam) e desaparecem sozinhos.
-// - As notificações de volume e brilho dos scripts do HyDE (volumecontrol.sh e
-//   brightnesscontrol.sh) são ignoradas quando o OSD da shell está ligado: fariam o mesmo
-//   que o OSD, em duplicado.
+// - All notifications are kept in the history (up to `historySize`), except those marked as
+//   "transient" by the app, which only show up as a popup.
+// - Popups respect "Do not disturb" (only critical ones get through) and disappear by themselves.
+// - The volume and brightness notifications from HyDE's scripts (volumecontrol.sh and
+//   brightnesscontrol.sh) are ignored when the shell's OSD is enabled: they would do the same
+//   as the OSD, twice.
 Singleton {
     id: root
 
@@ -18,7 +18,7 @@ Singleton {
     readonly property var list: server.trackedNotifications.values.slice().reverse()
     readonly property int count: list.length
     property var popups: []
-    // Hora de chegada de cada notificação (o protocolo não a indica).
+    // Arrival time of each notification (the protocol doesn't provide it).
     property var times: ({})
 
     readonly property bool dnd: Prefs.dnd
@@ -28,7 +28,7 @@ Singleton {
         Prefs.save();
     }
 
-    // Compatibilidade com o widget da barra: abre o histórico no centro de controlo.
+    // Compatibility with the bar widget: opens the history in the control center.
     function togglePanel() {
         ShellState.toggleControlCenter("notifications");
     }
@@ -44,7 +44,7 @@ Singleton {
 
     function hidePopup(n) {
         popups = popups.filter(p => p !== n);
-        // As transitórias não ficam no histórico.
+        // Transient ones are not kept in the history.
         if (n.transient && n.tracked)
             n.expire();
     }
@@ -54,10 +54,11 @@ Singleton {
     }
 
     function isHydeOsd(n) {
-        return Config.widgets.osd.enabled && n.appName === "HyDE Notify" && String(n.appIcon).includes("/Wallbash-Icon/media/");
+        // The path passed with `notify-send -i` may arrive in appIcon or in image.
+        return Config.widgets.osd.enabled && n.appName === "HyDE Notify" && `${n.appIcon} ${n.image}`.includes("/Wallbash-Icon/media/");
     }
 
-    // Ícone/imagem a mostrar: imagem da notificação, ícone da app (caminho ou nome do tema).
+    // Icon/image to show: the notification's image, or the app icon (path or theme name).
     function imageOf(n) {
         if (n.image)
             return n.image;
@@ -74,9 +75,9 @@ Singleton {
             return;
         n.tracked = true;
 
-        // Mesma app e mesmo título que um popup ainda à vista (ex.: mudar de layout várias vezes
-        // seguidas): a nova substitui a antiga, em vez de se empilharem. O `-r` do notify-send só
-        // o faria se a app soubesse o id que o servidor lhe deu.
+        // Same app and same title as a popup still on screen (e.g. switching layouts several times
+        // in a row): the new one replaces the old one instead of stacking up. notify-send's `-r` would only
+        // do that if the app knew the id the server gave it.
         for (const old of popups.filter(p => p !== n && p.appName === n.appName && p.summary === n.summary)) {
             popups = popups.filter(p => p !== old);
             old.expire();
@@ -86,7 +87,7 @@ Singleton {
         t[n.id] = new Date();
         times = t;
 
-        // Histórico limitado: as mais antigas saem.
+        // Bounded history: the oldest ones are dropped.
         const tracked = server.trackedNotifications.values;
         for (let i = 0; i < tracked.length - Config.widgets.notifications.historySize; i++)
             tracked[i].expire();
@@ -111,7 +112,7 @@ Singleton {
         onNotification: n => root.onArrived(n)
     }
 
-    // Com o centro de controlo aberto os popups saem: as notificações já estão lá, no histórico.
+    // With the control center open the popups go away: the notifications are already there, in the history.
     Connections {
         target: ShellState
         function onControlCenterOpenChanged() {
@@ -121,7 +122,7 @@ Singleton {
         }
     }
 
-    // Uma notificação fechada (pela app ou por nós) sai dos popups.
+    // A closed notification (by the app or by us) leaves the popups.
     Instantiator {
         model: root.popups
         delegate: Connections {

@@ -3,19 +3,19 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
-// OSD de volume, microfone e brilho. Reage às mudanças nos serviços (Pipewire e o uevent do
-// backlight), por isso aparece venha a mudança de onde vier: teclas do HyDE, barra, apps.
-// Exceções (o hypridle baixa o brilho para 1% ao fim de 60 s e repõe-no no regresso):
-//  - mudanças enquanto o utilizador está inativo, ou logo a seguir a voltar;
-//  - mudanças de brilho de ou para ≤ 2% (o nível de escurecimento), venham de onde vierem.
+// Volume, microphone and brightness OSD. Reacts to changes in the services (Pipewire and the
+// backlight uevent), so it shows up wherever the change comes from: HyDE keys, the bar, apps.
+// Exceptions (hypridle lowers the brightness to 1% after 60 s and restores it on return):
+//  - changes while the user is idle, or right after coming back;
+//  - brightness changes from or to ≤ 2% (the dimming level), wherever they come from.
 Singleton {
     id: root
 
     property string kind: ""      // "volume" | "mic" | "brightness"
     property bool visible: false
-    // A janela do OSD só existe enquanto é precisa (visível ou a desaparecer).
+    // The OSD window only exists while it is needed (visible or fading out).
     readonly property bool needed: visible || fadeOut.running
-    // Durante o arranque e ao trocar de dispositivo os valores "mudam" sem ninguém mexer.
+    // During startup and when switching devices the values "change" without anyone touching them.
     property bool armed: false
     property int lastBrightness: -1
 
@@ -26,7 +26,7 @@ Singleton {
     function show(k) {
         if (!armed || !Config.widgets.osd.enabled || idle.isIdle)
             return;
-        // O hypridle repõe o brilho no instante em que se volta: essa mudança não conta.
+        // hypridle restores the brightness the moment you come back: that change doesn't count.
         if (k === "brightness" && resumeGrace.running)
             return;
         kind = k;
@@ -39,8 +39,8 @@ Singleton {
         arm.restart();
     }
 
-    // Inativo há 20 s: bem antes do escurecimento do hypridle (60 s). Ignora os inibidores
-    // (cafeína, vídeos): com eles ativos o hypridle também não mexe no brilho.
+    // Idle for 20 s: well before hypridle's dimming (60 s). Ignores the inhibitors
+    // (caffeine, videos): with those active hypridle doesn't touch the brightness either.
     IdleMonitor {
         id: idle
         timeout: 20

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Abre o seletor de ficheiros do sistema (xdg-desktop-portal) e escreve no stdout o caminho escolhido.
+"""Opens the system file chooser (xdg-desktop-portal) and prints the chosen path to stdout.
 
-A shell não tem janelas normais e o tema Qt (qt6ct) não traz seletor nativo; o portal mostra o
-seletor do sistema (GTK) independentemente disso. Sai com código 1 se o utilizador cancelar.
+The shell has no regular windows and the Qt theme (qt6ct) has no native chooser; the portal shows
+the system (GTK) chooser regardless. Exits with code 1 if the user cancels.
 
-Uso: pick_file.py "Título" "Imagens:*.png;*.jpg" [pasta inicial]
+Usage: pick_file.py "Title" "Images:*.png;*.jpg" [initial folder]
 """
 import sys
 

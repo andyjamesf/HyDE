@@ -4,8 +4,8 @@ import Quickshell
 import qs.components
 import qs.services
 
-// Relógio grande, calendário do mês (segunda-feira primeiro) e eventos do Google Calendar
-// (serviço Agenda). Setas ou scroll mudam de mês; clicar num dia mostra os eventos desse dia.
+// Large clock, month calendar (Monday first) and Google Calendar events
+// (Agenda service). Arrows or scroll change the month; clicking a day shows that day's events.
 ColumnLayout {
     id: root
 
@@ -15,7 +15,7 @@ ColumnLayout {
     readonly property date now: clock.date
     readonly property date month: new Date(now.getFullYear(), now.getMonth() + shift, 1)
 
-    // As 6 semanas mostradas, a começar na segunda-feira antes do dia 1.
+    // The 6 weeks shown, starting on the Monday before the 1st.
     readonly property var days: {
         const start = new Date(month);
         start.setDate(1 - (month.getDay() + 6) % 7);
@@ -144,7 +144,7 @@ ColumnLayout {
                     opacity: day.inMonth ? 1 : 0.5
                 }
 
-                // Um ponto por evento (até 3), com a cor do calendário.
+                // One dot per event (up to 3), in the calendar's color.
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
@@ -172,7 +172,7 @@ ColumnLayout {
         }
     }
 
-    // Eventos do dia escolhido.
+    // Events of the selected day.
     ColumnLayout {
         Layout.fillWidth: true
         spacing: 4

@@ -3,12 +3,12 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 
-// Wi-Fi: ligar/desligar, redes visíveis e ligação. As redes protegidas desconhecidas pedem a
-// palavra-passe; o campo só aparece onde há teclado (`canType`, no centro de controlo). Na popup
-// da barra, escolher uma dessas redes abre o centro de controlo nesta página.
+// Wi-Fi: on/off, visible networks and connecting. Unknown secured networks ask for the
+// password; the field only appears where there is keyboard input (`canType`, in the control center). In the bar
+// popup, choosing one of those networks opens the control center on this page.
 ColumnLayout {
     id: root
-    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    // In the control center: the header gets the back button.
     property bool backButton: false
     signal back
 
@@ -40,7 +40,7 @@ ColumnLayout {
         wrapMode: Text.WordWrap
     }
 
-    // Palavra-passe para a rede escolhida.
+    // Password for the chosen network.
     Card {
         visible: root.canType && Network.pendingNetwork !== null
         Layout.fillWidth: true

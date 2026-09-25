@@ -5,8 +5,8 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Leitor de media: capa, título, progresso (com seek) e controlos. Com mais de um leitor,
-// mostra atalhos para trocar entre eles.
+// Media player: cover, title, progress (with seeking) and controls. With more than one player,
+// shows shortcuts to switch between them.
 ColumnLayout {
     id: root
 
@@ -15,8 +15,8 @@ ColumnLayout {
     width: 320
     spacing: 12
 
-    // O MPRIS não avisa quando a posição avança; pede-se uma atualização por segundo, e só
-    // enquanto este cartão está visível e a tocar.
+    // MPRIS doesn't signal when the position advances; an update is requested every second, and only
+    // while this card is visible and playing.
     Timer {
         interval: 1000
         repeat: true

@@ -1,9 +1,9 @@
 import QtQuick
 import qs.services
 
-// Slider em barra: um trilho arredondado que enche e esvazia, com o ícone dentro e o valor à direita,
-// fora do trilho.
-// `value` vem de fora (0..1); ao arrastar, emite moved() e mostra o valor local para não saltar.
+// Bar slider: a rounded track that fills and empties, with the icon inside and the value on the right,
+// outside the track.
+// `value` comes from outside (0..1); while dragging it emits moved() and shows the local value so it doesn't jump.
 Item {
     id: root
 
@@ -46,7 +46,7 @@ Item {
             color: Theme.surfaceContainerHighest
         }
 
-        // Parte cheia: cresce e encolhe com o valor (nunca menor que um círculo, para o ícone).
+        // Filled part: grows and shrinks with the value (never smaller than a circle, to fit the icon).
         Rectangle {
             id: fill
             height: parent.height
@@ -82,7 +82,7 @@ Item {
             preventStealing: true
 
             onPressed: mouse => {
-                // Clique no ícone: ação própria (normalmente silenciar), sem mexer no valor.
+                // Click on the icon: its own action (usually mute), without touching the value.
                 if (root.icon !== "" && mouse.x < root.trackHeight) {
                     mouse.accepted = false;
                     root.iconClicked();

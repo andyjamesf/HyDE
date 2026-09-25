@@ -3,11 +3,11 @@ import Quickshell
 import Quickshell.Hyprland
 import qs.services
 
-// Painel que abre por baixo (ou por cima) de um widget da barra, com o conteúdo em `content`.
-// Entra com um deslize curto e um fade. Fecha ao clicar fora ou com Esc: usa a focus grab do
-// Hyprland (e não a do xdg_popup, que só funciona se a abertura vier de um clique — falha quando
-// a popout é aberta por IPC). A barra faz parte da grab, para os cliques nela continuarem a
-// funcionar (trocar de popout, fechar no mesmo widget).
+// Panel that opens below (or above) a bar widget, with its contents in `content`.
+// Enters with a short slide and a fade. Closes on an outside click or Esc: it uses Hyprland's
+// focus grab (not the xdg_popup one, which only works if the popup was opened by a click — it fails when
+// the popout is opened over IPC). The bar is part of the grab, so clicks on it keep
+// working (switching popouts, closing on the same widget).
 PopupWindow {
     id: popout
 
@@ -37,8 +37,8 @@ PopupWindow {
         visible = false;
     }
 
-    // A grab só começa depois de a popout estar no ecrã: ao trocar de popout, a da anterior ainda
-    // está a sair e o Hyprland cancelava logo a nova (a popout abria e fechava no mesmo instante).
+    // The grab only starts once the popout is on screen: when switching popouts, the previous one's grab is still
+    // going away and Hyprland would cancel the new one at once (the popout opened and closed in the same instant).
     property bool grabReady: false
 
     Timer {
@@ -89,7 +89,7 @@ PopupWindow {
         }
     }
 
-    // O Translate não é um Item (não aceita Behavior), por isso o deslize é uma animação à parte.
+    // Translate is not an Item (it does not accept a Behavior), so the slide is a separate animation.
     NumberAnimation {
         running: true
         target: slide

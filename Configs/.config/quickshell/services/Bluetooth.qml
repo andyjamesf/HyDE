@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Bluetooth as QsBluetooth
 
-// Bluetooth via Quickshell.Bluetooth (BlueZ por D-Bus, sem bluetoothctl).
+// Bluetooth via Quickshell.Bluetooth (BlueZ over D-Bus, no bluetoothctl).
 Singleton {
     id: root
 
@@ -13,7 +13,7 @@ Singleton {
     readonly property bool scanning: adapter?.discovering ?? false
     readonly property var devices: adapter ? adapter.devices.values : []
     readonly property var connected: devices.filter(d => d.connected)
-    // Emparelhados primeiro (ligados no topo), depois os novos encontrados na pesquisa, com nome.
+    // Paired first (connected at the top), then new ones found by discovery, that have a name.
     readonly property var paired: devices.filter(d => d.paired || d.bonded).sort((a, b) => b.connected - a.connected)
     readonly property var discovered: devices.filter(d => !d.paired && !d.bonded && d.deviceName !== "")
 
@@ -30,7 +30,7 @@ Singleton {
             adapter.discovering = on;
     }
 
-    // Ícone Material a partir do ícone freedesktop que o BlueZ indica.
+    // Material icon derived from the freedesktop icon BlueZ reports.
     function iconFor(device) {
         const i = device?.icon ?? "";
         if (i.includes("headset") || i.includes("headphone"))
@@ -50,7 +50,7 @@ Singleton {
         return "bluetooth";
     }
 
-    // Ligar um dispositivo novo: emparelhar, confiar (para voltar a ligar sozinho) e ligar.
+    // Connecting a new device: pair, trust (so it reconnects by itself) and connect.
     function activate(device) {
         if (device.connected) {
             device.disconnect();

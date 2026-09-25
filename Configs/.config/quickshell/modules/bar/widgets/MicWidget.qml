@@ -3,7 +3,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Microfone: só o ícone. Clique abre o painel de som; clique direito silencia; scroll ajusta.
+// Microphone: icon only. Click opens the sound panel; right click mutes; scroll adjusts.
 BarItem {
     shown: !!Audio.source?.audio
     icon: Audio.micIcon

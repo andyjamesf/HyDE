@@ -1,8 +1,8 @@
 import qs.components
 import qs.services
 
-// Luz noturna (hyprsunset do HyDE). Clique liga/desliga, scroll ajusta a temperatura,
-// clique direito abre as predefinições.
+// Night light (HyDE's hyprsunset). Click toggles it, scroll adjusts the temperature,
+// right click opens the presets.
 BarItem {
     icon: "nightlight"
     iconFill: NightLight.active ? 1 : 0

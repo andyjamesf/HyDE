@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Histórico do clipboard via cliphist (o mesmo que o HyDE já grava com wl-paste --watch).
-// Não há API nativa: a lista é lida com `cliphist list` só quando o launcher abre em modo clipboard.
+// Clipboard history via cliphist (the same one HyDE already records with wl-paste --watch).
+// There is no native API: the list is read with `cliphist list` only when the launcher opens in clipboard mode.
 Singleton {
     id: root
 
@@ -16,7 +16,7 @@ Singleton {
         lister.running = true;
     }
 
-    // Copia a entrada escolhida para o clipboard (o cliphist devolve o conteúdo original).
+    // Copies the chosen entry to the clipboard (cliphist returns the original content).
     function copy(entry) {
         Quickshell.execDetached(["sh", "-c", `cliphist decode '${entry.id}' | wl-copy`]);
     }

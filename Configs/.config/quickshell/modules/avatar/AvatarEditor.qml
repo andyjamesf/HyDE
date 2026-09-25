@@ -5,18 +5,18 @@ import Quickshell.Wayland
 import qs.components
 import qs.services
 
-// Editor da fotografia do utilizador: a imagem escolhida aparece num quadro com o círculo que a
-// shell mostra; arrasta-se para a posicionar e faz-se zoom (roda do rato ou slider). "Save" grava
-// o recorte quadrado (512 px) em ~/.face.
+// User picture editor: the chosen image appears in a frame with the circle the
+// shell displays; drag to position it and zoom (mouse wheel or slider). "Save" writes
+// the square crop (512 px) to ~/.face.
 PanelWindow {
     id: win
 
     required property ShellScreen modelData
     readonly property string source: ShellState.avatarSource
-    // Tamanho do quadro de edição (px lógicos).
+    // Size of the editing frame (logical px).
     readonly property int frame: 280
 
-    // Zoom 1 = a imagem cobre o quadro à justa; offset em px a partir do centro.
+    // Zoom 1 = the image exactly covers the frame; offset in px from the center.
     property real zoom: 1
     property real ox: 0
     property real oy: 0
@@ -44,7 +44,7 @@ PanelWindow {
         oy = Math.max(-my, Math.min(my, oy));
     }
 
-    // Zoom à volta do centro do quadro: o ponto que está no centro continua no centro.
+    // Zoom around the center of the frame: the point at the center stays at the center.
     function setZoom(z) {
         const nz = Math.max(1, Math.min(4, z));
         ox = ox * nz / zoom;
@@ -62,7 +62,7 @@ PanelWindow {
         }, Qt.size(512, 512));
     }
 
-    // Clique fora do cartão cancela.
+    // A click outside the card cancels.
     MouseArea {
         anchors.fill: parent
         onClicked: ShellState.avatarSource = ""
@@ -81,7 +81,7 @@ PanelWindow {
         Keys.onEscapePressed: ShellState.avatarSource = ""
         Keys.onReturnPressed: win.save()
 
-        // Absorve os cliques no cartão (não fecham o editor).
+        // Swallows clicks on the card (they don't close the editor).
         MouseArea {
             anchors.fill: parent
         }
@@ -103,8 +103,8 @@ PanelWindow {
                 color: Theme.textDim
             }
 
-            // Quadro de edição: a imagem recortada (é isto que se grava) e, por cima, a máscara
-            // circular que mostra o que vai aparecer na shell.
+            // Editing frame: the clipped image (this is what gets saved) and, on top, the circular
+            // mask showing what will appear in the shell.
             Item {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: win.frame

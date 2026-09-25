@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 
-// Título pequeno de uma secção dentro de um painel.
+// Small title of a section inside a panel.
 StyledText {
     Layout.fillWidth: true
     Layout.topMargin: 4

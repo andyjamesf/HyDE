@@ -4,8 +4,8 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Workspaces do Hyprland: sempre pelo menos `shown` visíveis, os ocupados com os ícones das apps,
-// e um indicador que desliza até ao workspace ativo deste ecrã. Scroll muda de workspace.
+// Hyprland workspaces: always at least `shown` visible, the occupied ones with their apps' icons,
+// and an indicator that slides to this screen's active workspace. Scroll switches workspace.
 Item {
     id: root
 
@@ -18,7 +18,7 @@ Item {
 
     implicitWidth: row.implicitWidth + 8
     implicitHeight: BarLayout.height
-    // Altura do indicador do workspace ativo; os ícones das apps ficam 3 px dentro dele.
+    // Height of the active workspace indicator; the app icons sit 3 px inside it.
     readonly property int indicatorHeight: Math.round(height * 0.72)
 
     WheelHandler {

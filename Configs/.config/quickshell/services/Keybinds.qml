@@ -3,16 +3,16 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Atalhos do Hyprland para o modo "Keys" do launcher (substitui o keybinds_hint do HyDE, que abria
-// no rofi). Lidos de `hyprctl binds -j`; só os que têm descrição. A descrição do HyDE traz a
-// categoria entre parênteses retos: "[Launcher|Apps] browser" → categoria "Launcher · Apps".
+// Hyprland keybindings for the launcher's "Keys" mode (replaces HyDE's keybinds_hint, which opened
+// in rofi). Read from `hyprctl binds -j`; only those with a description. HyDE's description carries the
+// category in square brackets: "[Launcher|Apps] browser" → category "Launcher · Apps".
 Singleton {
     id: root
 
     property var entries: []
     property bool loading: false
 
-    // Bits do modmask do Hyprland, pela ordem em que se escrevem.
+    // Hyprland modmask bits, in the order they are written.
     readonly property var mods: [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]]
     readonly property var keyNames: ({
             "slash": "/",
@@ -79,12 +79,12 @@ Singleton {
         return parts;
     }
 
-    // Teclas que são só modificadores (ex.: soltar o Alt no fim do Alt+Tab): fazem parte de outro
-    // atalho e não se carregam sozinhas, por isso não aparecem na lista.
+    // Keys that are only modifiers (e.g. releasing Alt at the end of Alt+Tab): they are part of another
+    // binding and aren't pressed on their own, so they don't appear in the list.
     readonly property var modifierKeys: ["alt_l", "alt_r", "super_l", "super_r", "control_l", "control_r", "shift_l", "shift_r"]
 
-    // Um atalho por ação: combinações diferentes para a mesma coisa (Super+Q e Alt+F4 para fechar a
-    // janela) ficam na mesma linha, em `combos`.
+    // One entry per action: different combinations for the same thing (Super+Q and Alt+F4 to close the
+    // window) go on the same row, in `combos`.
     function parse(json) {
         const byAction = {};
         const out = [];
@@ -116,15 +116,15 @@ Singleton {
         return out;
     }
 
-    // Todas as palavras da pesquisa têm de aparecer (na descrição, na categoria ou nas teclas).
+    // Every word of the query must appear (in the description, the category or the keys).
     function search(query) {
         const words = query.trim().toLowerCase().split(/\s+/).filter(w => w);
         return words.length ? entries.filter(e => words.every(w => e.haystack.includes(w))) : entries;
     }
 
-    // Com a configuração em Lua, cada atalho é o dispatcher "__lua" com o número da função no
-    // registo do Lua (o `hyprctl dispatch __lua N` do HyDE já não funciona: o dispatch passou a
-    // receber código Lua). Só se aceita um número, para nunca avaliar texto arbitrário.
+    // With the Lua config, each binding is the "__lua" dispatcher with the function's number in the
+    // Lua registry (HyDE's `hyprctl dispatch __lua N` no longer works: dispatch now
+    // takes Lua code). Only a number is accepted, so arbitrary text is never evaluated.
     function run(entry) {
         if (entry.dispatcher === "__lua") {
             if (/^\d+$/.test(entry.arg))

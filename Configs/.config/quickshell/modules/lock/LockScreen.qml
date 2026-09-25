@@ -3,8 +3,8 @@ import Quickshell
 import Quickshell.Wayland
 import qs.services
 
-// Bloqueio de sessão: enquanto Lock.locked, o compositor mostra só estas superfícies (uma por
-// monitor) e nada mais recebe teclado ou rato.
+// Session lock: while Lock.locked, the compositor only shows these surfaces (one per
+// monitor) and nothing else receives keyboard or mouse input.
 WlSessionLock {
     locked: Lock.locked
 

@@ -3,12 +3,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Brilho do ecrã. Não há API nativa no Quickshell, por isso:
-// - leitura: o ficheiro do sysfs, com FileView;
-// - deteção de mudanças: o kernel emite um uevent "change" em cada escrita no backlight
-//   (testado neste portátil), lido com `udevadm monitor` — evita polling, e apanha também as
-//   mudanças feitas pelas teclas/HyDE (brightnesscontrol.sh);
-// - escrita: brightnessctl, porque o sysfs só é gravável por root (o brightnessctl usa o logind).
+// Screen brightness. Quickshell has no native API, so:
+// - reading: the sysfs file, with FileView;
+// - change detection: the kernel emits a "change" uevent on every backlight write
+//   (tested on this laptop), read with `udevadm monitor` — avoids polling, and also catches
+//   changes made by the keys/HyDE (brightnesscontrol.sh);
+// - writing: brightnessctl, because sysfs is only writable by root (brightnessctl uses logind).
 Singleton {
     id: root
 
@@ -21,7 +21,7 @@ Singleton {
 
     function set(p) {
         p = Math.max(1, Math.min(100, Math.round(p)));
-        percent = p; // resposta imediata; o uevent confirma logo a seguir
+        percent = p; // immediate feedback; the uevent confirms right after
         Quickshell.execDetached(["brightnessctl", "-q", "set", `${p}%`]);
     }
 

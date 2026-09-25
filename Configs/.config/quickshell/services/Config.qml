@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Definições do utilizador, em config/config.json. Os valores por omissão estão aqui:
-// o ficheiro só precisa de ter o que se quer mudar. As alterações aplicam-se a quente.
+// User settings, in config/config.json. The defaults live here:
+// the file only needs what you want to change. Changes are applied live.
 Singleton {
     id: root
 
@@ -17,27 +17,27 @@ Singleton {
         path: Quickshell.shellPath("config/config.json")
         watchChanges: true
         onFileChanged: reload()
-        // Um JSON inválido não deve deitar a shell abaixo: fica-se com os últimos valores bons.
+        // Invalid JSON must not bring the shell down: the last good values are kept.
         onLoadFailed: error => console.warn("config.json:", FileViewError.toString(error))
 
         JsonAdapter {
             id: adapter
 
             property JsonObject bar: JsonObject {
-                // Layout por omissão (um dos nomes em config/layouts.json).
+                // Default layout (one of the names in config/layouts.json).
                 property string layout: "islands"
-                // "top" | "bottom" (os layouts podem impor a sua própria posição)
+                // "top" | "bottom" (layouts can enforce their own position)
                 property string position: "top"
                 property real opacity: 0.92
-                // Fundo das ilhas: "surface", "tint", "container", "accent", "glass", "outline"
-                // ou uma cor fixa ("#rrggbb"). Pode ser mudado no menu do HyDE.
+                // Island background: "surface", "tint", "container", "accent", "glass", "outline"
+                // or a fixed color ("#rrggbb"). Can be changed in the HyDE menu.
                 property string pillStyle: "tint"
-                // Layout a usar automaticamente com cada tema do HyDE, ex.: { "Catppuccin-Mocha": "minimal" }.
+                // Layout to use automatically with each HyDE theme, e.g. { "Catppuccin-Mocha": "minimal" }.
                 property var themeLayouts: ({})
             }
 
             property JsonObject appearance: JsonObject {
-                // Língua das datas (nomes dos meses e dias da semana).
+                // Language for dates (month and weekday names).
                 property string locale: "en_GB"
                 property string font: "Inter"
                 property string monoFont: "JetBrainsMono Nerd Font"
@@ -45,13 +45,13 @@ Singleton {
                 property int fontSize: 12
                 property int iconSize: 17
                 property int radius: 14
-                // Multiplicador das durações das animações (0 desliga-as).
+                // Multiplier for animation durations (0 disables them).
                 property real animationScale: 1
             }
 
             property JsonObject widgets: JsonObject {
                 property JsonObject workspaces: JsonObject {
-                    // Número mínimo de workspaces mostrados, mesmo vazios.
+                    // Minimum number of workspaces shown, even when empty.
                     property int shown: 5
                     property bool appIcons: true
                     property int maxIcons: 3
@@ -84,13 +84,13 @@ Singleton {
                     property int step: 5
                 }
                 property JsonObject notifications: JsonObject {
-                    // Tempo máximo que um popup fica visível (ms); as apps podem pedir menos.
+                    // Maximum time a popup stays visible (ms); apps can ask for less.
                     property int timeout: 5000
                     property int maxPopups: 4
                     property int historySize: 100
                 }
                 property JsonObject lock: JsonObject {
-                    // false: bloquear usa o hyprlock do HyDE em vez do lockscreen da shell.
+                    // false: locking uses HyDE's hyprlock instead of the shell's lock screen.
                     property bool enabled: true
                 }
                 property JsonObject osd: JsonObject {

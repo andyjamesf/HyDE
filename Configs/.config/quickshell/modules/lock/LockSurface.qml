@@ -5,14 +5,14 @@ import Quickshell.Widgets
 import qs.components
 import qs.services
 
-// Conteúdo do ecrã bloqueado (um por monitor): wallpaper desfocado do HyDE, relógio, utilizador,
-// palavra-passe e, em baixo, bateria e o que está a tocar.
+// Lock screen contents (one per monitor): HyDE's blurred wallpaper, clock, user,
+// password and, at the bottom, battery and what's playing.
 Item {
     id: root
 
     anchors.fill: parent
 
-    // Entra com um fade (o compositor já cobriu o ecrã a preto no instante do bloqueio).
+    // Fades in (the compositor has already covered the screen in black at the moment of locking).
     opacity: 0
     Component.onCompleted: {
         opacity = 1;
@@ -68,7 +68,7 @@ Item {
 
         StyledText {
             Layout.alignment: Qt.AlignHCenter
-            // Só a primeira letra em maiúscula ("Quarta-feira, 23 de setembro").
+            // Only the first letter capitalized (e.g. Portuguese "Quarta-feira, 23 de setembro").
             text: Utils.formatDate(clock.date, "dddd, d MMMM").replace(/^./, c => c.toUpperCase())
             font.pixelSize: Theme.titleLarge
             color: Theme.textDim
@@ -112,7 +112,7 @@ Item {
             font.weight: Font.DemiBold
         }
 
-        // Palavra-passe
+        // Password
         Rectangle {
             id: field
 
@@ -124,7 +124,7 @@ Item {
             border.width: 2
             border.color: Lock.error !== "" ? Theme.error : input.activeFocus ? Theme.primary : Theme.outlineVariant
 
-            // Abana quando a palavra-passe está errada.
+            // Shakes when the password is wrong.
             transform: Translate {
                 id: shakeX
             }
@@ -212,7 +212,7 @@ Item {
         }
     }
 
-    // Rodapé: bateria e media
+    // Footer: battery and media
     RowLayout {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 36

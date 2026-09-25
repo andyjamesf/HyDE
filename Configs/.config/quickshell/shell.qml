@@ -1,6 +1,6 @@
 //@ pragma UseQApplication
-// Shell Quickshell para o HyDE. Arranca com `qs` (é a config por omissão em ~/.config/quickshell).
-// Controlo externo: `qs ipc call <alvo> <função>`; `qs ipc show` lista tudo.
+// Quickshell shell for HyDE. Starts with `qs` (it is the default config in ~/.config/quickshell).
+// External control: `qs ipc call <target> <function>`; `qs ipc show` lists everything.
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -16,13 +16,13 @@ import qs.modules.lock
 import qs.modules.avatar
 
 ShellRoot {
-    // Os singletons só são criados quando alguém os usa; estes têm de existir desde o arranque
-    // (as cores do rofi, os eventos do calendário e o servidor de notificações).
+    // Singletons are only created when something uses them; these must exist from startup
+    // (the rofi colors, the calendar events and the notification server).
     readonly property var rofi: Rofi
     readonly property var agenda: Agenda
     readonly property var notifs: Notifs
 
-    // Editor da fotografia do utilizador (só existe enquanto está aberto).
+    // User picture editor (only exists while it is open).
     Variants {
         model: Quickshell.screens
 
@@ -49,7 +49,7 @@ ShellRoot {
         ControlCenter {}
     }
 
-    // Popups e OSD também só existem quando há algo a mostrar, no ecrã com foco.
+    // Popups and OSD also only exist when there is something to show, on the focused screen.
     Variants {
         model: Quickshell.screens
 
@@ -78,8 +78,8 @@ ShellRoot {
         }
     }
 
-    // Launcher e power menu só existem enquanto estão abertos, e só no ecrã onde abriram: cada
-    // janela tem o seu contexto gráfico, e mantê-las todas criadas custava centenas de MB.
+    // Launcher and power menu only exist while open, and only on the screen where they opened: each
+    // window has its own graphics context, and keeping them all created cost hundreds of MB.
     Variants {
         model: Quickshell.screens
 
@@ -120,14 +120,14 @@ ShellRoot {
         function calc(): void {
             ShellState.toggleLauncher("calc");
         }
-        // Atalhos de teclado do Hyprland (substitui o keybinds_hint do HyDE).
+        // Hyprland keybindings (replaces HyDE's keybinds_hint).
         function keys(): void {
             ShellState.toggleLauncher("keys");
         }
         function close(): void {
             ShellState.launcherOpen = false;
         }
-        // Abre num monitor específico (ex.: "DP-1").
+        // Opens on a specific monitor (e.g. "DP-1").
         function openOn(screen: string): void {
             ShellState.launcherOpen = false;
             ShellState.toggleLauncher("apps", screen);
@@ -142,7 +142,7 @@ ShellRoot {
         function lock(): void {
             Lock.lock();
         }
-        // Mesmo nível de confiança que `loginctl unlock-session` (usado pelo unlock_cmd do hypridle).
+        // Same trust level as `loginctl unlock-session` (used by hypridle's unlock_cmd).
         function unlock(): void {
             Lock.unlock();
         }
@@ -188,7 +188,7 @@ ShellRoot {
         function close(): void {
             ShellState.closeControlCenter();
         }
-        // "wifi", "bluetooth" ou "audio"
+        // "wifi", "bluetooth" or "audio"
         function page(name: string): void {
             ShellState.openControlCenter(name);
         }
@@ -215,30 +215,30 @@ ShellRoot {
         function prev(): void {
             BarLayout.cycle(-1);
         }
-        // "calendar", "media", "audio", "network", "bluetooth", "battery" ou "brightness"
-        // Abre a popout de um widget; "" fecha a que estiver aberta.
+        // "calendar", "media", "audio", "network", "bluetooth", "battery" or "brightness"
+        // Opens a widget's popout; "" closes the one that is open.
         function popout(name: string): void {
             if (name === "")
                 ShellState.popoutOwner = null;
             else
                 ShellState.requestPopout(name);
         }
-        // Abre o menu de um widget ("hyde", "hyde:0" entra no 1.º submenu); "" fecha.
+        // Opens a widget's menu ("hyde", "hyde:0" enters the 1st submenu); "" closes it.
         function menu(spec: string): void {
             ShellState.requestMenu(spec);
         }
-        // Mostra a tooltip de um widget (o id do layout, ex.: "clock"); "" esconde.
+        // Shows a widget's tooltip (the layout id, e.g. "clock"); "" hides it.
         function tooltip(name: string): void {
             ShellState.requestTooltip(name);
         }
-        // Fundo das ilhas: surface, tint, container, accent, glass, outline ou "#rrggbb".
+        // Island background: surface, tint, container, accent, glass, outline or "#rrggbb".
         function pill(style: string): void {
             BarLayout.setPillStyle(style);
         }
         function opacity(value: real): void {
             BarLayout.setPillOpacity(value);
         }
-        // Altura da barra em px (0 volta à do layout); taller/shorter mudam 2 px.
+        // Bar height in px (0 goes back to the layout's); taller/shorter change it by 2 px.
         function height(value: int): void {
             BarLayout.setHeight(value);
         }
@@ -248,7 +248,7 @@ ShellRoot {
         function shorter(): void {
             BarLayout.adjustHeight(-2);
         }
-        // Mostra/recolhe o uso dos agentes de IA na barra.
+        // Shows/collapses the AI agents' usage on the bar.
         function agents(): void {
             Prefs.aiExpanded = !Prefs.aiExpanded;
             Prefs.save();
@@ -261,7 +261,7 @@ ShellRoot {
     IpcHandler {
         target: "colors"
 
-        // "hyde" (segue o HyDE) ou "wallpaper" (cores do wallpaper atual).
+        // "hyde" (follows HyDE) or "wallpaper" (colors of the current wallpaper).
         function source(name: string): void {
             Theme.setColorSource(name);
         }
@@ -301,11 +301,11 @@ ShellRoot {
         function reload(): void {
             Quickshell.reload(true);
         }
-        // Escolher a fotografia do utilizador (a mesma ação que clicar na foto do centro de controlo).
+        // Choose the user picture (the same action as clicking the picture in the control center).
         function avatar(): void {
             SysInfo.chooseAvatar();
         }
-        // Abre o editor com uma imagem já escolhida ("" fecha).
+        // Opens the editor with an already chosen image ("" closes it).
         function editAvatar(path: string): void {
             ShellState.avatarScreen = Hyprland.focusedMonitor?.name ?? "";
             ShellState.avatarSource = path;

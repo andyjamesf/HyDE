@@ -1,9 +1,9 @@
 import QtQuick
 import qs.services
 
-// Botão redondo só com ícone. `checked` preenche-o com a cor primária (para toggles); `tonal`
-// dá-lhe um fundo discreto, para botões que vivem soltos num painel. `tooltip` aparece ao fim de
-// meio segundo com o rato por cima.
+// Round icon-only button. `checked` fills it with the primary color (for toggles); `tonal`
+// gives it a subtle background, for buttons that sit on their own in a panel. `tooltip` shows up after
+// half a second of hovering.
 Item {
     id: root
 

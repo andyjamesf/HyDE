@@ -3,30 +3,30 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
-// Estado da shell partilhado por todos os ecrãs.
+// Shell state shared by all screens.
 Singleton {
     id: root
 
     property bool barHidden: false
-    // Lido pelo IdleInhibitor de cada barra (o inibidor precisa de uma janela).
+    // Read by each bar's IdleInhibitor (the inhibitor needs a window).
     property bool idleInhibited: false
 
-    // Centro de controlo: aberto em que ecrã, e em que página ("" = principal, "wifi", "bluetooth", "audio").
+    // Control center: which screen it is open on, and which page ("" = main, "wifi", "bluetooth", "audio").
     property bool controlCenterOpen: false
     property string controlCenterScreen: ""
     property string controlCenterPage: ""
-    // Um clique fora fecha o painel (focus grab) e, se foi no botão da barra, o mesmo clique
-    // voltaria a abri-lo; este instante permite ignorar esse segundo efeito.
+    // An outside click closes the panel (focus grab) and, if it was on the bar button, the same click
+    // would open it again; this timestamp allows ignoring that second effect.
     property real controlCenterClosedAt: 0
 
-    // Pedido de abrir uma popout da barra por nome (IPC/atalhos): a barra do ecrã com foco abre-a.
+    // Request to open a bar popout by name (IPC/keybindings): the bar on the focused screen opens it.
     property string requestedPopout: ""
-    // O widget da barra com a popout aberta (só pode haver uma).
+    // The bar widget with the open popout (there can only be one).
     property var popoutOwner: null
     property string requestedPopoutScreen: ""
 
-    // Menus e tooltips da barra pedidos por IPC (para testar sem rato): "nome" ou "nome:i:j" abre
-    // o menu do widget e entra nos submenus i, j…; vazio fecha.
+    // Bar menus and tooltips requested over IPC (for testing without a mouse): "name" or "name:i:j" opens
+    // the widget's menu and enters submenus i, j…; empty closes it.
     property string requestedMenu: ""
     property string requestedTooltip: ""
 
@@ -47,8 +47,8 @@ Singleton {
         requestedPopout = name;
     }
 
-    // Launcher: aberto em que ecrã e em que modo ("apps", "clipboard" ou "calc").
-    // Editor da fotografia: a imagem escolhida (vazio = fechado) e o ecrã onde abre.
+    // Launcher: which screen it is open on and in which mode ("apps", "clipboard" or "calc").
+    // Picture editor: the chosen image (empty = closed) and the screen it opens on.
     property string avatarSource: ""
     property string avatarScreen: ""
 

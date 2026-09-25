@@ -1,6 +1,6 @@
 import QtQuick
 
-// Carrega um widget da barra pelo id usado no config.json.
+// Loads a bar widget by the id used in config.json.
 Loader {
     id: root
 
@@ -31,8 +31,8 @@ Loader {
         })
 
     source: files[name] ? Qt.resolvedUrl(`widgets/${files[name]}Widget.qml`) : ""
-    // O widget quer aparecer? (lido pela Island, que não pode usar `visible`: esse depende também
-    // da própria Island, e uma ilha que começasse vazia nunca chegaria a aparecer.)
+    // Does the widget want to appear? (read by the Island, which can't use `visible`: that also depends
+    // on the Island itself, and an island that started empty would never show up.)
     readonly property bool wanted: status === Loader.Ready && (item.shown ?? true)
     visible: wanted
     asynchronous: false

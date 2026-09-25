@@ -3,10 +3,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Eventos dos calendários (Google Calendar ou outro com endereço iCal), para o calendário da barra.
-// O trabalho é feito por scripts/ical_events.py, que descarrega os calendários listados em
-// ~/.local/share/quickshell/calendars.json e escreve ~/.cache/quickshell/calendar.json; este
-// serviço vigia esse ficheiro. Atualiza a cada 15 minutos e quando se abre o calendário.
+// Calendar events (Google Calendar or any other with an iCal address), for the bar calendar.
+// The work is done by scripts/ical_events.py, which downloads the calendars listed in
+// ~/.local/share/quickshell/calendars.json and writes ~/.cache/quickshell/calendar.json; this
+// service watches that file. It refreshes every 15 minutes and when the calendar is opened.
 Singleton {
     id: root
 
@@ -19,7 +19,7 @@ Singleton {
     property var errors: []
     property real lastRun: 0
 
-    // Atualiza, mas não mais do que uma vez a cada 2 minutos (abrir e fechar a popout seguido).
+    // Refreshes, but no more than once every 2 minutes (opening and closing the popout repeatedly).
     function refresh() {
         if (configured && Date.now() - lastRun > 120000) {
             lastRun = Date.now();
@@ -27,7 +27,7 @@ Singleton {
         }
     }
 
-    // "2026-09-25" (dia inteiro) tem de ser uma data local, não meia-noite UTC.
+    // "2026-09-25" (all day) must be a local date, not UTC midnight.
     function parseDate(s, allDay) {
         if (allDay) {
             const [y, m, d] = s.slice(0, 10).split("-").map(Number);
@@ -40,7 +40,7 @@ Singleton {
         return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
     }
 
-    // Eventos que tocam um dia (os de vários dias aparecem em todos).
+    // Events touching a day (multi-day ones show up on every day).
     function eventsOn(day) {
         const start = new Date(day.getFullYear(), day.getMonth(), day.getDate());
         const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);

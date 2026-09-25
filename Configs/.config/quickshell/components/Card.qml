@@ -1,7 +1,7 @@
 import QtQuick
 import qs.services
 
-// Superfície arrumada em cartão, para agrupar conteúdo nos painéis.
+// Card-shaped surface, for grouping content in panels.
 Rectangle {
     default property alias content: inner.data
     property int padding: Theme.space4

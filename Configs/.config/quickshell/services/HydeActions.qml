@@ -1,8 +1,8 @@
 pragma Singleton
 import Quickshell
 
-// Ações do HyDE (as mesmas entradas e comandos dos menus da Waybar do HyDE:
-// ~/.local/share/waybar/menus/*.xml + "menu-actions" dos módulos). Formato para o MenuPopup:
+// HyDE actions (the same entries and commands as HyDE's Waybar menus:
+// ~/.local/share/waybar/menus/*.xml + the modules' "menu-actions"). Format for MenuPopup:
 // { label, cmd } | { label, items: [...] } | { sep: true }.
 Singleton {
     readonly property var hyprsunset: [

@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// CPU, memória, temperatura e tráfego de rede, lidos de /proc e /sys com FileView (sem processos).
-// O kernel não avisa quando estes valores mudam, por isso aqui é inevitável um temporizador; só
-// corre enquanto algum widget precisar dos dados (contador `users`).
+// CPU, memory, temperature and network traffic, read from /proc and /sys with FileView (no processes).
+// The kernel doesn't signal when these values change, so a timer is unavoidable here; it only
+// runs while some widget needs the data (`users` counter).
 Singleton {
     id: root
 
@@ -99,7 +99,7 @@ Singleton {
         onLoaded: root.temperature = Number(text()) / 1000
     }
 
-    // Escolhe o sensor do CPU (k10temp na AMD, coretemp na Intel) uma única vez.
+    // Picks the CPU sensor (k10temp on AMD, coretemp on Intel) only once.
     Process {
         running: true
         command: ["sh", "-c", "for h in /sys/class/hwmon/hwmon*; do n=$(cat $h/name); case $n in k10temp|coretemp|zenpower|cpu_thermal) echo $h/temp1_input; exit;; esac; done"]

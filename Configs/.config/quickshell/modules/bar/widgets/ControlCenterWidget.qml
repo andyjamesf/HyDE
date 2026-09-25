@@ -1,7 +1,7 @@
 import qs.components
 import qs.services
 
-// Abre o centro de controlo.
+// Opens the control center.
 BarItem {
     icon: "tune"
     iconFill: ShellState.controlCenterOpen ? 1 : 0

@@ -5,10 +5,10 @@ import Quickshell.Services.Pipewire
 import qs.components
 import qs.services
 
-// Som: volume de saída e de entrada, escolha do dispositivo e volume de cada app.
+// Sound: output and input volume, device selection and per-app volume.
 ColumnLayout {
     id: root
-    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    // In the control center: the header gets the back button.
     property bool backButton: false
     signal back
 

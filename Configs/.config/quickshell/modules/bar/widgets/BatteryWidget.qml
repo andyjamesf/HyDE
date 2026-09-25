@@ -4,7 +4,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Bateria. Clique abre o painel (carga, tempo restante, perfil de energia).
+// Battery. Click opens the panel (charge, time remaining, power profile).
 BarItem {
     readonly property var cfg: Config.widgets.battery
 

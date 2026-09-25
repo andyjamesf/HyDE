@@ -5,8 +5,8 @@ import Quickshell.Hyprland
 import qs.components
 import qs.services
 
-// Popups das notificações, no canto do ecrã com foco (junto à barra). Cada um entra a deslizar,
-// desaparece sozinho ao fim do tempo (que pára enquanto o rato está por cima) e sai a deslizar.
+// Notification popups, in the corner of the focused screen (next to the bar). Each one slides in,
+// disappears by itself after the timeout (which pauses while hovered) and slides out.
 PanelWindow {
     id: win
 
@@ -29,7 +29,7 @@ PanelWindow {
     implicitHeight: Math.max(1, column.implicitHeight)
     exclusiveZone: 0
     color: "transparent"
-    // Só os cartões recebem cliques; o resto da janela deixa-os passar.
+    // Only the cards receive clicks; the rest of the window lets them through.
     mask: Region {
         item: column
     }
@@ -106,8 +106,8 @@ PanelWindow {
                     }
                 }
 
-                // Tempo do config.json (5 s); a app só o pode encurtar (expireTimeout vem em ms).
-                // As críticas ficam até serem fechadas.
+                // Timeout from config.json (5 s); the app can only shorten it (expireTimeout is in ms).
+                // Critical ones stay until they are closed.
                 Timer {
                     readonly property int maxTimeout: Config.widgets.notifications.timeout
                     readonly property real appTimeout: slot.modelData.expireTimeout

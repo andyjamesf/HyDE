@@ -5,13 +5,13 @@ import Quickshell.Hyprland
 import qs.components
 import qs.services
 
-// Janela do OSD: criada só enquanto há OSD para mostrar, no ecrã com foco (ver shell.qml).
-// Não recebe cliques; entra a subir com um fade.
+// OSD window: only created while there is an OSD to show, on the focused screen (see shell.qml).
+// It doesn't receive clicks; it slides up with a fade.
 PanelWindow {
     id: win
 
     required property ShellScreen modelData
-    // Só é criada quando há OSD para mostrar; `ready` deixa a primeira entrada animar.
+    // Only created when there is an OSD to show; `ready` lets the first entrance animate.
     property bool ready: false
     readonly property bool shown: ready && Osd.visible && (Hyprland.focusedMonitor?.name ?? "") === modelData.name
     Component.onCompleted: Qt.callLater(() => ready = true)

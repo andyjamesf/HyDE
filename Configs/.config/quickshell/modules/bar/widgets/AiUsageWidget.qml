@@ -2,10 +2,10 @@ import QtQuick
 import qs.components
 import qs.services
 
-// Uso das ferramentas de IA (Claude Code, Codex, Copilot), com os scripts do utilizador
-// (~/.local/bin/ai-usage-watch). Fica recolhido atrás de um botão: o ícone fica vermelho se algum
-// estiver perto do limite, a tooltip resume os três e o clique mostra/esconde os detalhes
-// (a escolha fica guardada). Clique num dos detalhes força uma atualização desse.
+// Usage of the AI tools (Claude Code, Codex, Copilot), from the user's scripts
+// (~/.local/bin/ai-usage-watch). Stays collapsed behind a button: the icon turns red if any of them
+// is close to its limit, the tooltip summarizes all three and a click shows/hides the details
+// (the choice is remembered). Clicking one of the details forces a refresh of that one.
 Row {
     id: root
 
@@ -30,7 +30,7 @@ Row {
         }
     ]
     readonly property bool expanded: Prefs.aiExpanded
-    // Estado de cada agente (texto sem markup e classe), preenchido pelos streams abaixo.
+    // State of each agent (text without markup, and class), filled by the streams below.
     property var states: ({})
     readonly property bool anyData: Object.values(states).some(s => s.text !== "")
     readonly property string worst: {
@@ -44,7 +44,7 @@ Row {
     property bool shown: anyData
 
     // "<span foreground='#c'>G</span> 61% <span …>G</span> 3h06m" → [{glyph, color, text}, …]:
-    // cada ícone com o valor que se lhe segue.
+    // each icon with the value that follows it.
     function parse(markup) {
         const out = [];
         const re = /<span([^>]*)>([^<]*)<\/span>|([^<]+)/g;
@@ -77,7 +77,7 @@ Row {
     function setState(name, text, cls) {
         const s = Object.assign({}, states);
         s[name] = {
-            // Ícone e valor separados por espaços (colados, o glifo tapava o número na tooltip).
+            // Icon and value separated by spaces (stuck together, the glyph covered the number in the tooltip).
             text: root.parse(text).map(g => [g.glyph, g.text].filter(x => x).join("&nbsp;&nbsp;")).join("&nbsp;&nbsp;&nbsp;&nbsp;"),
             cls: cls
         };
@@ -108,8 +108,8 @@ Row {
             required property var modelData
             readonly property string cls: stream.cls
 
-            // Os scripts escrevem "<span …>ícone</span> valor"; o ícone (Nerd Font) é desenhado à
-            // parte, numa caixa própria: dentro do texto em Inter, o glifo sobrepunha-se aos números.
+            // The scripts write "<span …>icon</span> value"; the icon (Nerd Font) is drawn
+            // separately, in its own box: inside the Inter text, the glyph overlapped the numbers.
             readonly property var segments: root.parse(stream.text)
 
             shown: root.expanded && stream.text !== ""
@@ -160,7 +160,7 @@ Row {
                 }
             }
 
-            // Os streams correm sempre (mesmo recolhido), para o ícone e a tooltip estarem certos.
+            // The streams always run (even when collapsed), so the icon and tooltip stay accurate.
             JsonStream {
                 id: stream
                 exec: `ai-usage-watch ${item.modelData.name} ${item.modelData.period} -- ${item.modelData.cmd}`

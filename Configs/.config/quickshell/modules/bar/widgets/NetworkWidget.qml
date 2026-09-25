@@ -3,7 +3,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Estado da rede. Clique abre a lista de redes; clique direito liga/desliga o Wi-Fi.
+// Network status. Click opens the network list; right click toggles Wi-Fi on/off.
 BarItem {
     icon: Network.icon
     iconFill: 1

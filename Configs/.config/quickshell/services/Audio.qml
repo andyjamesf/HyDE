@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 
-// Som: saída e entrada por omissão, lista de dispositivos e o volume de cada app
-// (Pipewire nativo, sem pactl/wpctl).
+// Sound: default output and input, device list and per-app volume
+// (native Pipewire, no pactl/wpctl).
 Singleton {
     id: root
 
@@ -19,7 +19,7 @@ Singleton {
 
     readonly property var sinks: Pipewire.nodes.values.filter(n => n.audio && n.isSink && !n.isStream)
     readonly property var sources: Pipewire.nodes.values.filter(n => n.audio && !n.isSink && !n.isStream && !(n.name ?? "").endsWith(".monitor"))
-    // Apps a tocar som (streams de saída).
+    // Apps playing sound (output streams).
     readonly property var streams: Pipewire.nodes.values.filter(n => n.audio && n.isStream && n.properties["media.class"] === "Stream/Output/Audio")
 
     readonly property string icon: iconFor(volume, muted)
@@ -80,7 +80,7 @@ Singleton {
         return p["application.icon-name"] || p["application.process.binary"] || "";
     }
 
-    // Sem isto os nós não mantêm as propriedades de áudio atualizadas.
+    // Without this the nodes don't keep their audio properties up to date.
     PwObjectTracker {
         objects: [root.sink, root.source].concat(root.sinks, root.sources, root.streams)
     }

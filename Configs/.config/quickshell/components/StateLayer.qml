@@ -1,8 +1,8 @@
 import QtQuick
 import qs.services
 
-// Área clicável com a camada de hover/pressão por baixo do conteúdo. Emite os mesmos sinais para
-// os três botões e acumula o scroll (touchpads mandam muitos eventos pequenos) em passos de 120.
+// Clickable area with the hover/press layer underneath the content. Emits the same signals for
+// all three buttons and accumulates scrolling (touchpads send many small events) into steps of 120.
 MouseArea {
     id: root
 
@@ -10,7 +10,7 @@ MouseArea {
     property color highlight: Theme.hover
     property bool active: false
 
-    signal scrolled(int direction) // +1 para cima, -1 para baixo
+    signal scrolled(int direction) // +1 up, -1 down
 
     property real _wheel: 0
 

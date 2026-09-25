@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Aplicações instaladas (ficheiros .desktop): ícones por app id, pesquisa fuzzy para o launcher,
-// favoritos e "frecência" (as mais usadas e mais recentes sobem na lista). O histórico de uso e
-// os favoritos ficam em ~/.local/state/quickshell/…/launcher.json.
+// Installed applications (.desktop files): icons by app id, fuzzy search for the launcher,
+// favorites and "frecency" (the most used and most recent rise in the list). The usage history and
+// the favorites are stored in ~/.local/state/quickshell/…/launcher.json.
 Singleton {
     id: root
 
@@ -38,7 +38,7 @@ Singleton {
         file.writeAdapter();
     }
 
-    // Lança pelo app2unit do HyDE (como o rofi do HyDE): cada app fica na sua unidade systemd.
+    // Launches through HyDE's app2unit (like HyDE's rofi): each app gets its own systemd unit.
     function launch(entry, actionId) {
         const uses = Object.assign({}, store.uses);
         const u = uses[entry.id] ?? {
@@ -54,7 +54,7 @@ Singleton {
         Quickshell.execDetached(["hyde-shell", "app", "--", actionId ? `${entry.id}.desktop:${actionId}` : `${entry.id}.desktop`]);
     }
 
-    // Frecência: usos, com mais peso para os recentes (meia-vida de uma semana).
+    // Frecency: uses, with more weight for recent ones (one-week half-life).
     function frecency(entry) {
         const u = store.uses[entry.id];
         if (!u)
@@ -63,7 +63,7 @@ Singleton {
         return u.count * Math.pow(0.5, days / 7);
     }
 
-    // Pontuação fuzzy de `q` em `text`: prefixo > início de palavra > substring > subsequência.
+    // Fuzzy score of `q` in `text`: prefix > word start > substring > subsequence.
     function fuzzy(q, text) {
         if (!text)
             return 0;
@@ -78,7 +78,7 @@ Singleton {
         const idx = t.indexOf(q);
         if (idx >= 0)
             return 70 - Math.min(20, idx);
-        // Subsequência: todas as letras por ordem; perde pontos por cada salto.
+        // Subsequence: all letters in order; loses points for every gap.
         let ti = 0, gaps = 0, last = -1;
         for (const ch of q) {
             const found = t.indexOf(ch, ti);
@@ -95,7 +95,7 @@ Singleton {
     function search(query) {
         const q = query.trim().toLowerCase();
         if (q === "") {
-            // Sem pesquisa: favoritos, depois as mais usadas, depois o resto por ordem alfabética.
+            // No query: favorites, then the most used, then the rest in alphabetical order.
             const fav = applications.filter(e => isFavorite(e));
             const used = applications.filter(e => !isFavorite(e) && frecency(e) > 0).sort((a, b) => frecency(b) - frecency(a));
             const rest = applications.filter(e => !isFavorite(e) && frecency(e) === 0);

@@ -2,17 +2,17 @@ import QtQuick
 import Quickshell
 import qs.services
 
-// Menu em popup ancorado a um item da barra.
-// Entradas: { label, cmd } | { label, action: função } | { label, items } | { sep: true };
-// `checked: true` mostra um visto à direita (para opções exclusivas, como o layout atual).
-// Um submenu substitui a lista no mesmo sítio, com uma linha "Back" no topo.
+// Popup menu anchored to a bar item.
+// Entries: { label, cmd } | { label, action: function } | { label, items } | { sep: true };
+// `checked: true` shows a check mark on the right (for exclusive options, like the current layout).
+// A submenu replaces the list in place, with a "Back" row at the top.
 PopupWindow {
     id: menu
 
     required property Item target
     required property var items
     property var stack: [items]
-    // Submenus a abrir logo ao criar (índices em cada nível); usado pelos testes por IPC.
+    // Submenus to open right on creation (indices at each level); used by the IPC tests.
     property var path: []
     readonly property var current: stack[stack.length - 1]
     readonly property bool below: BarLayout.atTop
@@ -28,7 +28,7 @@ PopupWindow {
     grabFocus: true
     visible: true
     color: "transparent"
-    // Largura à medida do texto mais comprido do nível atual (entre 200 e 360 px).
+    // Width fitted to the longest text of the current level (between 200 and 360 px).
     implicitWidth: {
         let widest = 0;
         for (const item of current)

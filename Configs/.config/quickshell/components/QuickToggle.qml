@@ -1,9 +1,9 @@
 import QtQuick
 import qs.services
 
-// Atalho rápido do centro de controlo: botão redondo com o ícone e o nome por baixo. Clique
-// liga/desliga; se `expandable`, o clique direito (ou manter premido) abre a página de detalhe e
-// um pequeno selo com a seta mostra que há mais opções.
+// Control center quick toggle: round button with the icon and the name underneath. Click
+// toggles on/off; if `expandable`, right click (or press and hold) opens the detail page and
+// a small badge with an arrow shows there are more options.
 Item {
     id: root
 
@@ -70,7 +70,7 @@ Item {
             color: root.checked ? Theme.onPrimary : Theme.text
         }
 
-        // Selo "há mais": abre o detalhe com um clique normal.
+        // "More" badge: opens the detail page with a normal click.
         Rectangle {
             visible: root.expandable
             anchors.right: parent.right

@@ -1,8 +1,8 @@
 import qs.components
 import qs.services
 
-// Menu com as opções da shell (layout da barra, origem das cores) e as ações do HyDE
-// (tema, wallpaper, animações, workflows, luz noturna…).
+// Menu with the shell options (bar layout, color source) and the HyDE actions
+// (theme, wallpaper, animations, workflows, night light…).
 BarItem {
     icon: "palette"
     iconColor: Theme.primary

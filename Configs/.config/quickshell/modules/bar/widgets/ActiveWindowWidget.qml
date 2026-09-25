@@ -1,7 +1,7 @@
 import qs.components
 import qs.services
 
-// Ícone e título da janela ativa, só na barra do ecrã onde ela está.
+// Icon and title of the active window, only on the bar of the screen it is on.
 BarItem {
     id: root
 

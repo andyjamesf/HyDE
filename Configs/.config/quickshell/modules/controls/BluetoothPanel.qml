@@ -4,18 +4,18 @@ import Quickshell.Bluetooth as QsBluetooth
 import qs.components
 import qs.services
 
-// Bluetooth: ligar/desligar, dispositivos emparelhados (ligar/desligar/esquecer) e pesquisa de
-// dispositivos novos para emparelhar.
+// Bluetooth: on/off, paired devices (connect/disconnect/forget) and discovery of
+// new devices to pair.
 ColumnLayout {
     id: root
-    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    // In the control center: the header gets the back button.
     property bool backButton: false
     signal back
 
     width: 320
     spacing: 8
 
-    // A pesquisa gasta bateria: pára quando o painel fecha.
+    // Discovery drains battery: it stops when the panel closes.
     Component.onDestruction: Bluetooth.setScanning(false)
 
     PanelHeader {

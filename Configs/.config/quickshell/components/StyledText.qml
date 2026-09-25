@@ -1,9 +1,9 @@
 import QtQuick
 import qs.services
 
-// Texto da shell: Inter, algarismos tabulares (os números não "dançam" ao mudar) e uma folga
-// vertical de 1 px, porque com `elide` o Qt recorta à caixa da linha e, com escala fracionária,
-// as pernas das letras (g, p, y) ficavam cortadas.
+// Shell text: Inter, tabular figures (numbers don't "dance" when they change) and 1 px of vertical
+// padding, because with `elide` Qt clips to the line box and, with fractional scaling,
+// the descenders of letters (g, p, y) got cut off.
 Text {
     color: Theme.text
     font.family: Config.appearance.font

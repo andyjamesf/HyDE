@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Widgets
 import qs.services
 
-// Linha de lista clicável: ícone (Material ou imagem), título, subtítulo e conteúdo à direita.
+// Clickable list row: icon (Material or image), title, subtitle and trailing content.
 Item {
     id: root
 
@@ -56,7 +56,7 @@ Item {
             source: root.image
         }
 
-        // Anel a rodar enquanto a ação está em curso (ligar, emparelhar…).
+        // Spinning ring while the action is in progress (connecting, pairing…).
         Rectangle {
             visible: root.busy
             anchors.centerIn: parent

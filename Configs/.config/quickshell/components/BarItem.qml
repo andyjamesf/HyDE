@@ -2,9 +2,9 @@ import QtQuick
 import Quickshell.Widgets
 import qs.services
 
-// Elemento base dos widgets da barra: ícone (Material ou imagem), texto, tooltip, os três botões
-// do rato, scroll, um menu opcional e uma popout (painel) que abre com o clique esquerdo.
-// Conteúdo extra pode ser acrescentado como filhos.
+// Base element of the bar widgets: icon (Material or image), text, tooltip, the three mouse
+// buttons, scroll, an optional menu and a popout (panel) that opens on left click.
+// Extra content can be added as children.
 Item {
     id: root
 
@@ -23,24 +23,24 @@ Item {
     property bool active: false
     property int padding: Math.round(BarLayout.height * 0.2)
 
-    // Os widgets dizem se têm alguma coisa para mostrar através de `shown` (e não de `visible`,
-    // que depende também dos pais). O WidgetLoader e a Island usam-no para se esconderem.
+    // Widgets say whether they have anything to show through `shown` (and not `visible`,
+    // which also depends on the parents). The WidgetLoader and the Island use it to hide themselves.
     property bool shown: true
 
     property bool menuOpen: false
     property Component popout: null
-    // Nome para abrir esta popout por IPC (`qs ipc call bar popout <nome>`).
+    // Name used to open this popout over IPC (`qs ipc call bar popout <name>`).
     property string popoutName
-    // Nome para os menus/tooltips pedidos por IPC (`bar menu <nome>`, `bar tooltip <nome>`); o
-    // WidgetLoader preenche-o com o id do widget.
+    // Name for menus/tooltips requested over IPC (`bar menu <name>`, `bar tooltip <name>`); the
+    // WidgetLoader fills it with the widget id.
     property string ipcName
-    // Submenus a abrir logo (índices), quando o menu é aberto por IPC.
+    // Submenus to open right away (indices) when the menu is opened over IPC.
     property var menuPath: []
     readonly property bool ipcScreenOk: !root.bar?.screen || ShellState.requestedPopoutScreen === "" || ShellState.requestedPopoutScreen === root.bar.screen.name
     readonly property bool tipForced: ipcName !== "" && ShellState.requestedTooltip === ipcName && ipcScreenOk && visible
     property var bar
 
-    // Só uma popout aberta de cada vez: abrir esta fecha a anterior.
+    // Only one popout open at a time: opening this one closes the previous one.
     onPopoutOpenChanged: if (popoutOpen)
         ShellState.popoutOwner = root
     Connections {
@@ -51,7 +51,7 @@ Item {
         }
     }
     property bool popoutOpen: false
-    // O clique fora que fecha a popout pode ser neste mesmo widget; sem isto reabria logo.
+    // The outside click that closes the popout may land on this same widget; without this it would reopen at once.
     property real popoutClosedAt: 0
     readonly property bool hovered: layer.containsMouse
     default property alias content: row.data

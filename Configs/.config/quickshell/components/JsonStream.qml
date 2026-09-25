@@ -1,9 +1,9 @@
 import QtQuick
 import Quickshell.Io
 
-// Lê um comando que fala o protocolo JSON dos módulos "custom" da Waybar ({text, tooltip, class, alt}),
-// uma linha de cada vez. Serve para reaproveitar scripts do HyDE e os do utilizador (AI usage, cava).
-// Com interval 0 o comando é um stream contínuo e é relançado se terminar; senão corre a cada interval ms.
+// Reads a command that speaks the JSON protocol of Waybar "custom" modules ({text, tooltip, class, alt}),
+// one line at a time. Used to reuse HyDE's scripts and the user's own (AI usage, cava).
+// With interval 0 the command is a continuous stream and is restarted if it exits; otherwise it runs every interval ms.
 Item {
     id: root
 

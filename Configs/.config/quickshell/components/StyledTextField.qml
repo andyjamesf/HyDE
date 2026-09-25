@@ -1,7 +1,7 @@
 import QtQuick
 import qs.services
 
-// Campo de texto com o aspeto da shell (usado para palavras-passe e pesquisas).
+// Text field with the shell's look (used for passwords and searches).
 Rectangle {
     id: root
 

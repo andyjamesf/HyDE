@@ -4,10 +4,10 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Histórico de notificações (centro de controlo). Com `limit` mostra só as mais recentes.
+// Notification history (control center). With `limit` it only shows the most recent ones.
 ColumnLayout {
     id: root
-    // No centro de controlo: o cabeçalho leva o botão de voltar.
+    // In the control center: the header gets the back button.
     property bool backButton: false
     signal back
 

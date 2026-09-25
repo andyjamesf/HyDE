@@ -2,15 +2,15 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Calculadora do launcher: um parser próprio (descida recursiva), sem eval — só aceita números,
-// operadores, parênteses, funções e constantes conhecidas. Aceita vírgula decimal ("2,5").
+// Launcher calculator: its own parser (recursive descent), no eval — it only accepts numbers,
+// operators, parentheses, and known functions and constants. Accepts a decimal comma ("2,5").
 //
-//   + - * / ^ %(resto)   ( )   pi e   sqrt abs sin cos tan asin acos atan log(base 10) ln exp
-//   round floor ceil      e 20% de 50 → "50 * 20%" também funciona como percentagem.
+//   + - * / ^ %(modulo)   ( )   pi e   sqrt abs sin cos tan asin acos atan log(base 10) ln exp
+//   round floor ceil      and 20% of 50 → "50 * 20%" also works as a percentage.
 Singleton {
     id: root
 
-    // Devolve o resultado (número) ou null se `text` não for uma expressão válida.
+    // Returns the result (a number) or null if `text` is not a valid expression.
     function evaluate(text) {
         const src = String(text).replace(/,/g, ".").replace(/×/g, "*").replace(/÷/g, "/").trim();
         if (src === "" || !/[\d)]/.test(src) || !/[+\-*/^%()a-z]/i.test(src.replace(/^[+-]?\d+(\.\d+)?$/, "")))
@@ -84,7 +84,7 @@ Singleton {
             }
             return postfix();
         }
-        // postfix := primary '%'?   (percentagem: 20% = 0.2)
+        // postfix := primary '%'?   (percentage: 20% = 0.2)
         function postfix() {
             let v = primary();
             if (peek() === "%" && (tokens[pos + 1] === undefined || tokens[pos + 1] === ")" || "+-*/".includes(tokens[pos + 1]))) {
@@ -143,7 +143,7 @@ Singleton {
         return out;
     }
 
-    // Resultado legível: até 10 casas decimais, sem zeros à direita, com vírgula (pt-PT).
+    // Readable result: up to 10 decimal places, no trailing zeros, with a decimal comma (pt-PT).
     function format(v) {
         const s = Math.abs(v) >= 1e15 || (Math.abs(v) < 1e-6 && v !== 0) ? v.toExponential(6) : String(Number(v.toFixed(10)));
         return s.replace(".", ",");

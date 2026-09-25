@@ -4,7 +4,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Relógio. Clique abre o calendário.
+// Clock. Click opens the calendar.
 BarItem {
     id: root
 

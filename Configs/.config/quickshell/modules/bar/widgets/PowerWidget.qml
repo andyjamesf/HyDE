@@ -1,7 +1,7 @@
 import qs.components
 import qs.services
 
-// Sessão: clique abre o power menu da shell, clique direito o menu rápido.
+// Session: click opens the shell's power menu, right click the quick menu.
 BarItem {
     icon: "power_settings_new"
     iconColor: Theme.error

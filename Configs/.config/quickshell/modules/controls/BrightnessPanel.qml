@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs.components
 import qs.services
 
-// Brilho do ecrã e luz noturna.
+// Screen brightness and night light.
 ColumnLayout {
     width: 300
     spacing: 12

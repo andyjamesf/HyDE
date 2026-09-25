@@ -3,13 +3,13 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 
-// Bateria e perfis de energia (UPower e power-profiles-daemon, nativos).
+// Battery and power profiles (UPower and power-profiles-daemon, native).
 Singleton {
     id: root
 
     readonly property UPowerDevice device: UPower.displayDevice
     readonly property bool available: device?.isLaptopBattery ?? false
-    // Consoante a versão, percentage vem em 0..1 ou 0..100.
+    // Depending on the version, percentage comes as 0..1 or 0..100.
     readonly property int percent: available ? Math.round(device.percentage <= 1 ? device.percentage * 100 : device.percentage) : 0
     readonly property bool charging: available && device.state === UPowerDeviceState.Charging
     readonly property bool plugged: available && [UPowerDeviceState.Charging, UPowerDeviceState.FullyCharged, UPowerDeviceState.PendingCharge].includes(device.state)

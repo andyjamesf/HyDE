@@ -3,7 +3,7 @@ import qs.components
 import qs.services
 import qs.modules.controls
 
-// Bluetooth. Clique abre os dispositivos; clique direito liga/desliga.
+// Bluetooth. Click opens the devices; right click toggles it on/off.
 BarItem {
     shown: Bluetooth.available
     icon: Bluetooth.icon
