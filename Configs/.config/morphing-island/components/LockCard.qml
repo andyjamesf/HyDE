@@ -124,12 +124,17 @@ Item {
                 Lock.clearError()
         }
 
+        // Up to two lines: PAM's notices ("Account locked after failed attempts. Try again in 10 min")
+        // are longer than "Wrong password".
         Label {
             anchors.horizontalCenter: parent.horizontalCenter
-            height: 26
+            height: Math.max(26, implicitHeight)
             width: Math.min(implicitWidth, 320)
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignBottom
+            wrapMode: Text.WordWrap
+            maximumLineCount: 2
+            elide: Text.ElideRight
             text: Lock.error
             color: Theme.danger
             opacity: Lock.error !== "" ? 1 : 0

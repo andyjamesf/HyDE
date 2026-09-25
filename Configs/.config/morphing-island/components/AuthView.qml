@@ -210,7 +210,8 @@ FocusScope {
         Label {
             width: parent.width
             visible: text !== ""
-            text: Polkit.failedNotice ? "Authentication failed" : (root.flow?.supplementaryMessage ?? "")
+            // PAM's own explanation (e.g. "account locked") wins over the generic notice.
+            text: PamText.friendly(root.flow?.supplementaryMessage ?? "") || (Polkit.failedNotice ? "Authentication failed" : "")
             color: root.errorShown ? Theme.danger : Theme.dim
             wrapMode: Text.Wrap
             maximumLineCount: 3

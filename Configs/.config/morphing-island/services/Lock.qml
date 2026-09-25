@@ -39,6 +39,8 @@ Singleton {
 
     // Password waiting to be requested by PAM (only exists during authentication).
     property string _pending: ""
+    // What PAM said during the current attempt (e.g. pam_faillock's "account locked" notice).
+    property var _pamMessages: []
 
     function lock() {
         if (persist.locked)
@@ -70,6 +72,7 @@ Singleton {
             return;
         error = "";
         errorTimer.stop();
+        _pamMessages = [];
         _pending = password;
         if (!pam.start()) {
             _pending = "";
@@ -124,8 +127,10 @@ Singleton {
             if (responseRequired) {
                 respond(root._pending);
                 root._pending = "";
-            } else if (messageIsError) {
-                root.error = message;
+            } else if (message !== "") {
+                root._pamMessages = root._pamMessages.concat([message]);
+                if (messageIsError)
+                    root.error = PamText.friendly(message);
             }
         }
 
@@ -135,7 +140,9 @@ Singleton {
                 root.unlock();
             } else {
                 root.failures++;
-                root.error = result === PamResult.MaxTries ? "Too many attempts, wait a moment" : "Wrong password";
+                // PAM's own explanation wins (a locked account refuses even the right password).
+                const said = PamText.friendly(root._pamMessages.join(" "));
+                root.error = said !== "" ? said : result === PamResult.MaxTries ? "Too many attempts, wait a moment" : "Wrong password";
                 errorTimer.restart();
             }
         }

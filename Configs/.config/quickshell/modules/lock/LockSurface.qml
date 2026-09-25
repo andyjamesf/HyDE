@@ -203,9 +203,15 @@ Item {
             }
         }
 
+        // Up to two lines: PAM's notices ("Account locked after failed attempts. Try again in 10 min")
+        // are longer than "Wrong password".
         StyledText {
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: 20
+            Layout.preferredHeight: Math.max(20, implicitHeight)
+            Layout.maximumWidth: 340
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            maximumLineCount: 2
             text: Lock.error
             color: Theme.error
             font.pixelSize: Theme.bodyMedium
