@@ -270,7 +270,8 @@ qs ipc call shell          reload
 In `~/.config/hypr/hyprland.lua` (HyDE's user override layer):
 
 - **Waybar**: `hyde.config.start.bar = "hyde-shell app -u hyde-" .. os.getenv("XDG_SESSION_DESKTOP") .. "-bar.scope -t scope -- waybar.py --watch"`
-  (and install `waybar`).
+  (and install `waybar`), then `systemctl --user unmask hyde-Hyprland-bar.service`: the installer masks
+  that unit, because HyDE otherwise starts Waybar again whenever it updates the Waybar config.
 - **dunst**: `hyde.config.start.notifications = "hyde-shell app -u hyde-" .. os.getenv("XDG_SESSION_DESKTOP") .. "-notifications.service -t service -- dunst"`
   (and install `dunst`).
 - **hyprlock**: set `"lock": { "enabled": false }` in `config.json`. hypridle also falls back to

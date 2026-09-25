@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # First-install look of the Quickshell Edition: the Drawbridge theme, macOS-like animations and the
-# Morphing Island as the active shell. Each default is applied only when nothing was chosen yet, so
+# Morphing Island as the active shell; and Waybar kept off. Each default is applied only when nothing was chosen yet, so
 # installing over an existing HyDE keeps the user's theme, animations and shell. Run by install.sh
 # after the themes are installed and before the theme is applied.
 set -euo pipefail
@@ -28,4 +28,15 @@ island_state="${XDG_STATE_HOME:-$HOME/.local/state}/morphing-island"
 if [[ ! -d "$island_state" ]]; then
     mkdir -p "$island_state"
     touch "$island_state/active"
+fi
+
+# Waybar: both shells replace it, but HyDE still starts it whenever waybar.py updates its config (its
+# installer, themes whose waybar.theme runs wbarconfgen.sh). waybar.py only starts it through this
+# systemd unit, so masking the unit keeps it off. A plain symlink works without a running user
+# manager (installs from a TTY). Undo: systemctl --user unmask hyde-Hyprland-bar.service
+unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+bar_unit="$unit_dir/hyde-${XDG_SESSION_DESKTOP:-Hyprland}-bar.service"
+if [[ ! -e "$bar_unit" ]]; then
+    mkdir -p "$unit_dir"
+    ln -s /dev/null "$bar_unit"
 fi
