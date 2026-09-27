@@ -7,9 +7,10 @@ import qs.theme
 
 // Calendar (island mode "calendar"): the month, the chosen day's events and your calendars.
 // A click on a day shows its events; ‹ › change month, the month name goes back to today.
-// ☰ opens the calendars page: your calendars (click a colour dot to pick another colour, × removes)
-// and adding one: type or paste an iCal/webcal link and press Enter, "Paste link" (straight from
-// the clipboard) or "Add .ics file…". ← goes back to the month.
+// ☰ opens the calendars page: your calendars (click a colour dot to pick another colour, click a
+// name to rename it, × removes) and adding one: an optional name, then type or paste an iCal/webcal
+// link and press Enter, "Paste link" (straight from the clipboard) or "Add .ics file…". ← goes back
+// to the month.
 // Keyboard: ←/→ previous/next day, ↑/↓ a week, PageUp/PageDown a month, Esc closes (or goes back
 // from the calendars page).
 // Data: services/Calendar.qml; options: config/CalendarConfig.qml.
@@ -30,12 +31,15 @@ Item {
     property bool messageError: false
     // Calendar whose colour palette is open (-1: none).
     property int colorFor: -1
+    // Calendar being renamed (-1: none).
+    property int renameFor: -1
     // "month" (the month and the day's events) or "calendars" (your calendars, adding new ones).
     property string page: "month"
 
     function showPage(p) {
         page = p;
         colorFor = -1;
+        renameFor = -1;
         message = "";
         root.forceActiveFocus();
     }
@@ -63,8 +67,10 @@ Item {
         select(new Date());
         message = "";
         colorFor = -1;
+        renameFor = -1;
         page = "month";
         input.text = "";
+        nameInput.text = "";
         Calendar.refresh(false);
         focusRetry.start();
     }
@@ -83,7 +89,7 @@ Item {
 
     // Adds the pasted link; on success the field empties, otherwise the reason shows below it.
     function addFromInput() {
-        const why = Calendar.addLink(input.text);
+        const why = Calendar.addLink(input.text, nameInput.text);
         if (why === "")
             input.text = "";
         else {
@@ -97,6 +103,9 @@ Item {
         function onNotice(text, error) {
             root.message = text;
             root.messageError = error;
+            // Added: the name was used, the field is ready for the next one.
+            if (!error)
+                nameInput.text = "";
         }
     }
 
@@ -417,14 +426,69 @@ Item {
                             }
                         }
 
+                        // The name: a click turns it into a field (Enter saves, Esc cancels).
                         Label {
+                            visible: root.renameFor !== cal.index
                             anchors.left: swatch.right
                             anchors.leftMargin: 10
                             anchors.right: removeButton.left
                             anchors.rightMargin: 6
                             anchors.verticalCenter: parent.verticalCenter
                             text: cal.error !== "" ? `${cal.modelData.name}  ·  couldn't read it` : `${cal.modelData.name}  ·  ${cal.modelData.path ? "file" : "link"}`
-                            color: cal.error !== "" ? Theme.danger : Theme.foreground
+                            color: cal.error !== "" ? Theme.danger : nameMouse.containsMouse ? Theme.accent : Theme.foreground
+
+                            MouseArea {
+                                id: nameMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.IBeamCursor
+                                onClicked: {
+                                    root.colorFor = -1;
+                                    root.renameFor = cal.index;
+                                    renameInput.text = cal.modelData.name;
+                                    renameInput.selectAll();
+                                    renameInput.forceActiveFocus();
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: root.renameFor === cal.index
+                            anchors.left: swatch.right
+                            anchors.leftMargin: 6
+                            anchors.right: removeButton.left
+                            anchors.rightMargin: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            height: 28
+                            radius: 14
+                            color: Theme.surface
+                            border.width: 1.5
+                            border.color: Theme.accent
+
+                            TextInput {
+                                id: renameInput
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                verticalAlignment: TextInput.AlignVCenter
+                                color: Theme.foreground
+                                selectionColor: Theme.accent
+                                selectedTextColor: Theme.accentContent
+                                font.family: Appearance.font
+                                font.pixelSize: Appearance.fontSize
+                                clip: true
+                                function save() {
+                                    Calendar.rename(cal.index, text);
+                                    root.renameFor = -1;
+                                    root.forceActiveFocus();
+                                }
+                                Keys.onReturnPressed: save()
+                                Keys.onEnterPressed: save()
+                                Keys.onEscapePressed: {
+                                    root.renameFor = -1;
+                                    root.forceActiveFocus();
+                                }
+                            }
                         }
 
                         IconButton {
@@ -496,6 +560,40 @@ Item {
                 color: Theme.dim
             }
 
+            // Name for the next calendar (optional; used by the link and the file).
+            Rectangle {
+                width: parent.width
+                height: 36
+                radius: 18
+                color: Theme.surface
+                border.width: nameInput.activeFocus ? 1.5 : 1
+                border.color: nameInput.activeFocus ? Theme.accent : Theme.border
+
+                TextInput {
+                    id: nameInput
+                    anchors.fill: parent
+                    anchors.leftMargin: 14
+                    anchors.rightMargin: 14
+                    verticalAlignment: TextInput.AlignVCenter
+                    color: Theme.foreground
+                    selectionColor: Theme.accent
+                    selectedTextColor: Theme.accentContent
+                    font.family: Appearance.font
+                    font.pixelSize: Appearance.fontSize
+                    clip: true
+                    KeyNavigation.tab: input
+                    Keys.onReturnPressed: input.forceActiveFocus()
+                    Keys.onEnterPressed: input.forceActiveFocus()
+
+                    Label {
+                        visible: nameInput.text === ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Name (optional)"
+                        color: Theme.faint
+                    }
+                }
+            }
+
             Rectangle {
                 width: parent.width
                 height: 36
@@ -535,11 +633,11 @@ Item {
                     model: [
                         {
                             label: "Paste link",
-                            run: () => Calendar.addFromClipboard()
+                            run: () => Calendar.addFromClipboard(nameInput.text)
                         },
                         {
                             label: "Add .ics file…",
-                            run: () => Calendar.addFile()
+                            run: () => Calendar.addFile(nameInput.text)
                         }
                     ]
 

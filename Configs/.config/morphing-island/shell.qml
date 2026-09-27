@@ -156,12 +156,15 @@ ShellRoot {
         function launcherState(): string {
             return IslandController.mode === IslandState.launcher ? LauncherState.status : "closed";
         }
-        // Calendar: the calendars list as JSON; add the clipboard's link; set a colour.
+        // Calendar: the calendars list as JSON; add the clipboard's link; rename; set a colour.
         function calendars(): string {
             return JSON.stringify(Calendar.calendars);
         }
-        function calendarAddFromClipboard(): void {
-            Calendar.addFromClipboard();
+        function calendarAddFromClipboard(name: string): void {
+            Calendar.addFromClipboard(name);
+        }
+        function calendarRename(index: int, name: string): void {
+            Calendar.rename(index, name);
         }
         function calendarSetColor(index: int, color: string): void {
             Calendar.setColor(index, color);

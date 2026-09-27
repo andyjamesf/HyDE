@@ -11,9 +11,11 @@ import qs.config
 // writes ~/.cache/quickshell/calendar.json, which this service watches. The HyDE Quickshell shell
 // uses the same two files, so both shells show the same calendars.
 //
-// Adding a calendar: addLink(url) for iCal/webcal links, addFromClipboard() for the link in the
-// clipboard, addFile() opens the system file chooser and copies the chosen .ics to
-// ~/.local/share/quickshell/calendars/. setColor(index, "#rrggbb") and remove(index) edit the list.
+// Adding a calendar: addLink(url, name) for iCal/webcal links, addFromClipboard(name) for the link in
+// the clipboard, addFile(name) opens the system file chooser and copies the chosen .ics to
+// ~/.local/share/quickshell/calendars/ (`name` optional: otherwise one is made up from the link or
+// the file). rename(index, name), setColor(index, "#rrggbb") and remove(index) edit the list.
+// Names are unique (colours and errors are matched by name): a repeated one gets a number.
 Singleton {
     id: root
 
@@ -72,23 +74,49 @@ Singleton {
     }
 
     // Adds an iCal link (https://, http:// or webcal://). Returns "" or why it was refused.
-    function addLink(link) {
+    function addLink(link, name) {
         const url = String(link ?? "").trim();
         if (!/^(https?|webcal):\/\/\S+$/i.test(url))
             return "Paste an https:// or webcal:// link to an iCal calendar";
         if (calendars.some(c => c.url === url))
             return "That calendar is already added";
         _add({
-            name: _nameForLink(url),
+            name: _unique(String(name ?? "").trim() || _nameForLink(url), -1),
             url: url
         });
         return "";
     }
 
+    // Renames calendar `index` (empty names are ignored). The events are read again under the new
+    // name.
+    function rename(index, name) {
+        const n = String(name ?? "").trim();
+        if (!calendars[index] || n === "" || n === calendars[index].name)
+            return;
+        const list = calendars.slice();
+        list[index] = Object.assign({}, list[index], {
+            name: _unique(n, index)
+        });
+        _write(list);
+    }
+
+    // `name`, or "name 2", "name 3"… if another calendar (not `except`) already has it.
+    function _unique(name, except) {
+        const taken = n => calendars.some((c, i) => i !== except && c.name === n);
+        if (!taken(name))
+            return name;
+        let k = 2;
+        while (taken(`${name} ${k}`))
+            k++;
+        return `${name} ${k}`;
+    }
+
     // Adds the iCal link currently in the clipboard (answers through `notice`).
-    function addFromClipboard() {
-        if (!clipboard.running)
-            clipboard.running = true;
+    function addFromClipboard(name) {
+        if (clipboard.running)
+            return;
+        clipboard.name = String(name ?? "");
+        clipboard.running = true;
     }
 
     // Colour of calendar `index` ("#rrggbb").
@@ -103,9 +131,11 @@ Singleton {
     }
 
     // Opens the system file chooser; the chosen .ics is copied next to the list and added.
-    function addFile() {
-        if (!picker.running)
-            picker.running = true;
+    function addFile(name) {
+        if (picker.running)
+            return;
+        picker.name = String(name ?? "").trim();
+        picker.running = true;
     }
 
     function remove(index) {
@@ -139,9 +169,7 @@ Singleton {
     // A readable name for a link: Google/Outlook/iCloud by host, else the host itself.
     function _nameForLink(url) {
         const host = (url.match(/^[a-z]+:\/\/([^\/?#]+)/i)?.[1] ?? "").toLowerCase();
-        const base = host.includes("google.") ? "Google Calendar" : host.includes("outlook.") || host.includes("office365.") ? "Outlook" : host.includes("icloud.") ? "iCloud" : host.replace(/^www\./, "");
-        const taken = calendars.filter(c => c.name === base || c.name.startsWith(base + " ")).length;
-        return taken > 0 ? `${base} ${taken + 1}` : base;
+        return host.includes("google.") ? "Google Calendar" : host.includes("outlook.") || host.includes("office365.") ? "Outlook" : host.includes("icloud.") ? "iCloud" : host.replace(/^www\./, "");
     }
 
     Component.onCompleted: Quickshell.execDetached(["mkdir", "-p", "--", filesDir])
@@ -208,10 +236,11 @@ Singleton {
 
     Process {
         id: clipboard
+        property string name: ""
         command: ["wl-paste", "--no-newline", "--type", "text"]
         stdout: StdioCollector {
             onStreamFinished: {
-                const why = root.addLink(text);
+                const why = root.addLink(text, clipboard.name);
                 if (why !== "")
                     root.notice(text.trim() === "" ? "The clipboard is empty: copy an iCal link first" : why, true);
             }
@@ -221,6 +250,7 @@ Singleton {
     // The chosen .ics is copied (the original may be moved or deleted later), then added.
     Process {
         id: picker
+        property string name: ""
         command: ["python3", Quickshell.shellPath("scripts/pick_file.py"), "Add a calendar (.ics)", "iCalendar:*.ics;*.ICS"]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -230,7 +260,7 @@ Singleton {
                 const base = src.slice(src.lastIndexOf("/") + 1);
                 const dst = `${root.filesDir}/${Date.now()}-${base}`;
                 copier.dst = dst;
-                copier.name = base.replace(/\.ics$/i, "");
+                copier.name = root._unique(picker.name || base.replace(/\.ics$/i, ""), -1);
                 copier.command = ["sh", "-c", 'mkdir -p "$(dirname "$2")" && cp -- "$1" "$2"', "sh", src, dst];
                 copier.running = true;
             }
