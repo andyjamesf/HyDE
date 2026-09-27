@@ -21,6 +21,10 @@ Singleton {
     // Calendars are downloaded again every this many minutes (and when the calendar opens, at most
     // every 2 minutes). Default 15.
     readonly property int refreshMinutes: 15
+    // New events (Google Calendar): length when only a start time is given, in minutes. Default 60.
+    readonly property int defaultDurationMinutes: 60
+    // Reminder choices offered in the full form, in minutes before the start (0 = at the start).
+    readonly property var reminderChoices: [0, 10, 30, 60, 1440]
     // Colours given to new calendars, in turn.
     readonly property var colors: ["#8ab4f8", "#f28b82", "#81c995", "#fdd663", "#c58af9", "#78d9ec", "#fcad70", "#ff8bcb"]
 }

@@ -31,11 +31,16 @@ Singleton {
         const colors = {};
         for (const c of calendars)
             colors[c.name] = c.color;
-        return calendars.length === 0 ? [] : _events.map(e => Object.assign({}, e, {
+        const read = calendars.length === 0 ? [] : _events.map(e => Object.assign({}, e, {
                     color: colors[e.calendar] || e.color
                 }));
+        // Events just created in Google Calendar (GoogleCalendar.add), until the calendars read
+        // brings them (Google's iCal links can lag) or for 6 hours at most.
+        const shown = _pending.filter(p => Date.now() - p.addedAt < 6 * 3600000 && !read.some(e => e.title === p.title && Math.abs(e.start - p.start) < 60000));
+        return read.concat(shown).sort((a, b) => a.start - b.start);
     }
     property var _events: []
+    property var _pending: []
     // Result of an add that finishes later (the clipboard, the file chooser): what to tell the user.
     signal notice(string text, bool error)
     // "Name: reason" for calendars that could not be read last time.
@@ -71,6 +76,34 @@ Singleton {
         const start = new Date(day.getFullYear(), day.getMonth(), day.getDate());
         const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
         return events.filter(e => e.start < end && (e.end > start || (e.end.getTime() === e.start.getTime() && e.start >= start)));
+    }
+
+    // Shows an event created elsewhere (GoogleCalendar.add) right away, and reads the calendars
+    // again. `event`: { title, allDay, start, end, location } as given to gcal.py.
+    function addPending(event, color) {
+        const allDay = !!event.allDay;
+        const start = allDay ? parseDate(event.start, true) : new Date(event.start);
+        let end;
+        if (allDay) {
+            const last = parseDate(event.end || event.start, true);
+            end = new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1);
+        } else {
+            end = event.end ? new Date(event.end) : new Date(start.getTime() + 3600000);
+        }
+        _pending = _pending.concat([
+            {
+                title: event.title,
+                location: event.location || "",
+                allDay: allDay,
+                start: start,
+                end: end,
+                calendar: "Google Calendar",
+                color: color || "",
+                addedAt: Date.now()
+            }
+        ]);
+        lastRun = 0;
+        refreshSoon.restart();
     }
 
     // Adds an iCal link (https://, http:// or webcal://). Returns "" or why it was refused.
@@ -172,7 +205,8 @@ Singleton {
         return host.includes("google.") ? "Google Calendar" : host.includes("outlook.") || host.includes("office365.") ? "Outlook" : host.includes("icloud.") ? "iCloud" : host.replace(/^www\./, "");
     }
 
-    Component.onCompleted: Quickshell.execDetached(["mkdir", "-p", "--", filesDir])
+    // Private links give read access to a calendar: the list and the copied files are yours only.
+    Component.onCompleted: Quickshell.execDetached(["sh", "-c", 'mkdir -p -m 700 -- "$1" && chmod 700 -- "$1"', "sh", filesDir])
 
     // The list of calendars (the HyDE shell may change it too: watched).
     FileView {
@@ -183,6 +217,8 @@ Singleton {
         atomicWrites: true
         onFileChanged: reload()
         onLoaded: {
+            // Every write (ours or the HyDE shell's) may create it world-readable: keep it private.
+            Quickshell.execDetached(["chmod", "600", "--", root.configPath]);
             try {
                 root.calendars = JSON.parse(text()).calendars ?? [];
             } catch (e) {

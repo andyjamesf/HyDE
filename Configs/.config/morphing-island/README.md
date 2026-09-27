@@ -33,7 +33,7 @@ Run by hand: `qs -p ~/.config/morphing-island` (a named config via `qs -c` is no
 | Clock | default | time; equalizer bars while music plays |
 | Workspaces | always, at the screen's left edge | each workspace of this screen with windows (plus the current one), its number and app icons; click to go there, scroll to step; slides into the island when it expands |
 | Status | always, at the screen's right edge; each icon opens its page | caffeine (click turns it on/off) (when on), unread notifications, volume, Bluetooth, Wi‑Fi, battery with the percentage inside it and the time left (to empty, or to full while charging); slides into the island when it expands |
-| Calendar | click the clock pill, or the time in the expanded island | month view (←/→/↑/↓ days, PageUp/PageDown months), the chosen day's events with calendar colours; ☰ opens your calendars: pick each one's colour, click its name to rename it, remove with ×; add one (with an optional name) by pasting an iCal/webcal link (or "Paste link") or picking a .ics file |
+| Calendar | click the clock pill, or the time in the expanded island | month view; + adds an event to Google Calendar (simple, or "More options": repeat, colour, reminders…; see "Google Calendar" below) (←/→/↑/↓ days, PageUp/PageDown months), the chosen day's events with calendar colours; ☰ opens your calendars: pick each one's colour, click its name to rename it, remove with ×; add one (with an optional name) by pasting an iCal/webcal link (or "Paste link") or picking a .ics file |
 | Expanded | right click the pill (again to close); hover too if turned on in Settings | workspaces · media controls · time and date · the status pill's icons |
 | Volume / microphone / brightness OSD | changing volume, mic volume/mute or brightness | icon reacts to the level; 1.5 s; ignores hypridle's dimming |
 | Notification | a notification arrives | countdown pauses on hover; click dismisses; critical ones are red and stay 12 s; queued behind open surfaces |
@@ -121,6 +121,38 @@ services/       audio, brightness, network, Bluetooth, battery, media, notificat
                 Prefs (user overrides), Paths (XDG directories)
 theme/          Theme (roles, contrast, transitions) and Palettes
 ```
+
+## Google Calendar (adding events)
+
+The calendar shows any iCal link or `.ics` file, but those are read-only. To add events that show up
+in Google Calendar everywhere, the island uses Google's Calendar API through your own OAuth client.
+You set it up once, in about 5 minutes:
+
+1. Open <https://console.cloud.google.com/> and create a project (any name, e.g. "Morphing Island").
+2. **APIs & Services → Library**: search for "Google Calendar API" and click **Enable**.
+3. **Google Auth Platform** (the OAuth consent screen):
+   - **Branding**: an app name and your email;
+   - **Audience**: "External", add your own address as a test user, then **Publish app**
+     ("In production"). Otherwise the access stops working after 7 days. Google will call the app
+     "unverified"; that is expected for a personal client.
+4. **Clients → Create client**: type **Desktop app**, create it, then **Download JSON**
+   (`client_secret_….json`).
+5. In the island: calendar → ☰ → **Google Calendar** → **Choose client file…** (the JSON) →
+   **Connect**. The browser opens: pick your account; at "Google hasn't verified this app" choose
+   **Advanced → Go to …**, and allow access to your calendar.
+
+Then **+** in the calendar adds events: a title, a date and an optional time (empty = all day), or
+**More options** for the calendar, start and end, repeat (daily / weekly on chosen days / monthly /
+yearly, until a date or a number of times), the event colour, location, description and a reminder.
+A new event shows in the island at once.
+
+To also *see* your Google events in the island, add the calendar's secret iCal link too (Google
+Calendar → Settings → your calendar → "Secret address in iCal format") with ☰ → Add a calendar.
+
+Everything stays on this PC, readable only by you, outside git: the client and the granted access
+in `~/.local/share/quickshell/google/`, the calendar list in `~/.local/share/quickshell/calendars.json`.
+**Disconnect** (☰ → Google Calendar) forgets the access; to revoke it on Google's side too:
+<https://myaccount.google.com/permissions>.
 
 ## IPC (for scripts and tests)
 

@@ -4,7 +4,7 @@ import qs.theme
 
 // Small vector glyphs used across the UI (same 24×24 grid as the other icons, outline only):
 // "back" (‹), "chevron" (›), "lock", "check", "bell", "bellOff", "refresh", "mic", "micOff",
-// "close", "speaker", "coffee" (caffeine tile) and "menu" (☰).
+// "close", "speaker", "coffee" (caffeine tile), "menu" (☰) and "plus".
 Item {
     id: root
 
@@ -37,6 +37,8 @@ Item {
             return "M 6.5 6.5 L 17.5 17.5 M 17.5 6.5 L 6.5 17.5";
         case "speaker":
             return "M 7 3.5 H 17 A 1.5 1.5 0 0 1 18.5 5 V 19 A 1.5 1.5 0 0 1 17 20.5 H 7 A 1.5 1.5 0 0 1 5.5 19 V 5 A 1.5 1.5 0 0 1 7 3.5 Z M 12 10.5 A 3.5 3.5 0 1 1 11.99 10.5 Z";
+        case "plus":
+            return "M 12 5 V 19 M 5 12 H 19";
         case "menu":
             return "M 4.5 7 H 19.5 M 4.5 12 H 19.5 M 4.5 17 H 19.5";
         case "coffee":

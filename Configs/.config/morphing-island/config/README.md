@@ -15,7 +15,7 @@ what it does, its unit, a sensible range and the default.
 | `Expanded.qml` | the expanded island (hover/pin): side zone width, gutters, margins, extra height, status icons and their order, media zone sizes |
 | `Clock.qml` | time / short date / long date formats and the locale |
 | `WorkspacesConfig.qml` | workspace pill (left edge or next to the clock) and its part of the expanded island: on/off, placement, margins, spacing, icons per workspace, one icon per app, icon size, per-screen or all workspaces |
-| `CalendarConfig.qml` | calendar: width, first day of the week, events per day, refresh interval, colours for new calendars (the calendars themselves are in `~/.local/share/quickshell/calendars.json`, outside git) |
+| `CalendarConfig.qml` | calendar: width, first day of the week, events per day, refresh interval, colours for new calendars, new events' default length and reminder choices (the calendars themselves are in `~/.local/share/quickshell/calendars.json`, outside git) |
 | `StatusPillConfig.qml` | status pill (right edge or next to the clock): on/off, placement, margins, which icons and in what order, battery percentage and time left |
 | `OsdConfig.qml` | volume / microphone / brightness OSD: timeout, size, bar thickness, mic OSD on/off, startup arm delay, hypridle dimming threshold, brightness step |
 | `NotificationsConfig.qml` | notification history size, popup timeouts, queue gap, peace mode rules, HyDE filters, popup layout (widths, radius, padding, avatar, actions, line counts) |
