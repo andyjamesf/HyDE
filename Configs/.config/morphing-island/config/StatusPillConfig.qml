@@ -23,9 +23,9 @@ Singleton {
     // wired), "battery" (hidden on PCs without one). Default
     // ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"].
     readonly property var icons: ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"]
-    // Battery percentage next to its icon. Default true.
+    // Battery percentage, inside the battery icon. Default true.
     readonly property bool batteryPercent: true
-    // Time left next to it: until empty on battery, until full while charging ("3h 12m"; hidden while
-    // UPower has no estimate yet, and when plugged in and full). Default true.
+    // Time left next to the battery: until empty on battery, until full while charging ("3h 12m";
+    // hidden while UPower has no estimate yet, and when plugged in and full). Default true.
     readonly property bool batteryTime: true
 }

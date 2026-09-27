@@ -15,9 +15,9 @@ Item {
     property int zoneWidth: implicitWidth
     // Icons to show, in order.
     property var icons: Expanded.statusIcons
-    // Battery percentage next to the battery icon.
-    property bool batteryPercent: false
-    // …and the time left: until empty on battery, until full while charging.
+    // Battery percentage, drawn inside the battery icon.
+    property bool batteryPercent: true
+    // Time left next to the battery icon: until empty on battery, until full while charging.
     property bool batteryTime: false
 
     // "3h 12m" / "45m" from seconds; "" while UPower has no estimate.
@@ -28,17 +28,7 @@ Item {
         const h = Math.floor(m / 60);
         return h > 0 ? `${h}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
     }
-    readonly property string batteryText: {
-        const parts = [];
-        if (batteryPercent)
-            parts.push(`${Math.round(Battery.percent)}%`);
-        if (batteryTime) {
-            const t = duration(Battery.charging ? Battery.timeToFull : Battery.plugged ? 0 : Battery.timeToEmpty);
-            if (t !== "")
-                parts.push(t);
-        }
-        return parts.join(" · ");
-    }
+    readonly property string batteryText: batteryTime ? duration(Battery.charging ? Battery.timeToFull : Battery.plugged ? 0 : Battery.timeToEmpty) : ""
 
     readonly property real iconSize: Math.round(Pill.height * Expanded.statusIconFactor)
 
@@ -118,8 +108,8 @@ Item {
         }
     }
 
-    // Battery, then its percentage and time left (batteryPercent / batteryTime; red when low and
-    // not charging).
+    // Battery (percentage inside it, if batteryPercent), then the time left (batteryTime; red when
+    // low and not charging).
     Component {
         id: batteryIcon
 
@@ -133,6 +123,7 @@ Item {
                 present: Battery.available
                 percent: Battery.percent
                 charging: Battery.charging
+                showPercent: root.batteryPercent
             }
 
             Label {

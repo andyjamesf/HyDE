@@ -64,7 +64,7 @@ Item {
         zoneWidth: root.side
         // With the status pill on, it slides in here: show what it showed, so nothing disappears.
         icons: StatusPillConfig.enabled ? StatusPillConfig.icons : Expanded.statusIcons
-        batteryPercent: StatusPillConfig.enabled && StatusPillConfig.batteryPercent
+        batteryPercent: !StatusPillConfig.enabled || StatusPillConfig.batteryPercent
         batteryTime: StatusPillConfig.enabled && StatusPillConfig.batteryTime
     }
 }

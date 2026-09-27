@@ -19,8 +19,10 @@ Singleton {
     // Horizontal padding inside the pill, as a fraction of `height` (0.55 × 36 ≈ 20 px). 0–1,
     // default 0.55.
     readonly property real paddingFactor: 0.55
-    // Hovering the pill expands it (media, date, status icons). Default true.
-    readonly property bool hoverExpand: Prefs.get("pill.hoverExpand", true)
+    // Hovering the pill expands it (workspaces, media, date, status). Default false: the expanded
+    // island only opens with a click on the pill (and closes with another), so it never covers
+    // the windows by accident. The Settings screen can turn hover back on.
+    readonly property bool hoverExpand: Prefs.get("pill.hoverExpand", false)
     // After the pointer leaves, the expanded island waits this long before collapsing (avoids
     // flicker when the pointer brushes the edge). Milliseconds, 0–2000, default 220.
     readonly property int hoverCollapseDelay: 220
