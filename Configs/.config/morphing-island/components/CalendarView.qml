@@ -7,9 +7,11 @@ import qs.theme
 
 // Calendar (island mode "calendar"): the month, the chosen day's events and your calendars.
 // A click on a day shows its events; ‹ › change month, the month name goes back to today.
-// Add a calendar: type or paste an iCal/webcal link and press Enter, "Paste link" (straight from
-// the clipboard) or "Add .ics file…". Click a calendar's colour dot to pick another colour.
-// Keyboard: ←/→ previous/next day, ↑/↓ a week, PageUp/PageDown a month, Esc closes.
+// ☰ opens the calendars page: your calendars (click a colour dot to pick another colour, × removes)
+// and adding one: type or paste an iCal/webcal link and press Enter, "Paste link" (straight from
+// the clipboard) or "Add .ics file…". ← goes back to the month.
+// Keyboard: ←/→ previous/next day, ↑/↓ a week, PageUp/PageDown a month, Esc closes (or goes back
+// from the calendars page).
 // Data: services/Calendar.qml; options: config/CalendarConfig.qml.
 Item {
     id: root
@@ -28,6 +30,15 @@ Item {
     property bool messageError: false
     // Calendar whose colour palette is open (-1: none).
     property int colorFor: -1
+    // "month" (the month and the day's events) or "calendars" (your calendars, adding new ones).
+    property string page: "month"
+
+    function showPage(p) {
+        page = p;
+        colorFor = -1;
+        message = "";
+        root.forceActiveFocus();
+    }
 
     readonly property var days: {
         const first = new Date(year, month, 1);
@@ -52,6 +63,7 @@ Item {
         select(new Date());
         message = "";
         colorFor = -1;
+        page = "month";
         input.text = "";
         Calendar.refresh(false);
         focusRetry.start();
@@ -98,6 +110,14 @@ Item {
         when: root.open
     }
 
+    // Esc on the calendars page goes back to the month (on the month it closes the island).
+    Keys.onEscapePressed: event => {
+        if (page === "calendars")
+            showPage("month");
+        else
+            event.accepted = false;
+    }
+
     Keys.onPressed: event => {
         const k = event.key;
         const shift = k === Qt.Key_Left ? -1 : k === Qt.Key_Right ? 1 : k === Qt.Key_Up ? -7 : k === Qt.Key_Down ? 7 : 0;
@@ -123,30 +143,20 @@ Item {
         width: root.width - 2 * root.pad
         spacing: 12
 
-        // Month header: ‹ September 2026 ›
+        // Header. Month page: the month (click: back to today), ‹ › and ☰ (your calendars).
+        // Calendars page: ← and the title.
         Item {
             width: parent.width
             height: 32
 
-            IconButton {
-                id: prevButton
+            Label {
+                visible: root.page === "month"
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                size: 30
-                onClicked: root.stepMonth(-1)
-                Glyph {
-                    kind: "back"
-                    size: 16
-                }
-            }
-
-            Label {
-                anchors.centerIn: parent
                 text: root.locale.toString(new Date(root.year, root.month, 1), "MMMM yyyy")
                 font.pixelSize: Appearance.fontSize + 3
                 font.weight: Font.DemiBold
 
-                // The month name goes back to today.
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
@@ -154,14 +164,58 @@ Item {
                 }
             }
 
-            IconButton {
+            Row {
+                visible: root.page === "month"
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                size: 30
-                onClicked: root.stepMonth(1)
-                Glyph {
-                    kind: "chevron"
-                    size: 16
+                spacing: 2
+
+                IconButton {
+                    size: 30
+                    onClicked: root.stepMonth(-1)
+                    Glyph {
+                        kind: "back"
+                        size: 16
+                    }
+                }
+                IconButton {
+                    size: 30
+                    onClicked: root.stepMonth(1)
+                    Glyph {
+                        kind: "chevron"
+                        size: 16
+                    }
+                }
+                IconButton {
+                    size: 30
+                    onClicked: root.showPage("calendars")
+                    Glyph {
+                        kind: "menu"
+                        size: 16
+                    }
+                }
+            }
+
+            Row {
+                visible: root.page === "calendars"
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 8
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    size: 30
+                    onClicked: root.showPage("month")
+                    Glyph {
+                        kind: "back"
+                        size: 16
+                    }
+                }
+                Label {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Calendars"
+                    font.pixelSize: Appearance.fontSize + 3
+                    font.weight: Font.DemiBold
                 }
             }
         }
@@ -169,6 +223,7 @@ Item {
         // Weekday names and the 6×7 day grid.
         Grid {
             id: grid
+            visible: root.page === "month"
             width: parent.width
             columns: 7
             readonly property real cell: width / 7
@@ -260,6 +315,7 @@ Item {
 
         // The chosen day's events.
         Column {
+            visible: root.page === "month"
             width: parent.width
             spacing: 6
 
@@ -272,7 +328,7 @@ Item {
 
             Label {
                 visible: root.dayEvents.length === 0
-                text: Calendar.calendars.length === 0 ? "No calendars yet: add one below" : Calendar.loading && Calendar.events.length === 0 ? "Loading…" : "No events"
+                text: Calendar.calendars.length === 0 ? "No calendars yet: add one with ☰" : Calendar.loading && Calendar.events.length === 0 ? "Loading…" : "No events"
                 color: Theme.faint
             }
 
@@ -311,22 +367,16 @@ Item {
             }
         }
 
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Theme.border
-        }
-
-        // Your calendars: colour (click the dot to change it), name, remove.
+        // Calendars page: your calendars, colour (click the dot to change it), name, remove.
         Column {
+            visible: root.page === "calendars"
             width: parent.width
             spacing: 4
 
             Label {
-                text: "Calendars"
-                font.pixelSize: Appearance.fontSize - 1
-                font.weight: Font.DemiBold
-                color: Theme.dim
+                visible: Calendar.calendars.length === 0
+                text: "No calendars yet"
+                color: Theme.faint
             }
 
             Repeater {
@@ -432,9 +482,10 @@ Item {
             }
         }
 
-        // Adding a calendar: an iCal link (typed, pasted into the field, or straight from the
-        // clipboard with "Paste link") or a .ics file.
+        // Calendars page: adding one, an iCal link (typed, pasted into the field, or straight from
+        // the clipboard with "Paste link") or a .ics file.
         Column {
+            visible: root.page === "calendars"
             width: parent.width
             spacing: 8
 
