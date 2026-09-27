@@ -159,19 +159,13 @@ PanelWindow {
             }
         }
 
-        // A click opens the control center (the same status, with its controls).
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: IslandController.open(IslandState.controlCenter)
-        }
-
         StatusZone {
             id: status
             anchors.centerIn: parent
             icons: StatusPillConfig.icons
             batteryPercent: StatusPillConfig.batteryPercent
             batteryTime: StatusPillConfig.batteryTime
+            alwaysShowBell: StatusPillConfig.alwaysShowBell
         }
     }
 

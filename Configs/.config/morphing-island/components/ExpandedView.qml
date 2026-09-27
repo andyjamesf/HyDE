@@ -66,5 +66,6 @@ Item {
         icons: StatusPillConfig.enabled ? StatusPillConfig.icons : Expanded.statusIcons
         batteryPercent: !StatusPillConfig.enabled || StatusPillConfig.batteryPercent
         batteryTime: StatusPillConfig.enabled && StatusPillConfig.batteryTime
+        alwaysShowBell: StatusPillConfig.alwaysShowBell
     }
 }
