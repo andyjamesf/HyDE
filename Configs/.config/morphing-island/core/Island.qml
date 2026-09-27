@@ -12,11 +12,13 @@ IslandSurface {
     required property string mode
     readonly property bool hovered: hover.hovered
 
-    signal emptyClicked
+    // A click on empty space (the contents' buttons keep their own clicks): Qt.LeftButton or
+    // Qt.RightButton.
+    signal emptyClicked(int button)
 
     // Content of the current mode (the target of the shape).
     readonly property Item content: slots.find(s => s.current)?.item ?? null
-    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot]
+    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot, calendarSlot]
     // Modes that share the control center's content (the pages slide inside it).
     readonly property var controlModes: [IslandState.controlCenter].concat(IslandState.subviews)
 
@@ -39,7 +41,8 @@ IslandSurface {
     // Click on empty space (the contents' buttons sit on top and keep their own clicks).
     MouseArea {
         anchors.fill: parent
-        onClicked: island.emptyClicked()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => island.emptyClicked(mouse.button)
     }
 
     ModeSlot {
@@ -164,6 +167,15 @@ IslandSurface {
         anchors.horizontalCenter: parent.horizontalCenter
         sourceComponent: SettingsView {
             open: settingsSlot.current
+        }
+    }
+    ModeSlot {
+        id: calendarSlot
+        mode: IslandState.calendar
+        current: island.mode === mode
+        focus: current
+        sourceComponent: CalendarView {
+            open: calendarSlot.current
         }
     }
     ModeSlot {

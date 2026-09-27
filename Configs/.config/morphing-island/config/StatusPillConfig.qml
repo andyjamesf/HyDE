@@ -19,11 +19,15 @@ Singleton {
     readonly property int padding: 12
 
     // What it shows, in this order. Each icon is a button (the same in the expanded island):
-    // "caffeine" (only while on; click turns it off), "notifications" (bell with the unread count,
-    // crossed out in peace mode; click opens the notification center), "volume" (click: audio page,
-    // middle click: mute, scroll: volume), "bluetooth" and "wifi" (click: their pages; wifi also
-    // shows wired), "battery" (hidden on PCs without one; click: control center). Default
-    // ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"].
+    //   "caffeine"       dim when off, accent when on; click turns it on/off
+    //   "notifications"  bell with the unread count (crossed out in peace mode); click opens the
+    //                    notification center
+    //   "volume"         click: audio page · middle click: mute · scroll: volume
+    //   "bluetooth"      click: Bluetooth page
+    //   "wifi"           click: network page (also shows wired)
+    //   "battery"        percentage inside, time left next to it; hidden on PCs without one;
+    //                    click: control center
+    // Default ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"].
     readonly property var icons: ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"]
     // Battery percentage, inside the battery icon. Default true.
     readonly property bool batteryPercent: true

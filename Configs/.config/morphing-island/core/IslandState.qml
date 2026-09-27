@@ -24,12 +24,13 @@ Singleton {
     readonly property string settings: "settings"
     readonly property string power: "power"
     readonly property string auth: "auth"
+    readonly property string calendar: "calendar"
 
     readonly property var transients: [volume, mic, brightness, notification]
-    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, theme, wallpaper, settings, power, auth]
+    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, theme, wallpaper, settings, power, auth, calendar]
     // Surfaces that take the keyboard exclusively: text input, and the pickers with a grid (so
     // arrows and Enter work without clicking first).
-    readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power]
+    readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power, calendar]
     // Control center subviews (Esc goes back to the control center, not to the clock).
     readonly property var subviews: [wifi, bluetooth, audio, media]
 

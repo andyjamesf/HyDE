@@ -7,12 +7,12 @@ import qs.theme
 
 // Status icons, right-aligned: the right zone of the expanded island and the status pill at the
 // screen's right edge (StatusPillConfig.icons). Ids: "volume", "bluetooth", "wifi", "battery",
-// "caffeine" (only while on), "notifications" (bell with the unread count; crossed out in peace
+// "caffeine" (dim when off, accent when on), "notifications" (bell with the unread count; crossed out in peace
 // mode). Each icon is a button:
 //   volume        click: audio page · middle click: mute · scroll: volume
 //   bluetooth     click: Bluetooth page          wifi       click: network page
 //   notifications click: notification center (the control center, with the history)
-//   battery       click: control center          caffeine   click: turn caffeine off
+//   battery       click: control center          caffeine   click: turn caffeine on/off
 Item {
     id: root
 
@@ -73,8 +73,6 @@ Item {
 
     // Icons that only show when they have something to say (a hidden icon takes no space in the row).
     function available(id) {
-        if (id === "caffeine")
-            return Caffeine.active;
         if (id === "notifications")
             return alwaysShowBell || Notifications.count > 0 || Notifications.peaceMode;
         return id === "bluetooth" ? Bluetooth.available : id === "battery" ? Battery.available : true;
@@ -193,14 +191,15 @@ Item {
         }
     }
 
-    // Caffeine on: the session never goes idle (control center tile or `island ipc caffeine`).
+    // Caffeine: while on, the session never goes idle (also the control center tile and
+    // `island ipc caffeine`). Always shown: dim when off, accent colour when on.
     Component {
         id: caffeineIcon
 
         Glyph {
             kind: "coffee"
             size: root.iconSize
-            color: Theme.accent
+            color: Caffeine.active ? Theme.accent : Theme.dim
         }
     }
 

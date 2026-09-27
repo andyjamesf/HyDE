@@ -1,5 +1,6 @@
 import QtQuick
 import qs.config
+import qs.core
 import qs.services
 import qs.theme
 
@@ -53,6 +54,13 @@ Item {
             font.pixelSize: Appearance.fontSize - 2
             color: Theme.dim
         }
+    }
+
+    // The time and date open the calendar.
+    MouseArea {
+        anchors.fill: center
+        cursorShape: Qt.PointingHandCursor
+        onClicked: IslandController.open(IslandState.calendar)
     }
 
     // Right: status

@@ -127,9 +127,37 @@ Singleton {
             n.expire();
     }
 
+    // Identity of a notification across a reload of the island (the id alone could repeat if the
+    // server's counter restarted).
+    function keyOf(n) {
+        return `${n.id}|${n.appName}|${n.summary}`;
+    }
+
+    // persist.arrivedJson as an object ({} if unreadable: then nothing is lost, at worst a popup
+    // shows again).
+    function readArrived() {
+        try {
+            return JSON.parse(persist.arrivedJson || "{}") ?? {};
+        } catch (e) {
+            return {};
+        }
+    }
+
     function onArrived(n) {
         if (isHydeOsd(n))
             return;
+
+        // keepOnReload: after the island reloads, the server hands every kept notification over
+        // again. Those are not new: back into the history with their real arrival time, no popup.
+        const arrived = readArrived();
+        const known = arrived[keyOf(n)];
+        if (known !== undefined) {
+            n.tracked = true;
+            const t = Object.assign({}, times);
+            t[n.id] = new Date(known);
+            times = t;
+            return;
+        }
 
         const popup = !peaceMode || bypassesPeace(n);
         // A transient without a popup is useless: it is not kept (it is discarded).
@@ -140,6 +168,15 @@ Singleton {
         const t = Object.assign({}, times);
         t[n.id] = new Date();
         times = t;
+        // Remembered across reloads; entries of notifications no longer kept are dropped.
+        const keep = {};
+        for (const x of server.trackedNotifications.values) {
+            const k = keyOf(x);
+            if (arrived[k] !== undefined)
+                keep[k] = arrived[k];
+        }
+        keep[keyOf(n)] = t[n.id].getTime();
+        persist.arrivedJson = JSON.stringify(keep);
 
         // Limited history: the oldest ones leave.
         const tracked = server.trackedNotifications.values;
@@ -201,6 +238,15 @@ Singleton {
         const n = current;
         current = null;
         retire(n);
+    }
+
+    // Survives reloads of the island (see onArrived).
+    PersistentProperties {
+        id: persist
+        reloadableId: "islandNotifications"
+        // JSON of keyOf(n) → arrival time in ms. A string: a JS object can't cross into the new
+        // QML engine of a reload ("JSValue can't be reassigned to another engine").
+        property string arrivedJson: "{}"
     }
 
     NotificationServer {

@@ -32,8 +32,9 @@ Run by hand: `qs -p ~/.config/morphing-island` (a named config via `qs -c` is no
 |---|---|---|
 | Clock | default | time; equalizer bars while music plays |
 | Workspaces | always, at the screen's left edge | each workspace of this screen with windows (plus the current one), its number and app icons; click to go there, scroll to step; slides into the island when it expands |
-| Status | always, at the screen's right edge; click opens the control center | caffeine (when on), unread notifications, volume, Bluetooth, Wi‑Fi, battery with the percentage inside it and the time left (to empty, or to full while charging); slides into the island when it expands |
-| Expanded | click the pill (click again to close); hover too if turned on in Settings | workspaces · media controls · time and date · the status pill's icons |
+| Status | always, at the screen's right edge; each icon opens its page | caffeine (click turns it on/off) (when on), unread notifications, volume, Bluetooth, Wi‑Fi, battery with the percentage inside it and the time left (to empty, or to full while charging); slides into the island when it expands |
+| Calendar | click the clock pill, or the time in the expanded island | month view (←/→/↑/↓ days, PageUp/PageDown months), the chosen day's events with calendar colours; add calendars by pasting an iCal/webcal link or picking a .ics file, remove them with × |
+| Expanded | right click the pill (again to close); hover too if turned on in Settings | workspaces · media controls · time and date · the status pill's icons |
 | Volume / microphone / brightness OSD | changing volume, mic volume/mute or brightness | icon reacts to the level; 1.5 s; ignores hypridle's dimming |
 | Notification | a notification arrives | countdown pauses on hover; click dismisses; critical ones are red and stay 12 s; queued behind open surfaces |
 | Launcher | `Super+A` | fuzzy apps with favorites (`Ctrl+F`) and frecency; animated results |
@@ -124,7 +125,7 @@ theme/          Theme (roles, contrast, transitions) and Palettes
 
 ```
 island ipc open <mode>          launcher | controlcenter | wifi | bluetooth | audio | media |
-                                theme | wallpaper | settings | power
+                                theme | wallpaper | settings | power | calendar
 island ipc close | pin | mode
 island ipc launcher "<query>"   e.g. "=2+2", ":"
 island ipc pick <name>           windows | files | web | emoji | glyph | bookmarks | quickapps | games |

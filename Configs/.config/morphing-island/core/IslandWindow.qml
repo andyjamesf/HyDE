@@ -176,8 +176,14 @@ PanelWindow {
         mode: win.displayMode
         focus: true
         Keys.onEscapePressed: IslandController.back()
-        onEmptyClicked: {
-            if (!IslandState.isSurface(mode) && !IslandState.isTransient(mode))
+        // Clock pill: left click opens the calendar, right click the expanded island. Expanded:
+        // any click on empty space closes it (a click on its time opens the calendar).
+        onEmptyClicked: button => {
+            if (IslandState.isSurface(mode) || IslandState.isTransient(mode))
+                return;
+            if (mode === IslandState.clock && button === Qt.LeftButton)
+                IslandController.open(IslandState.calendar);
+            else
                 IslandController.togglePin();
         }
     }
