@@ -3,10 +3,10 @@ import qs.config
 import qs.services
 import qs.theme
 
-// New Google Calendar event (calendar page "+"). Simple: title, date and an optional time (empty =
-// all day), Enter saves. "More options": calendar, all day, start and end, repeat (every n days /
-// weeks on chosen weekdays / months / years, until a date or n times), event colour, location,
-// description and reminders. Not connected yet: the Google setup instead.
+// New Google Calendar event (calendar page "+"). Simple: title, date and an optional time
+// (empty = all day), Enter saves. "More options": calendar, all day, start and end, repeat (days,
+// weeks on chosen weekdays, months or years; from a date to a date, or n times), event colour,
+// location, description and reminders. Not connected yet: the Google setup instead.
 // Saving goes through GoogleCalendar.add (scripts/gcal.py); the event shows in the calendar at once.
 Column {
     id: root
@@ -58,8 +58,8 @@ Column {
         allDay.value = false;
         repeat.value = "";
         weekdays.values = [];
-        ends.value = "never";
-        endsValue.text = "";
+        repeatUntil.text = "";
+        repeatCount.text = "";
         colorPick.value = "";
         location.text = "";
         description.text = "";
@@ -107,15 +107,19 @@ Column {
                 };
                 if (repeat.value === "WEEKLY" && weekdays.values.length > 0)
                     ev.repeat.days = weekdays.values;
-                if (ends.value === "count") {
-                    const n = parseInt(endsValue.text);
+                const until = repeatUntil.text.trim();
+                const times = repeatCount.text.trim();
+                if (until !== "") {
+                    if (!validDate(until))
+                        return "The repeat end must look like 2026-12-31";
+                    if (until < startDate.text)
+                        return "The repeat must end after it starts";
+                    ev.repeat.until = until;
+                } else if (times !== "") {
+                    const n = parseInt(times);
                     if (!(n > 0))
                         return "How many times? Type a number";
                     ev.repeat.count = n;
-                } else if (ends.value === "until") {
-                    if (!validDate(endsValue.text))
-                        return "The repeat end must look like 2026-12-31";
-                    ev.repeat.until = endsValue.text;
                 }
             }
             if (colorPick.value !== "")
@@ -144,6 +148,11 @@ Column {
 
     Connections {
         target: GoogleCalendar
+        // The list may arrive after the form opened: select the primary calendar then.
+        function onCalendarsChanged() {
+            if (!GoogleCalendar.calendars.some(c => c.id === calendar.value))
+                calendar.value = GoogleCalendar.calendars.find(c => c.primary)?.id ?? GoogleCalendar.calendars[0]?.id ?? "primary";
+        }
         function onAdded(ok, text) {
             root.message = ok ? "" : text;
             if (ok)
@@ -244,6 +253,8 @@ Column {
                     width: 150
                     placeholder: "2026-09-27"
                     invalid: text !== "" && !root.validDate(text)
+                    onTextChanged: if (repeatFrom.text !== text)
+                        repeatFrom.text = text
                 }
                 Field {
                     id: startTime
@@ -318,33 +329,63 @@ Column {
                             value: v
                         }))
             }
-            Row {
+            // Repeating: from which date to which date (an empty "to" = no end), or a number of times.
+            // "From" is the event's first day (the same as "Starts").
+            Column {
                 visible: repeat.value !== ""
-                spacing: 8
-                Chips {
-                    id: ends
-                    anchors.verticalCenter: parent.verticalCenter
-                    value: "never"
-                    options: [
-                        {
-                            label: "Forever",
-                            value: "never"
-                        },
-                        {
-                            label: "Until",
-                            value: "until"
-                        },
-                        {
-                            label: "Times",
-                            value: "count"
-                        }
-                    ]
+                width: parent.width
+                spacing: 6
+
+                Row {
+                    spacing: 8
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "From"
+                        font.pixelSize: Appearance.fontSize - 1
+                        color: Theme.dim
+                    }
+                    Field {
+                        id: repeatFrom
+                        width: 130
+                        placeholder: "2026-09-27"
+                        invalid: text !== "" && !root.validDate(text)
+                        onTextChanged: if (text !== startDate.text)
+                            startDate.text = text
+                    }
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "to"
+                        font.pixelSize: Appearance.fontSize - 1
+                        color: Theme.dim
+                    }
+                    Field {
+                        id: repeatUntil
+                        width: 130
+                        placeholder: "no end"
+                        invalid: text !== "" && !root.validDate(text)
+                    }
                 }
-                Field {
-                    id: endsValue
-                    visible: ends.value !== "never"
-                    width: 120
-                    placeholder: ends.value === "count" ? "10" : "2026-12-31"
+
+                Row {
+                    spacing: 8
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "or"
+                        font.pixelSize: Appearance.fontSize - 1
+                        color: Theme.dim
+                    }
+                    Field {
+                        id: repeatCount
+                        width: 70
+                        placeholder: "–"
+                        invalid: text.trim() !== "" && !(parseInt(text) > 0)
+                    }
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "times"
+                        font.pixelSize: Appearance.fontSize - 1
+                        color: Theme.dim
+                    }
                 }
             }
 
