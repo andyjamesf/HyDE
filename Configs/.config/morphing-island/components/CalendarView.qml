@@ -7,7 +7,8 @@ import qs.theme
 
 // Calendar (island mode "calendar"): the month, the chosen day's events and your calendars.
 // A click on a day shows its events; ‹ › change month, the month name goes back to today.
-// Add a calendar: paste an iCal or webcal link and press Enter, or "Add .ics file".
+// Add a calendar: type or paste an iCal/webcal link and press Enter, "Paste link" (straight from
+// the clipboard) or "Add .ics file…". Click a calendar's colour dot to pick another colour.
 // Keyboard: ←/→ previous/next day, ↑/↓ a week, PageUp/PageDown a month, Esc closes.
 // Data: services/Calendar.qml; options: config/CalendarConfig.qml.
 Item {
@@ -22,7 +23,11 @@ Item {
     property date selected: new Date()
     property int year: selected.getFullYear()
     property int month: selected.getMonth()
+    // Feedback under "Add a calendar" (red when something went wrong).
     property string message: ""
+    property bool messageError: false
+    // Calendar whose colour palette is open (-1: none).
+    property int colorFor: -1
 
     readonly property var days: {
         const first = new Date(year, month, 1);
@@ -46,6 +51,7 @@ Item {
     function reset() {
         select(new Date());
         message = "";
+        colorFor = -1;
         input.text = "";
         Calendar.refresh(false);
         focusRetry.start();
@@ -65,9 +71,21 @@ Item {
 
     // Adds the pasted link; on success the field empties, otherwise the reason shows below it.
     function addFromInput() {
-        message = Calendar.addLink(input.text);
-        if (message === "")
+        const why = Calendar.addLink(input.text);
+        if (why === "")
             input.text = "";
+        else {
+            message = why;
+            messageError = true;
+        }
+    }
+
+    Connections {
+        target: Calendar
+        function onNotice(text, error) {
+            root.message = text;
+            root.messageError = error;
+        }
     }
 
     function timeOf(e) {
@@ -299,10 +317,10 @@ Item {
             color: Theme.border
         }
 
-        // Your calendars, and adding new ones.
+        // Your calendars: colour (click the dot to change it), name, remove.
         Column {
             width: parent.width
-            spacing: 6
+            spacing: 4
 
             Label {
                 text: "Calendars"
@@ -314,49 +332,119 @@ Item {
             Repeater {
                 model: Calendar.calendars
 
-                Item {
+                Column {
                     id: cal
                     required property var modelData
                     required property int index
                     readonly property string error: Calendar.errors.find(x => x.startsWith(modelData.name + ":")) ?? ""
+                    readonly property bool picking: root.colorFor === index
                     width: parent.width
-                    height: 28
+                    spacing: 4
 
-                    Rectangle {
-                        id: swatch
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 10
-                        height: 10
-                        radius: 5
-                        color: cal.modelData.color || Theme.accent
+                    Item {
+                        width: parent.width
+                        height: 30
+
+                        // The calendar's colour: a click opens the palette below.
+                        Rectangle {
+                            id: swatch
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 16
+                            height: 16
+                            radius: 8
+                            color: cal.modelData.color || Theme.accent
+                            border.width: swatchMouse.containsMouse || cal.picking ? 2 : 0
+                            border.color: Theme.foreground
+
+                            MouseArea {
+                                id: swatchMouse
+                                anchors.fill: parent
+                                anchors.margins: -6
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.colorFor = cal.picking ? -1 : cal.index
+                            }
+                        }
+
+                        Label {
+                            anchors.left: swatch.right
+                            anchors.leftMargin: 10
+                            anchors.right: removeButton.left
+                            anchors.rightMargin: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: cal.error !== "" ? `${cal.modelData.name}  ·  couldn't read it` : `${cal.modelData.name}  ·  ${cal.modelData.path ? "file" : "link"}`
+                            color: cal.error !== "" ? Theme.danger : Theme.foreground
+                        }
+
+                        IconButton {
+                            id: removeButton
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            size: 26
+                            onClicked: {
+                                root.colorFor = -1;
+                                Calendar.remove(cal.index);
+                            }
+                            Glyph {
+                                kind: "close"
+                                size: 14
+                            }
+                        }
                     }
 
-                    Label {
-                        anchors.left: swatch.right
-                        anchors.leftMargin: 10
-                        anchors.right: removeButton.left
-                        anchors.rightMargin: 6
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: cal.error !== "" ? `${cal.modelData.name}  ·  couldn't read it` : `${cal.modelData.name}${cal.modelData.path ? "  ·  file" : ""}`
-                        color: cal.error !== "" ? Theme.danger : Theme.foreground
-                    }
+                    // Palette (CalendarConfig.colors).
+                    Flow {
+                        visible: cal.picking
+                        width: parent.width
+                        leftPadding: 26
+                        spacing: 8
+                        bottomPadding: 4
 
-                    IconButton {
-                        id: removeButton
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        size: 26
-                        onClicked: Calendar.remove(cal.index)
-                        Glyph {
-                            kind: "close"
-                            size: 14
+                        Repeater {
+                            model: CalendarConfig.colors
+
+                            Rectangle {
+                                id: option
+                                required property string modelData
+                                readonly property bool chosen: modelData.toLowerCase() === String(cal.modelData.color).toLowerCase()
+                                width: 22
+                                height: 22
+                                radius: 11
+                                color: modelData
+                                border.width: chosen || optionMouse.containsMouse ? 2 : 0
+                                border.color: Theme.foreground
+
+                                MouseArea {
+                                    id: optionMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        Calendar.setColor(cal.index, option.modelData);
+                                        root.colorFor = -1;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Paste a link, Enter adds it.
+        // Adding a calendar: an iCal link (typed, pasted into the field, or straight from the
+        // clipboard with "Paste link") or a .ics file.
+        Column {
+            width: parent.width
+            spacing: 8
+
+            Label {
+                text: "Add a calendar"
+                font.pixelSize: Appearance.fontSize - 1
+                font.weight: Font.DemiBold
+                color: Theme.dim
+            }
+
             Rectangle {
                 width: parent.width
                 height: 36
@@ -383,47 +471,64 @@ Item {
                     Label {
                         visible: input.text === ""
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "Paste an iCal / webcal link and press Enter"
+                        text: "iCal link (https:// or webcal://), Enter adds it"
                         color: Theme.faint
                     }
                 }
             }
 
             Row {
-                spacing: 10
+                spacing: 8
 
-                Rectangle {
-                    width: fileLabel.implicitWidth + 28
-                    height: 32
-                    radius: 16
-                    color: fileMouse.pressed ? Theme.pressed : fileMouse.containsMouse ? Theme.hover : Theme.surface
-                    border.width: 1
-                    border.color: Theme.border
+                Repeater {
+                    model: [
+                        {
+                            label: "Paste link",
+                            run: () => Calendar.addFromClipboard()
+                        },
+                        {
+                            label: "Add .ics file…",
+                            run: () => Calendar.addFile()
+                        }
+                    ]
 
-                    Label {
-                        id: fileLabel
-                        anchors.centerIn: parent
-                        text: "Add .ics file…"
-                    }
+                    Rectangle {
+                        id: button
+                        required property var modelData
+                        width: buttonLabel.implicitWidth + 28
+                        height: 32
+                        radius: 16
+                        color: buttonMouse.pressed ? Theme.pressed : buttonMouse.containsMouse ? Theme.hover : Theme.surface
+                        border.width: 1
+                        border.color: Theme.border
 
-                    MouseArea {
-                        id: fileMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Calendar.addFile()
+                        Label {
+                            id: buttonLabel
+                            anchors.centerIn: parent
+                            text: button.modelData.label
+                        }
+
+                        MouseArea {
+                            id: buttonMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.message = "";
+                                button.modelData.run();
+                            }
+                        }
                     }
                 }
+            }
 
-                Label {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.message !== ""
-                    width: column.width - fileLabel.implicitWidth - 40
-                    text: root.message
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: Appearance.fontSize - 2
-                    color: Theme.danger
-                }
+            Label {
+                visible: root.message !== ""
+                width: parent.width
+                text: root.message
+                wrapMode: Text.WordWrap
+                font.pixelSize: Appearance.fontSize - 2
+                color: root.messageError ? Theme.danger : Theme.dim
             }
         }
     }

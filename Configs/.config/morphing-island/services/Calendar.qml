@@ -11,8 +11,9 @@ import qs.config
 // writes ~/.cache/quickshell/calendar.json, which this service watches. The HyDE Quickshell shell
 // uses the same two files, so both shells show the same calendars.
 //
-// Adding a calendar: addLink(url) for iCal/webcal links; addFile() opens the system file chooser
-// and copies the chosen .ics to ~/.local/share/quickshell/calendars/. remove(index) takes one out.
+// Adding a calendar: addLink(url) for iCal/webcal links, addFromClipboard() for the link in the
+// clipboard, addFile() opens the system file chooser and copies the chosen .ics to
+// ~/.local/share/quickshell/calendars/. setColor(index, "#rrggbb") and remove(index) edit the list.
 Singleton {
     id: root
 
@@ -22,8 +23,19 @@ Singleton {
 
     // [{ name, url | path, color }]
     property var calendars: []
-    // [{ title, location, allDay, start: Date, end: Date, calendar, color }], by start.
-    property var events: []
+    // [{ title, location, allDay, start: Date, end: Date, calendar, color }], by start. The colour
+    // comes from the calendar's entry, so changing it applies at once.
+    readonly property var events: {
+        const colors = {};
+        for (const c of calendars)
+            colors[c.name] = c.color;
+        return calendars.length === 0 ? [] : _events.map(e => Object.assign({}, e, {
+                    color: colors[e.calendar] || e.color
+                }));
+    }
+    property var _events: []
+    // Result of an add that finishes later (the clipboard, the file chooser): what to tell the user.
+    signal notice(string text, bool error)
     // "Name: reason" for calendars that could not be read last time.
     property var errors: []
     readonly property bool loading: fetcher.running
@@ -73,6 +85,23 @@ Singleton {
         return "";
     }
 
+    // Adds the iCal link currently in the clipboard (answers through `notice`).
+    function addFromClipboard() {
+        if (!clipboard.running)
+            clipboard.running = true;
+    }
+
+    // Colour of calendar `index` ("#rrggbb").
+    function setColor(index, color) {
+        if (!calendars[index])
+            return;
+        const list = calendars.slice();
+        list[index] = Object.assign({}, list[index], {
+            color: color
+        });
+        _write(list, false);
+    }
+
     // Opens the system file chooser; the chosen .ics is copied next to the list and added.
     function addFile() {
         if (!picker.running)
@@ -92,18 +121,19 @@ Singleton {
     function _add(entry) {
         entry.color = CalendarConfig.colors[calendars.length % CalendarConfig.colors.length];
         _write(calendars.concat([entry]));
+        notice(`Added "${entry.name}"`, false);
     }
 
-    function _write(list) {
+    // Saves the list; `refetch` (default true) reads the calendars again (not needed for a colour).
+    function _write(list, refetch) {
         calendars = list;
         configFile.setText(JSON.stringify({
             calendars: list
         }, null, 2) + "\n");
-        lastRun = 0;
-        refreshSoon.restart();
-        // No calendars left: no events either.
-        if (list.length === 0)
-            events = [];
+        if (refetch !== false) {
+            lastRun = 0;
+            refreshSoon.restart();
+        }
     }
 
     // A readable name for a link: Google/Outlook/iCloud by host, else the host itself.
@@ -130,15 +160,10 @@ Singleton {
             } catch (e) {
                 root.calendars = [];
             }
-            if (root.calendars.length === 0)
-                root.events = [];
             root.refresh(false);
         }
-        // No list (never set up, or deleted): no calendars and no events.
-        onLoadFailed: {
-            root.calendars = [];
-            root.events = [];
-        }
+        // No list (never set up, or deleted): no calendars (and so no events).
+        onLoadFailed: root.calendars = []
     }
 
     // The events the script wrote.
@@ -151,7 +176,7 @@ Singleton {
             try {
                 const d = JSON.parse(text());
                 root.errors = d.errors ?? [];
-                root.events = (d.events ?? []).map(e => Object.assign({}, e, {
+                root._events = (d.events ?? []).map(e => Object.assign({}, e, {
                             start: root.parseDate(e.start, e.allDay),
                             end: root.parseDate(e.end, e.allDay)
                         }));
@@ -178,6 +203,18 @@ Singleton {
         stderr: StdioCollector {
             onStreamFinished: if (text.trim() !== "")
                 console.info("calendar:", text.trim())
+        }
+    }
+
+    Process {
+        id: clipboard
+        command: ["wl-paste", "--no-newline", "--type", "text"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const why = root.addLink(text);
+                if (why !== "")
+                    root.notice(text.trim() === "" ? "The clipboard is empty: copy an iCal link first" : why, true);
+            }
         }
     }
 

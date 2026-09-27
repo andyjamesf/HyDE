@@ -83,6 +83,7 @@ HyDE's defaults); HyDE's `lua/morphing_island.lua` only reads that file. Run `hy
 | `Super+Shift+A` | HyDE menus (all pickers) | HyDE's rofi selector |
 | `Super+Alt+I` | switch to the HyDE shell | switch to the island |
 | `Super+,`, `Super+Ctrl+B` | hide/show the pill | hide/show the bar |
+| `Super+Alt+B` | expand the island / back to one pill | — |
 | `Super+Alt+↑/↓` | — | next/previous bar layout |
 | `Super+Enter` | terminal | terminal |
 | `Super+Alt+,` | settings | — |

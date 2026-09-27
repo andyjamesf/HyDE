@@ -63,6 +63,9 @@ M.shell = {
 	-- Bar.
 	{ keys = "$mod + comma", island = "hide", hyde = "qs ipc call bar toggle", desc = "[Window Management] hide or show the bar" },
 	{ keys = "$mod + CTRL + B", island = "hide", hyde = "qs ipc call bar toggle", desc = "[Window Management] hide or show the bar" },
+	-- Island: expanded (workspaces, media, time, status) ⇄ back to the single clock pill. A click on
+	-- the clock opens the calendar, a right click expands too.
+	{ keys = "$mod + ALT + B", island = "pin", hyde = nil, desc = "[Morphing Island] expand the island or shrink it back to one pill" },
 	-- Bar layouts only exist in the HyDE shell.
 	{ keys = "$mod + ALT + Up", island = nil, hyde = "qs ipc call bar next", desc = "[Theming and Wallpaper] next bar layout" },
 	{ keys = "$mod + ALT + Down", island = nil, hyde = "qs ipc call bar prev", desc = "[Theming and Wallpaper] previous bar layout" },
