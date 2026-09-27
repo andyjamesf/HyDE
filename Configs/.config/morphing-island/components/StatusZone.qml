@@ -4,14 +4,41 @@ import qs.icons
 import qs.services
 import qs.theme
 
-// Right zone of the expanded island: the icons listed in Expanded.statusIcons (volume, bluetooth,
-// network, battery), right-aligned. Display only (no buttons): a click here falls through to the
-// island background as empty space.
+// Status icons, right-aligned: the right zone of the expanded island (Expanded.statusIcons) and the
+// status pill at the screen's right edge (StatusPillConfig.icons). Ids: "volume", "bluetooth",
+// "wifi", "battery", "caffeine" (only while on), "notifications" (only with unread ones, or in
+// peace mode). Display only (no buttons): a click here falls through to the island background.
 Item {
     id: root
 
     // Width assigned by ExpandedView (the content hugs the right edge inside it).
     property int zoneWidth: implicitWidth
+    // Icons to show, in order.
+    property var icons: Expanded.statusIcons
+    // Battery percentage next to the battery icon.
+    property bool batteryPercent: false
+    // …and the time left: until empty on battery, until full while charging.
+    property bool batteryTime: false
+
+    // "3h 12m" / "45m" from seconds; "" while UPower has no estimate.
+    function duration(seconds) {
+        const m = Math.round(seconds / 60);
+        if (!(m > 0))
+            return "";
+        const h = Math.floor(m / 60);
+        return h > 0 ? `${h}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
+    }
+    readonly property string batteryText: {
+        const parts = [];
+        if (batteryPercent)
+            parts.push(`${Math.round(Battery.percent)}%`);
+        if (batteryTime) {
+            const t = duration(Battery.charging ? Battery.timeToFull : Battery.plugged ? 0 : Battery.timeToEmpty);
+            if (t !== "")
+                parts.push(t);
+        }
+        return parts.join(" · ");
+    }
 
     readonly property real iconSize: Math.round(Pill.height * Expanded.statusIconFactor)
 
@@ -24,11 +51,17 @@ Item {
             volume: volumeIcon,
             bluetooth: bluetoothIcon,
             wifi: wifiIcon,
-            battery: batteryIcon
+            battery: batteryIcon,
+            caffeine: caffeineIcon,
+            notifications: notificationsIcon
         })
 
-    // Icons that only show when the hardware exists (a hidden icon takes no space in the row).
+    // Icons that only show when they have something to say (a hidden icon takes no space in the row).
     function available(id) {
+        if (id === "caffeine")
+            return Caffeine.active;
+        if (id === "notifications")
+            return Notifications.count > 0 || Notifications.peaceMode;
         return id === "bluetooth" ? Bluetooth.available : id === "battery" ? Battery.available : true;
     }
 
@@ -39,7 +72,7 @@ Item {
         spacing: Expanded.statusSpacing
 
         Repeater {
-            model: Expanded.statusIcons.filter(i => root.iconComponents[i] !== undefined)
+            model: root.icons.filter(i => root.iconComponents[i] !== undefined)
 
             Loader {
                 required property string modelData
@@ -85,15 +118,64 @@ Item {
         }
     }
 
+    // Battery, then its percentage and time left (batteryPercent / batteryTime; red when low and
+    // not charging).
     Component {
         id: batteryIcon
 
-        BatteryIcon {
+        Row {
+            spacing: 4
+
+            BatteryIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                size: root.iconSize
+                color: Theme.icon
+                present: Battery.available
+                percent: Battery.percent
+                charging: Battery.charging
+            }
+
+            Label {
+                visible: root.batteryText !== ""
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.batteryText
+                font.pixelSize: Appearance.fontSize - 1
+                color: Battery.percent <= 15 && !Battery.charging ? Theme.danger : Theme.foreground
+            }
+        }
+    }
+
+    // Caffeine on: the session never goes idle (control center tile or `island ipc caffeine`).
+    Component {
+        id: caffeineIcon
+
+        Glyph {
+            kind: "coffee"
             size: root.iconSize
-            color: Theme.icon
-            present: Battery.available
-            percent: Battery.percent
-            charging: Battery.charging
+            color: Theme.accent
+        }
+    }
+
+    // Unread notifications (bell + count), or peace mode (crossed-out bell).
+    Component {
+        id: notificationsIcon
+
+        Row {
+            spacing: 3
+
+            Glyph {
+                anchors.verticalCenter: parent.verticalCenter
+                kind: Notifications.peaceMode ? "bellOff" : "bell"
+                size: root.iconSize
+                color: Theme.icon
+            }
+
+            Label {
+                visible: Notifications.count > 0
+                anchors.verticalCenter: parent.verticalCenter
+                text: String(Notifications.count)
+                font.pixelSize: Appearance.fontSize - 1
+            }
         }
     }
 }

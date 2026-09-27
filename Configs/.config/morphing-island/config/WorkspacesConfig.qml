@@ -7,15 +7,21 @@ import Quickshell
 // there, scroll over it to step through them. (Named WorkspacesConfig because
 // services/Workspaces.qml is the service.)
 //
-// With the clock pill showing, it is a small pill of its own to the left of the clock; when the
-// island expands (hover or pin) it slides into it and shows in the expanded island's left zone.
+// With the clock pill showing, it is a small pill of its own (at the screen's left edge, or next to
+// the clock); when the island expands (hover or pin) it slides into it and shows in the expanded
+// island's left zone.
 Singleton {
     // Show the indicator at all. Default true.
     readonly property bool enabled: true
     // Also show it inside the expanded island. Default true.
     readonly property bool inExpanded: true
 
-    // Space between the indicator pill and the clock pill, in pixels. Default 8.
+    // Where the indicator pill sits: "left" = the screen's left edge, "clock" = just left of the
+    // clock pill. Default "left".
+    readonly property string placement: "left"
+    // Distance from the screen's left edge ("left" placement), in pixels. Default 12.
+    readonly property int edgeMargin: 12
+    // Space between the indicator pill and the clock pill ("clock" placement), in pixels. Default 8.
     readonly property int gap: 8
     // Inner padding of the indicator pill at each end, in pixels. Default 10.
     readonly property int padding: 10

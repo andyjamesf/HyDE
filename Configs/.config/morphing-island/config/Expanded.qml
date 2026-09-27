@@ -15,9 +15,10 @@ Singleton {
     // Extra height over Pill.height, in pixels. Default 14.
     readonly property int extraHeight: 14
 
-    // Status icons on the right, in this order. Known ids: "volume", "bluetooth", "wifi" (also shows
-    // wired), "battery". Remove an id to hide that icon. Default ["volume", "bluetooth", "wifi",
-    // "battery"].
+    // Status icons on the right, in this order. Used only when the status pill is off: with it on,
+    // the expanded island shows StatusPillConfig.icons instead, since the pill slides into it. Known
+    // ids: "volume", "bluetooth", "wifi" (also shows wired), "battery". Remove an id to hide that
+    // icon. Default ["volume", "bluetooth", "wifi", "battery"].
     readonly property var statusIcons: ["volume", "bluetooth", "wifi", "battery"]
     // Space between status icons in pixels. Default 10.
     readonly property int statusSpacing: 10

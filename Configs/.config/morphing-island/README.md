@@ -31,8 +31,9 @@ Run by hand: `qs -p ~/.config/morphing-island` (a named config via `qs -c` is no
 | Mode | How to get there | Notes |
 |---|---|---|
 | Clock | default | time; equalizer bars while music plays |
-| Workspaces | always, next to the clock | a small pill left of the clock: each workspace of this screen with windows (plus the current one), its number and app icons; click to go there, scroll to step; slides into the island when it expands |
-| Expanded | hover, or click empty space to pin | workspaces · media controls · time and date · volume, Bluetooth, Wi‑Fi signal, battery |
+| Workspaces | always, at the screen's left edge | each workspace of this screen with windows (plus the current one), its number and app icons; click to go there, scroll to step; slides into the island when it expands |
+| Status | always, at the screen's right edge | caffeine (when on), unread notifications, volume, Bluetooth, Wi‑Fi, battery with percentage and time left (to empty, or to full while charging); slides into the island when it expands |
+| Expanded | hover, or click empty space to pin | workspaces · media controls · time and date · the status pill's icons |
 | Volume / microphone / brightness OSD | changing volume, mic volume/mute or brightness | icon reacts to the level; 1.5 s; ignores hypridle's dimming |
 | Notification | a notification arrives | countdown pauses on hover; click dismisses; critical ones are red and stay 12 s; queued behind open surfaces |
 | Launcher | `Super+A` | fuzzy apps with favorites (`Ctrl+F`) and frecency; animated results |
