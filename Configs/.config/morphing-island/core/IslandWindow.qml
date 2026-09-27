@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.config
 import qs.services
+import qs.components
 
 // One window per screen: transparent, as big as the island's largest shape, but only the island
 // receives clicks (mask). Reserves the space of the collapsed island at the top.
@@ -51,6 +52,10 @@ PanelWindow {
     color: "transparent"
     mask: Region {
         item: win.baseHidden ? null : island
+
+        Region {
+            item: win.satelliteShown ? satellite : null
+        }
     }
 
     WlrLayershell.namespace: "quickshell:island"
@@ -87,6 +92,40 @@ PanelWindow {
     Spring {
         id: ySpring
         target: win.baseHidden ? -island.height - 16 : Pill.topMargin
+    }
+
+    // Workspace indicator pill (config/WorkspacesConfig.qml), to the left of the clock pill. When the
+    // island leaves the clock (expands on hover or pin, or shows anything else) it slides under the
+    // island and fades, as if absorbed; the expanded island shows the workspaces itself.
+    readonly property bool satelliteShown: WorkspacesConfig.enabled && displayMode === IslandState.clock && !baseHidden
+
+    Spring {
+        id: satX
+        target: win.satelliteShown ? island.x - WorkspacesConfig.gap - satellite.width : island.x + (island.width - satellite.width) / 2
+    }
+
+    IslandSurface {
+        id: satellite
+        // Under the island, so it disappears behind it when absorbed.
+        z: -1
+        x: Math.round(satX.value)
+        y: ySpring.value
+        targetWidth: workspaces.implicitWidth + 2 * WorkspacesConfig.padding
+        targetHeight: Pill.height
+        opacity: win.satelliteShown ? 1 : 0
+        visible: opacity > 0.01
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Animations.duration(win.satelliteShown ? Animations.fadeIn : Animations.fadeOut)
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        WorkspacesView {
+            id: workspaces
+            anchors.centerIn: parent
+        }
     }
 
     Island {

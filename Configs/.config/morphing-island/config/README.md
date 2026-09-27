@@ -14,6 +14,7 @@ what it does, its unit, a sensible range and the default.
 | `Pill.qml` | the collapsed clock pill: height, minimum width, top margin, padding, hover-to-expand and its collapse delay, hidden pill, equalizer bars |
 | `Expanded.qml` | the expanded island (hover/pin): side zone width, gutters, margins, extra height, status icons and their order, media zone sizes |
 | `Clock.qml` | time / short date / long date formats and the locale |
+| `WorkspacesConfig.qml` | workspace indicator next to the clock and in the expanded island: on/off, gap to the clock, padding, spacing, icons per workspace, one icon per app, icon size, per-screen or all workspaces |
 | `OsdConfig.qml` | volume / microphone / brightness OSD: timeout, size, bar thickness, mic OSD on/off, startup arm delay, hypridle dimming threshold, brightness step |
 | `NotificationsConfig.qml` | notification history size, popup timeouts, queue gap, peace mode rules, HyDE filters, popup layout (widths, radius, padding, avatar, actions, line counts) |
 | `ControlCenter.qml` | control center: width, radius, padding, page slide, **tiles and their order** (incl. Caffeine), list row heights, slider throttle, Bluetooth discovery time, night light temperature |
