@@ -267,7 +267,7 @@ Item {
                         width: grid.cell
                         height: 22
                         horizontalAlignment: Text.AlignHCenter
-                        text: root.locale.dayName((CalendarConfig.firstDayOfWeek + index) % 7, Locale.NarrowFormat)
+                        text: root.locale.dayName((CalendarConfig.firstDayOfWeek + index) % 7, Locale.ShortFormat)
                         font.pixelSize: Appearance.fontSize - 2
                         color: Theme.dim
                     }
