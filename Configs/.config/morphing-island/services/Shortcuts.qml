@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import qs.config
 import qs.core
 
 // What the status icons and the shortcut buttons of the expanded island do when clicked, and the
@@ -40,6 +41,8 @@ Singleton {
             return "Lock screen";
         case "power":
             return "Power menu";
+        case "ai":
+            return `AI usage\n${AiUsage.summary}`;
         }
         return "";
     }
@@ -59,7 +62,11 @@ Singleton {
             Caffeine.toggle();
         else if (id === "power")
             IslandController.open(IslandState.power);
-        else
+        else if (id === "ai") {
+            // Fresh numbers, shown under the icon for a while (they fill in as they arrive).
+            AiUsage.refresh();
+            IslandController.pinHint("ai", AiUsageConfig.showMs);
+        } else
             IslandController.open(IslandState.controlCenter);
     }
 

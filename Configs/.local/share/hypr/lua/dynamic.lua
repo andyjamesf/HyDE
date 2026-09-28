@@ -72,9 +72,21 @@ if user_config_path then
 	end
 end
 
-check_require("lua_state.animations")
-check_require("lua_state.shaders")
-check_require("lua_state.layouts")
+-- The chosen animation, shader and layout presets. require() alone is not enough: Lua caches
+-- modules and Hyprland keeps the same Lua state across config reloads, so after a reload (a theme
+-- change, `hyprctl reload`, a picker) the presets did not run again and Hyprland's defaults came
+-- back (or, after a new choice, the old one stayed). Read the state file and run the chosen preset
+-- with dofile(), which is never cached.
+for _, module in ipairs({ "animations", "shaders", "layouts" }) do
+	local state = package.searchpath("lua_state." .. module, package.path)
+	local ok, chosen = false, nil
+	if state then
+		ok, chosen = pcall(dofile, state)
+	end
+	if ok and type(chosen) == "table" and type(chosen.path) == "string" and chosen.path:match("%.lua$") then
+		pcall(dofile, chosen.path)
+	end
+end
 
 hl.config(
 	{

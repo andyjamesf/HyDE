@@ -187,10 +187,19 @@ PanelWindow {
     }
     Connections {
         target: IslandController
+        function onHintPinnedChanged() {
+            if (IslandController.hintPinned && IslandController.hintScreen === win.modelData.name) {
+                hintDelay.stop();
+                hintGrace.stop();
+                win.hintArmed = true;
+            }
+        }
         function onHintChanged() {
             if (IslandController.hint !== "" && IslandController.hintScreen === win.modelData.name) {
                 hintGrace.stop();
-                if (!win.hintArmed)
+                if (IslandController.hintPinned)
+                    win.hintArmed = true;
+                else if (!win.hintArmed)
                     hintDelay.restart();
             } else {
                 hintDelay.stop();
@@ -207,7 +216,7 @@ PanelWindow {
         y: Math.round(IslandController.hintAt.y + 8)
         width: hintText.implicitWidth + 20
         height: hintText.implicitHeight + 10
-        radius: height / 2
+        radius: Math.min(height / 2, 14)
         color: Qt.alpha(Theme.background, 0.96)
         border.width: 1
         border.color: Theme.border

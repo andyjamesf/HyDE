@@ -43,9 +43,30 @@ Singleton {
     property string hint: ""
     property string hintScreen: ""
     property point hintAt: Qt.point(0, 0)
+    // A clicked icon can keep its hint up for a while (the AI usage): shown at once, and not taken
+    // away when the pointer leaves.
+    property bool hintPinned: false
+    property string _pinnedHint: ""
+    function pinHint(id, ms) {
+        _pinnedHint = id;
+        hintPinned = true;
+        hint = id;
+        hintUnpin.interval = ms;
+        hintUnpin.restart();
+    }
+    Timer {
+        id: hintUnpin
+        onTriggered: {
+            root.hintPinned = false;
+            root.hint = "";
+        }
+    }
     // A click that changes the island (opens a page, closes it) takes the hint away.
     onModeChanged: hint = ""
     onPinnedChanged: hint = ""
+    // Pointing at another icon ends the pinned one.
+    onHintChanged: if (hint !== _pinnedHint)
+        hintPinned = false
 
     // Surface Esc returns to (e.g. theme or wallpaper opened from the settings).
     property string returnMode: ""

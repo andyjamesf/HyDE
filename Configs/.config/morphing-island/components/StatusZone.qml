@@ -9,7 +9,8 @@ import qs.theme
 // Status icons, right-aligned: the right zone of the expanded island and the status pill at the
 // screen's right edge (StatusPillConfig.icons). Ids: "volume", "bluetooth", "wifi", "battery",
 // "caffeine" (dim when off, accent when on), "notifications" (bell with the unread count; crossed
-// out in peace mode), "power" (the power menu). With `extras`, shortcut buttons fill the free space on their left.
+// out in peace mode), "power" (the power menu), "ai" (AI usage: the symbol, coloured by the tool
+// closest to its limit; a click shows the numbers). With `extras`, shortcut buttons fill the free space on their left.
 // Every icon is a button; resting the pointer on one shows what it does. Actions and hints:
 // services/Shortcuts.qml.
 Item {
@@ -33,10 +34,10 @@ Item {
 
     // Nerd Font glyphs for the shortcuts that have no drawn icon.
     readonly property var extraGlyphs: ({
-            screenshot: "\u{F0E51}",
+            screenshot: "\u{F0E09}",
             clipboard: "\u{F0192}",
             picker: "\u{F020A}",
-            wallpaper: "\u{F0E09}",
+            wallpaper: "\u{F0E51}",
             theme: "\u{F03D8}",
             settings: "\u{F0493}"
         })
@@ -47,7 +48,7 @@ Item {
             IslandController.hintScreen = QsWindow.window?.screen?.name ?? "";
             IslandController.hintAt = item.mapToItem(null, item.width / 2, item.height);
             IslandController.hint = id;
-        } else if (IslandController.hint === id) {
+        } else if (IslandController.hint === id && !IslandController.hintPinned) {
             IslandController.hint = "";
         }
     }
@@ -78,13 +79,16 @@ Item {
             battery: batteryIcon,
             caffeine: caffeineIcon,
             notifications: notificationsIcon,
-            power: powerIcon
+            power: powerIcon,
+            ai: aiIcon
         })
 
     // Icons that only show when they have something to say (a hidden icon takes no space in the row).
     function available(id) {
         if (id === "notifications")
             return alwaysShowBell || Notifications.count > 0 || Notifications.peaceMode;
+        if (id === "ai")
+            return AiUsage.available;
         return id === "bluetooth" ? Bluetooth.available : id === "battery" ? Battery.available : true;
     }
 
@@ -303,6 +307,19 @@ Item {
             kind: "coffee"
             size: root.iconSize
             color: Caffeine.active ? Theme.accent : Theme.dim
+        }
+    }
+
+    // AI usage (services/AiUsage.qml): only the symbol; red near a limit, accent colour half way.
+    Component {
+        id: aiIcon
+
+        Label {
+            text: "\u{F06A9}"
+            font.family: Appearance.nerdFont
+            font.pixelSize: Math.round(root.iconSize * 0.95)
+            elide: Text.ElideNone
+            color: AiUsage.worst === "high" ? Theme.danger : AiUsage.worst === "mid" ? Theme.accent : Theme.icon
         }
     }
 
