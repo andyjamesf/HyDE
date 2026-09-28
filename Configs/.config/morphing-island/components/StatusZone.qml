@@ -150,16 +150,30 @@ Item {
         }
     }
 
-    // Wired: the wifi icon shows full and connected (no separate ethernet glyph).
+    // Network: the ethernet icon while a cable is connected (it takes priority), otherwise Wi‑Fi.
     Component {
         id: wifiIcon
 
-        WifiIcon {
-            size: root.iconSize
-            color: Network.wired || Network.connected ? Theme.icon : Theme.dim
-            level: Network.wired ? 4 : Network.level
-            enabled: Network.wired || Network.wifiEnabled
-            connected: Network.wired || Network.connected
+        Item {
+            implicitWidth: root.iconSize
+            implicitHeight: root.iconSize
+
+            EthernetIcon {
+                anchors.centerIn: parent
+                visible: Network.wired
+                size: root.iconSize
+                color: Theme.icon
+            }
+
+            WifiIcon {
+                anchors.centerIn: parent
+                visible: !Network.wired
+                size: root.iconSize
+                color: Network.connected ? Theme.icon : Theme.dim
+                level: Network.level
+                enabled: Network.wifiEnabled
+                connected: Network.connected
+            }
         }
     }
 
