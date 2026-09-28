@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# First-install look of the Quickshell Edition: the Drawbridge theme, macOS-like animations and the
+# First-install look of the Quickshell Edition: the Drawbridge theme, the Island animations and the
 # Morphing Island as the active shell; and Waybar kept off. Each default is applied only when nothing was chosen yet, so
 # installing over an existing HyDE keeps the user's theme, animations and shell. Run by install.sh
 # after the themes are installed and before the theme is applied.
@@ -18,9 +18,10 @@ if ! has_key HYDE_THEME && [[ -d "$themes_dir/Drawbridge" ]]; then
     echo 'HYDE_THEME="Drawbridge"' >>"$staterc"
 fi
 
-# Animations: macOS-like (HyDE's Lua selector reads the staterc until a choice is made).
+# Animations: Island, fast and discreet (lua/animations/island*.lua; HyDE's Lua selector reads the
+# staterc until a choice is made). Choose another with Super+Shift+Y.
 if ! has_key HYPR_ANIMATION; then
-    echo 'HYPR_ANIMATION="macos"' >>"$staterc"
+    echo 'HYPR_ANIMATION="island"' >>"$staterc"
 fi
 
 # Shell: the Morphing Island, unless a choice exists (`island on|off` creates this folder).

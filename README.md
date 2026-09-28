@@ -27,8 +27,9 @@ cd ~/HyDE/Scripts && ./install.sh
 - **Drivers:** HyDE's installer handles NVIDIA. On top of that, `Scripts/hw_detect.sh` adds what a
   plain Arch install leaves out on Intel and AMD: CPU microcode, Vulkan and, on Intel, hardware video
   decoding.
-- **First install:** the Drawbridge theme, macOS-like animations and the Morphing Island as the
-  active shell (`Scripts/edition_defaults.sh`).
+- **First install:** the Drawbridge theme, the Island animations (fast and discreet: no-bounce
+  springs; variants `island-vertical` and `island-fade`, or any HyDE preset with Super+Shift+Y) and
+  the Morphing Island as the active shell (`Scripts/edition_defaults.sh`).
 - **Over an existing HyDE:** your theme, animations and shell choice are kept.
 
 > The original HyDE README (features, themes, community, credits) is in
