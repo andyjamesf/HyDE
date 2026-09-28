@@ -5,11 +5,12 @@ import "components"
 // Login screen (SDDM) of the Morphing Island, a copy of the island's lock screen
 // (core/LockSurface.qml): the blurred wallpaper with a veil, and the clock pill at the top that
 // grows with the island's springs into the card at the centre: time, date, avatar, name and the
-// password pill. Below the card, a small pill with the session and the power buttons.
+// password pill. Below the card, a small pill with the session button (a menu of sessions) and
+// suspend / restart / power off. Everything but the background follows the monitor's scale.
 //
 // Colours, fonts, sizes and the wallpaper come from theme.conf.user, written by the island
 // (scripts/sddm.py sync) so this screen always matches it; theme.conf holds the defaults.
-// Keys: Enter logs in, Esc clears, Up/Down change the user, Tab changes the session.
+// Keys: Enter logs in, Esc clears, Up/Down change the user, Tab opens the sessions.
 Rectangle {
     id: root
 
@@ -55,6 +56,9 @@ Rectangle {
         source: root.cfg("fontFile", "") !== "" ? Qt.resolvedUrl(root.cfg("fontFile", "")) : ""
     }
 
+    // The desktop's scale (Hyprland's monitor scale, written by the sync): SDDM draws at 1×, so the
+    // island is scaled up to look the same size as the lock screen.
+    readonly property real uiScale: Math.max(0.5, num("scale", 1))
     readonly property int pillHeight: num("pillHeight", 36)
     readonly property int pillTop: num("pillTopMargin", 6)
     readonly property int pillMinWidth: num("pillMinWidth", 128)
@@ -210,19 +214,30 @@ Rectangle {
         onTriggered: field.focusField()
     }
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: field.focusField()
-    }
-
     Keys.onUpPressed: cycleUser(-1)
     Keys.onDownPressed: cycleUser(1)
-    Keys.onTabPressed: cycleSession(1)
+    Keys.onTabPressed: sessionMenu.open = !sessionMenu.open
+
+    // Everything above the background, in the desktop's logical pixels (scaled by uiScale).
+    Item {
+    id: ui
+    width: root.width / root.uiScale
+    height: root.height / root.uiScale
+    scale: root.uiScale
+    transformOrigin: Item.TopLeft
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            sessionMenu.open = false;
+            field.focusField();
+        }
+    }
 
     Spring {
         id: ys
         omega: theme.springOmega
-        target: root.expanded ? Math.round((root.height - island.targetHeight) / 2 + root.height * root.cardOffset) : root.pillTop
+        target: root.expanded ? Math.round((ui.height - island.targetHeight) / 2 + ui.height * root.cardOffset) : root.pillTop
     }
 
     IslandSurface {
@@ -502,38 +517,29 @@ Rectangle {
             anchors.centerIn: parent
             spacing: 4
 
-            // Session (Hyprland, …): click or Tab for the next one.
+            // Sessions: a button that opens the menu above (also Tab).
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: sessions.count > 0
-                width: sessionText.implicitWidth + 24
-                height: root.pillHeight - 8
-                radius: height / 2
-                color: sessionMouse.containsMouse ? theme.hover : "transparent"
+                width: root.pillHeight - 8
+                height: width
+                radius: width / 2
+                color: sessionMenu.open ? theme.hover : sessionMouse.containsMouse ? theme.hover : "transparent"
 
                 Text {
-                    id: sessionText
                     anchors.centerIn: parent
-                    text: root.sessionName
-                    color: theme.foreground
-                    font.family: theme.font
-                    font.pixelSize: theme.fontSize
+                    text: "\u{F0379}"
+                    color: sessionMenu.open ? theme.accent : theme.foreground
+                    font.family: theme.iconFont
+                    font.pixelSize: theme.fontSize + 3
                 }
                 MouseArea {
                     id: sessionMouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: sessions.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: root.cycleSession(1)
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: sessionMenu.open = !sessionMenu.open
                 }
-            }
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: sessions.count > 0
-                width: 1
-                height: 14
-                color: theme.border
             }
 
             Repeater {
@@ -581,5 +587,74 @@ Rectangle {
                 }
             }
         }
+    }
+
+    // The sessions (Hyprland, …), under the pill: click one to use it.
+    Rectangle {
+        id: sessionMenu
+        property bool open: false
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: bottomPill.y + bottomPill.height + 8
+        width: Math.max(180, sessionList.implicitWidth + 12)
+        height: sessionList.implicitHeight + 12
+        radius: Math.min(height / 2, 18)
+        color: Qt.alpha(theme.background, theme.islandOpacity)
+        border.width: 1
+        border.color: theme.border
+        opacity: open && root.expanded ? 1 : 0
+        visible: opacity > 0.01
+        scale: open ? 1 : 0.96
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 150
+            }
+        }
+        Behavior on scale {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Column {
+            id: sessionList
+            anchors.centerIn: parent
+            spacing: 2
+
+            Repeater {
+                model: sessions.count
+
+                Rectangle {
+                    required property int index
+                    readonly property bool chosen: index === root.sessionIndex
+                    width: Math.max(168, itemText.implicitWidth + 32)
+                    height: root.pillHeight - 6
+                    radius: height / 2
+                    color: chosen ? theme.accent : itemMouse.containsMouse ? theme.hover : "transparent"
+
+                    Text {
+                        id: itemText
+                        anchors.centerIn: parent
+                        text: sessions.objectAt(parent.index) ? sessions.objectAt(parent.index).name : ""
+                        color: parent.chosen ? theme.accentContent : theme.foreground
+                        font.family: theme.font
+                        font.pixelSize: theme.fontSize
+                    }
+                    MouseArea {
+                        id: itemMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.sessionIndex = parent.index;
+                            sessionMenu.open = false;
+                            field.focusField();
+                        }
+                    }
+                }
+            }
+        }
+    }
     }
 }

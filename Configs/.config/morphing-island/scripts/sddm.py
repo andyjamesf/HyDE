@@ -107,6 +107,13 @@ def sync(values, target):
         copy_if_changed(font, os.path.join(target, "fonts", "Inter.ttf"))
         conf["fontFile"] = "fonts/Inter.ttf"
 
+    # SDDM draws at 1×: the theme scales the island by the desktop's scale (focused monitor).
+    try:
+        mons = json.loads(subprocess.run(["hyprctl", "monitors", "-j"], capture_output=True, text=True, timeout=5).stdout)
+        mon = next((m for m in mons if m.get("focused")), mons[0])
+        conf["scale"] = float(mon.get("scale", 1))
+    except Exception:
+        pass
     conf.pop("avatarPath", None)
     lines = ["[General]", "# Written by the Morphing Island (scripts/sddm.py sync): edit the island, not this file."]
     # Strings are quoted: SDDM reads this with QSettings, which splits unquoted commas into a list.
