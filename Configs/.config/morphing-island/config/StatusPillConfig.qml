@@ -28,10 +28,12 @@ Singleton {
     //   "battery"        percentage inside, time left next to it; hidden on PCs without one;
     //                    click: control center
     //   "power"          click: power menu (log out, suspend, restart, shut down)
+    //   "updates"        only while updates wait, with their number (config/UpdatesConfig.qml);
+    //                    click: a terminal lists them and asks before updating
     //   "ai"             AI usage, only the symbol (config/AiUsageConfig.qml); click: fresh numbers
     //                    shown under it; hidden when the usage scripts are missing
-    // Default ["ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"].
-    readonly property var icons: ["ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"]
+    // Default ["updates", "ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"].
+    readonly property var icons: ["updates", "ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"]
     // Battery percentage, inside the battery icon. Default true.
     readonly property bool batteryPercent: true
     // Time left next to the battery: until empty on battery, until full while charging ("3h 12m";

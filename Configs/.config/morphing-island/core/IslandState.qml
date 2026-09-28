@@ -12,6 +12,7 @@ Singleton {
     readonly property string mic: "mic"
     readonly property string brightness: "brightness"
     readonly property string notification: "notification"
+    readonly property string screenshot: "screenshot"
     // Surfaces opened by the user (the island keeps the focus until Esc or a click outside)
     readonly property string launcher: "launcher"
     readonly property string controlCenter: "controlcenter"
@@ -25,12 +26,14 @@ Singleton {
     readonly property string power: "power"
     readonly property string auth: "auth"
     readonly property string calendar: "calendar"
+    // Wi-Fi password or Bluetooth pairing request (services/Agents.qml).
+    readonly property string agent: "agent"
 
-    readonly property var transients: [volume, mic, brightness, notification]
-    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, theme, wallpaper, settings, power, auth, calendar]
+    readonly property var transients: [volume, mic, brightness, notification, screenshot]
+    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, theme, wallpaper, settings, power, auth, calendar, agent]
     // Surfaces that take the keyboard exclusively: text input, and the pickers with a grid (so
     // arrows and Enter work without clicking first).
-    readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power, calendar]
+    readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power, calendar, agent]
     // Control center subviews (Esc goes back to the control center, not to the clock).
     readonly property var subviews: [wifi, bluetooth, audio, media]
 

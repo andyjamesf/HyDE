@@ -31,7 +31,8 @@ Singleton {
         const colors = {};
         for (const c of calendars)
             colors[c.name] = c.color;
-        const read = calendars.length === 0 ? [] : _events.map(e => Object.assign({}, e, {
+        const hidden = _hidden.filter(h => Date.now() - h.at < 6 * 3600000);
+        const read = calendars.length === 0 ? [] : _events.filter(e => !hidden.some(h => h.uid === e.uid && (h.original === "" || h.original === e.originalStart))).map(e => Object.assign({}, e, {
                     color: colors[e.calendar] || e.color
                 }));
         // Events just created in Google Calendar (GoogleCalendar.add), until the calendars read
@@ -41,6 +42,9 @@ Singleton {
     }
     property var _events: []
     property var _pending: []
+    // Events just changed or deleted in Google Calendar, hidden until the links catch up (6 h at
+    // most): [{ uid, original ("" = every occurrence), at }].
+    property var _hidden: []
     // Result of an add that finishes later (the clipboard, the file chooser): what to tell the user.
     signal notice(string text, bool error)
     // "Name: reason" for calendars that could not be read last time.
@@ -76,6 +80,28 @@ Singleton {
         const start = new Date(day.getFullYear(), day.getMonth(), day.getDate());
         const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
         return events.filter(e => e.start < end && (e.end > start || (e.end.getTime() === e.start.getTime() && e.start >= start)));
+    }
+
+    // An event the calendar view should open for editing (set by IPC tests; the view clears it).
+    property var editRequest: null
+
+    // Whether an event can be changed or deleted here: it comes from a Google calendar you can
+    // write to, and Google Calendar is connected.
+    function editable(e) {
+        return !!e && (e.googleCalendar ?? "") !== "" && (e.uid ?? "") !== "" && GoogleCalendar.connected && GoogleCalendar.calendars.some(c => c.id === e.googleCalendar);
+    }
+
+    // Hides an event changed or deleted elsewhere (GoogleCalendar.update/remove) right away.
+    function hideEvent(uid, original) {
+        _hidden = _hidden.concat([
+            {
+                uid: uid,
+                original: original || "",
+                at: Date.now()
+            }
+        ]);
+        lastRun = 0;
+        refreshSoon.restart();
     }
 
     // Shows an event created elsewhere (GoogleCalendar.add) right away, and reads the calendars

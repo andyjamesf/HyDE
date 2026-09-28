@@ -33,8 +33,27 @@ Item {
     property int colorFor: -1
     // Calendar being renamed (-1: none).
     property int renameFor: -1
-    // "month" (the month and the day's events) or "calendars" (your calendars, adding new ones).
+    // "month" (the month and the day's events), "calendars" (your calendars, adding new ones), "new"
+    // (a new Google event) or "edit" (changing one).
     property string page: "month"
+
+    Connections {
+        target: Calendar
+        function onEditRequestChanged() {
+            const e = Calendar.editRequest;
+            if (!e)
+                return;
+            Calendar.editRequest = null;
+            root.select(e.start);
+            root.editEvent(e);
+        }
+    }
+
+    // Opens an event of a Google calendar for editing.
+    function editEvent(e) {
+        showPage("edit");
+        eventForm.edit(e);
+    }
 
     function showPage(p) {
         page = p;
@@ -245,7 +264,7 @@ Item {
                     }
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.page === "new" ? "New event" : "Calendars"
+                        text: root.page === "new" ? "New event" : root.page === "edit" ? "Edit event" : "Calendars"
                         font.pixelSize: Appearance.fontSize + 3
                         font.weight: Font.DemiBold
                     }
@@ -367,33 +386,57 @@ Item {
                 Repeater {
                     model: root.dayEvents
 
-                    Row {
+                    Item {
                         id: ev
                         required property var modelData
+                        // From one of your Google calendars: a click edits it (or deletes it).
+                        readonly property bool editable: Calendar.editable(modelData)
                         width: parent.width
-                        spacing: 10
+                        height: evRow.implicitHeight
 
                         Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 4
-                            height: 28
-                            radius: 2
-                            color: ev.modelData.color || Theme.accent
+                            anchors.fill: parent
+                            anchors.margins: -4
+                            radius: 8
+                            color: evMouse.containsMouse ? Theme.hover : "transparent"
                         }
 
-                        Column {
-                            width: parent.width - 14
-                            Label {
-                                width: parent.width
-                                text: ev.modelData.title
-                                font.weight: Font.Medium
+                        Row {
+                            id: evRow
+                            width: parent.width
+                            spacing: 10
+
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 4
+                                height: 28
+                                radius: 2
+                                color: ev.modelData.color || Theme.accent
                             }
-                            Label {
-                                width: parent.width
-                                text: [root.timeOf(ev.modelData), ev.modelData.location, ev.modelData.calendar].filter(x => x).join("  ·  ")
-                                font.pixelSize: Appearance.fontSize - 2
-                                color: Theme.dim
+
+                            Column {
+                                width: parent.width - 14
+                                Label {
+                                    width: parent.width
+                                    text: ev.modelData.title
+                                    font.weight: Font.Medium
+                                }
+                                Label {
+                                    width: parent.width
+                                    text: [root.timeOf(ev.modelData), ev.modelData.location, ev.modelData.calendar].filter(x => x).join("  ·  ")
+                                    font.pixelSize: Appearance.fontSize - 2
+                                    color: Theme.dim
+                                }
                             }
+                        }
+
+                        MouseArea {
+                            id: evMouse
+                            anchors.fill: parent
+                            enabled: ev.editable
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.editEvent(ev.modelData)
                         }
                     }
                 }
@@ -713,7 +756,7 @@ Item {
             // New event page (Google Calendar).
             CalendarEventForm {
                 id: eventForm
-                visible: root.page === "new"
+                visible: root.page === "new" || root.page === "edit"
                 width: parent.width
                 onDone: root.showPage("month")
             }

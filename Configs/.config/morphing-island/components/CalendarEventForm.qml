@@ -8,12 +8,21 @@ import qs.theme
 // weeks on chosen weekdays, months or years; from a date to a date, or n times), event colour,
 // location, description and reminders. Not connected yet: the Google setup instead.
 // Saving goes through GoogleCalendar.add (scripts/gcal.py); the event shows in the calendar at once.
+// Editing (edit(event), a click on an event from one of your Google calendars): the same form with
+// every option, filled in, plus Delete; for a repeating event, "This event" or "All events" chooses
+// what changes.
 Column {
     id: root
 
     // The day the form starts on (the calendar's chosen day).
     property date day: new Date()
     property bool full: false
+    // Editing an existing event: { calendar, uid, originalStart, recurring, scope, id } (id arrives
+    // with the event); null = a new event.
+    property var editing: null
+    readonly property bool loading: editing !== null && (editing.id ?? "") === "" && message === "Loading…"
+    // Delete asks for a second click.
+    property bool confirmDelete: false
 
     // Saved: the calendar goes back to the month.
     signal done
@@ -46,6 +55,8 @@ Column {
 
     // Fresh form for `d`.
     function reset(d) {
+        editing = null;
+        confirmDelete = false;
         day = d;
         full = false;
         title.text = "";
@@ -71,6 +82,57 @@ Column {
     }
 
     property string message: ""
+
+    // Edits `event` (from the calendar view): loads it from Google and fills the form.
+    function edit(event, scope) {
+        reset(event.start);
+        full = true;
+        editing = {
+            calendar: event.googleCalendar,
+            uid: event.uid,
+            originalStart: event.originalStart,
+            recurring: !!event.recurring,
+            scope: scope ?? (event.recurring ? "this" : "all"),
+            id: "",
+            source: event
+        };
+        message = "Loading…";
+        GoogleCalendar.load(event, editing.scope);
+    }
+
+    function fill(f) {
+        editing = Object.assign({}, editing, {
+            id: f.id
+        });
+        title.text = f.title;
+        allDay.value = f.allDay;
+        startDate.text = f.start.slice(0, 10);
+        startTime.text = f.allDay ? "" : f.start.slice(11, 16);
+        endDate.text = f.end.slice(0, 10);
+        endTime.text = f.allDay ? "" : f.end.slice(11, 16);
+        repeat.value = f.repeat?.freq ?? "";
+        weekdays.values = f.repeat?.days ?? [];
+        repeatUntil.text = f.repeat?.until ?? "";
+        repeatCount.text = f.repeat?.count ? String(f.repeat.count) : "";
+        colorPick.value = f.color ?? "";
+        location.text = f.location ?? "";
+        description.text = f.description ?? "";
+        reminder.value = f.reminders === null ? -1 : f.reminders.length === 0 ? -2 : (CalendarConfig.reminderChoices.includes(f.reminders[0]) ? f.reminders[0] : -1);
+        calendar.value = editing.calendar;
+        message = "";
+    }
+
+    function remove() {
+        if (!editing || (editing.id ?? "") === "")
+            return;
+        if (!confirmDelete) {
+            confirmDelete = true;
+            return;
+        }
+        confirmDelete = false;
+        message = "Deleting…";
+        GoogleCalendar.remove(editing);
+    }
 
     // The event for gcal.py, or a string saying what is wrong.
     function build() {
@@ -101,6 +163,9 @@ Column {
             }
         }
         if (full) {
+            // Editing: "Never" removes a repeat the event had (not for a single occurrence).
+            if (editing && editing.scope === "all")
+                ev.repeat = null;
             if (repeat.value !== "") {
                 ev.repeat = {
                     freq: repeat.value
@@ -143,7 +208,10 @@ Column {
             return;
         }
         message = "Saving…";
-        GoogleCalendar.add(ev);
+        if (editing)
+            GoogleCalendar.update(editing, ev);
+        else
+            GoogleCalendar.add(ev);
     }
 
     Connections {
@@ -154,6 +222,23 @@ Column {
                 calendar.value = GoogleCalendar.calendars.find(c => c.primary)?.id ?? GoogleCalendar.calendars[0]?.id ?? "primary";
         }
         function onAdded(ok, text) {
+            if (root.editing)
+                return;
+            root.message = ok ? "" : text;
+            if (ok)
+                root.done();
+        }
+        function onLoaded(fields) {
+            if (!root.editing)
+                return;
+            if (fields)
+                root.fill(fields);
+            else
+                root.message = GoogleCalendar.error || "Could not load the event";
+        }
+        function onChanged(ok, text) {
+            if (!root.editing)
+                return;
             root.message = ok ? "" : text;
             if (ok)
                 root.done();
@@ -171,6 +256,26 @@ Column {
         visible: GoogleCalendar.connected
         width: parent.width
         spacing: 10
+
+        // Editing a repeating event: change this occurrence or the whole series (reloads the form).
+        Chips {
+            id: scopeChips
+            visible: root.editing?.recurring ?? false
+            width: parent.width
+            value: root.editing?.scope ?? "this"
+            options: [
+                {
+                    label: "This event",
+                    value: "this"
+                },
+                {
+                    label: "All events",
+                    value: "all"
+                }
+            ]
+            onValueChanged: if (root.editing && value !== root.editing.scope)
+                root.edit(root.editing.source, value)
+        }
 
         Field {
             id: title
@@ -212,13 +317,15 @@ Column {
             spacing: 10
 
             Label {
-                visible: GoogleCalendar.calendars.length > 0
+                visible: GoogleCalendar.calendars.length > 0 && !root.editing
                 text: "Calendar"
                 font.pixelSize: Appearance.fontSize - 2
                 color: Theme.dim
             }
             Chips {
                 id: calendar
+                // An event stays in its calendar when edited.
+                visible: !root.editing
                 width: parent.width
                 options: GoogleCalendar.calendars.map(c => ({
                             label: c.name,
@@ -287,13 +394,16 @@ Column {
                 }
             }
 
+            // One occurrence of a repeating event has no repeat of its own.
             Label {
+                visible: root.editing?.scope !== "this" || !root.editing?.recurring
                 text: "Repeat"
                 font.pixelSize: Appearance.fontSize - 2
                 color: Theme.dim
             }
             Chips {
                 id: repeat
+                visible: root.editing?.scope !== "this" || !root.editing?.recurring
                 width: parent.width
                 value: ""
                 options: [
@@ -483,6 +593,7 @@ Column {
         Row {
             spacing: 8
             CcTextButton {
+                visible: !root.editing
                 implicitHeight: 32
                 text: root.full ? "Fewer options" : "More options"
                 onClicked: {
@@ -493,20 +604,27 @@ Column {
             }
             CcTextButton {
                 implicitHeight: 32
-                text: GoogleCalendar.busy ? "Saving…" : "Save"
+                text: GoogleCalendar.busy && root.message === "Saving…" ? "Saving…" : "Save"
                 primary: true
-                enabled: !GoogleCalendar.busy
+                enabled: !GoogleCalendar.busy && !root.loading
                 onClicked: root.save()
+            }
+            CcTextButton {
+                visible: root.editing !== null
+                implicitHeight: 32
+                text: root.confirmDelete ? (root.editing?.scope === "all" && root.editing?.recurring ? "Delete every occurrence?" : "Delete it?") : root.editing?.scope === "all" && root.editing?.recurring ? "Delete all" : "Delete"
+                enabled: !GoogleCalendar.busy && !root.loading
+                onClicked: root.remove()
             }
         }
 
         Label {
-            visible: root.message !== "" && root.message !== "Saving…"
+            visible: root.message !== "" && !["Saving…", "Deleting…"].includes(root.message)
             width: parent.width
             wrapMode: Text.WordWrap
             text: root.message
             font.pixelSize: Appearance.fontSize - 2
-            color: Theme.danger
+            color: root.message === "Loading…" ? Theme.dim : Theme.danger
         }
     }
 }

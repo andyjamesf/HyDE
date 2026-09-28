@@ -273,7 +273,15 @@ def to_local(d):
     return d.astimezone(LOCAL) if isinstance(d, datetime) else d
 
 
+def google_calendar_id(cal):
+    """The Google calendar id in a Google "secret address in iCal format", or "" (other links)."""
+    src = cal.get("url") or ""
+    m = re.search(r"calendar\.google\.com/calendar/ical/([^/]+)/", src)
+    return urllib.parse.unquote(m.group(1)) if m else ""
+
+
 def expand(events, window_start, window_end, cal):
+    google = google_calendar_id(cal)
     overrides = {(e.get("uid"), e["recurrenceId"]): e for e in events if "recurrenceId" in e}
     out = []
     for e in events:
@@ -289,6 +297,8 @@ def expand(events, window_start, window_end, cal):
         starts = occurrences(start, e["rrule"], window_end) if "rrule" in e else [start]
         for s in starts:
             k = key_of(s)
+            # Google names one occurrence of a repeating event "<id>_<original start>".
+            original = k + ("Z" if isinstance(s, datetime) else "")
             if k in e["exdates"]:
                 continue
             item = overrides.get((e.get("uid"), k))
@@ -314,6 +324,11 @@ def expand(events, window_start, window_end, cal):
                 "end": le.isoformat(),
                 "calendar": cal.get("name", ""),
                 "color": cal.get("color", ""),
+                # Editing and deleting (Google calendars only): scripts/gcal.py finds it by these.
+                "uid": e.get("uid", ""),
+                "recurring": "rrule" in e,
+                "originalStart": original,
+                "googleCalendar": google,
             })
     return out
 

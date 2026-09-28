@@ -23,7 +23,7 @@ pacman = [
 action = "sync"
 source_root = "Configs/.config/morphing-island"
 target_root = "${XDG_CONFIG_HOME}/morphing-island"
-paths = ["shell.qml", "README.md", "components", "core", "icons", "scripts", "services", "theme"]
+paths = ["shell.qml", "README.md", "components", "core", "icons", "scripts", "services", "sddm", "theme"]
 
 # The user's settings (one documented file per area): only copied when missing, never overwritten.
 [[morphing-island.files]]

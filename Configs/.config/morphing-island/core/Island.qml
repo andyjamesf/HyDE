@@ -18,7 +18,7 @@ IslandSurface {
 
     // Content of the current mode (the target of the shape).
     readonly property Item content: slots.find(s => s.current)?.item ?? null
-    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot, calendarSlot]
+    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, screenshotSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot, calendarSlot, agentSlot]
     // Modes that share the control center's content (the pages slide inside it).
     readonly property var controlModes: [IslandState.controlCenter].concat(IslandState.subviews)
 
@@ -87,6 +87,13 @@ IslandSurface {
         current: island.mode === mode
         // Reads the notification from IslandController.payload.
         sourceComponent: NotificationView {}
+    }
+    ModeSlot {
+        id: screenshotSlot
+        mode: IslandState.screenshot
+        current: island.mode === mode
+        // Reads the capture from services/Screenshot.qml.
+        sourceComponent: ScreenshotView {}
     }
     ModeSlot {
         id: launcherSlot
@@ -185,6 +192,15 @@ IslandSurface {
         focus: current
         sourceComponent: AuthView {
             open: authSlot.current
+        }
+    }
+    ModeSlot {
+        id: agentSlot
+        mode: IslandState.agent
+        current: island.mode === mode
+        focus: current
+        sourceComponent: AgentView {
+            open: agentSlot.current
         }
     }
 }

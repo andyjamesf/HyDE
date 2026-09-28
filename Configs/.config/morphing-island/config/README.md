@@ -24,6 +24,7 @@ what it does, its unit, a sensible range and the default.
 | `ThemeConfig.qml` | default palette, island opacity, border and shadow strength, WCAG contrast targets, theme transition |
 | `WallpapersConfig.qml` | wallpaper folders (with `{theme}`, `{pictures}`, `{hydeConfig}` placeholders), extensions, minimum size, polling |
 | `LockScreenConfig.qml` | lock card size/padding/radius/offset, clock and avatar size, avatar path, password field size, blur and veil, PAM service, error and release timings |
+| `LoginScreenConfig.qml` | login screen (SDDM theme in `sddm/`): keep it in sync with the island, how often the wallpaper is checked. Install: `island login install` |
 | `Power.qml` | power menu actions (id, label, glyph, command, confirm), confirm timeout, tile size |
 | `PolkitConfig.qml` | polkit dialog: attempts per request, failure notice time, arm delay |
 | `SettingsScreen.qml` | Settings screen: size, slider ranges, save debounce, which keys "Reset to defaults" removes |

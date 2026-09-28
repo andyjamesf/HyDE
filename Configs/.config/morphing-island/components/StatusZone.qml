@@ -10,7 +10,8 @@ import qs.theme
 // screen's right edge (StatusPillConfig.icons). Ids: "volume", "bluetooth", "wifi", "battery",
 // "caffeine" (dim when off, accent when on), "notifications" (bell with the unread count; crossed
 // out in peace mode), "power" (the power menu), "ai" (AI usage: the symbol, coloured by the tool
-// closest to its limit; a click shows the numbers). With `extras`, shortcut buttons fill the free space on their left.
+// closest to its limit; a click shows the numbers), "updates" (only while updates wait, with their
+// number; a click opens the update in a terminal). With `extras`, shortcut buttons fill the free space on their left.
 // Every icon is a button; resting the pointer on one shows what it does. Actions and hints:
 // services/Shortcuts.qml.
 Item {
@@ -80,7 +81,8 @@ Item {
             caffeine: caffeineIcon,
             notifications: notificationsIcon,
             power: powerIcon,
-            ai: aiIcon
+            ai: aiIcon,
+            updates: updatesIcon
         })
 
     // Icons that only show when they have something to say (a hidden icon takes no space in the row).
@@ -89,6 +91,8 @@ Item {
             return alwaysShowBell || Notifications.count > 0 || Notifications.peaceMode;
         if (id === "ai")
             return AiUsage.available;
+        if (id === "updates")
+            return Updates.count > 0;
         return id === "bluetooth" ? Bluetooth.available : id === "battery" ? Battery.available : true;
     }
 
@@ -320,6 +324,29 @@ Item {
             font.pixelSize: Math.round(root.iconSize * 0.95)
             elide: Text.ElideNone
             color: AiUsage.worst === "high" ? Theme.danger : AiUsage.worst === "mid" ? Theme.accent : Theme.icon
+        }
+    }
+
+    // Updates waiting (services/Updates.qml): package symbol and their number.
+    Component {
+        id: updatesIcon
+
+        Row {
+            spacing: 3
+
+            Label {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "\u{F0BAF}"
+                font.family: Appearance.nerdFont
+                font.pixelSize: Math.round(root.iconSize * 0.95)
+                elide: Text.ElideNone
+                color: Updates.updating ? Theme.accent : Theme.icon
+            }
+            Label {
+                anchors.verticalCenter: parent.verticalCenter
+                text: String(Updates.count)
+                font.pixelSize: Appearance.fontSize - 1
+            }
         }
     }
 

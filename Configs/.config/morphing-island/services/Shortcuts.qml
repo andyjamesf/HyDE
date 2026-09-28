@@ -41,6 +41,8 @@ Singleton {
             return "Lock screen";
         case "power":
             return "Power menu";
+        case "updates":
+            return `Updates: ${Updates.count} (${Updates.summary})`;
         case "ai":
             return `AI usage\n${AiUsage.summary}`;
         }
@@ -62,6 +64,8 @@ Singleton {
             Caffeine.toggle();
         else if (id === "power")
             IslandController.open(IslandState.power);
+        else if (id === "updates")
+            Updates.open();
         else if (id === "ai") {
             // Fresh numbers, shown under the icon for a while (they fill in as they arrive).
             AiUsage.refresh();
@@ -78,7 +82,7 @@ Singleton {
         if (id === "nightlight")
             NightLight.toggle();
         else if (id === "screenshot")
-            Launch.run(["hyde-shell", "screenshot", "s"]);
+            Screenshot.take("area");
         else if (id === "picker")
             Launch.run(["hyprpicker", "-an"]);
         else if (id === "clipboard") {

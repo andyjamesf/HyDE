@@ -81,6 +81,10 @@ Singleton {
 
     // An event was created (ok) or refused (the text says why).
     signal added(bool ok, string text)
+    // An event to edit arrived (load): the form's fields plus "id"; or `error` says why not.
+    signal loaded(var fields)
+    // An event was changed or deleted (ok) or refused.
+    signal changed(bool ok, string text)
 
     function colorOf(id) {
         return eventColors.find(c => c.id === String(id))?.color ?? "";
@@ -118,6 +122,27 @@ Singleton {
         _pendingEvent = event;
         _run("add", ["add", JSON.stringify(event)]);
     }
+
+    // Editing (the calendar view's events from Google calendars, see Calendar.editable):
+    // `event` from the calendar view ({ googleCalendar, uid, originalStart, … }); scope "this" (one
+    // occurrence of a repeating event) or "all".
+    function load(event, scope) {
+        error = "";
+        _run("get", ["get", event.googleCalendar, event.uid, event.originalStart || "", scope]);
+    }
+    // `target`: { calendar, id, uid, originalStart, scope }; `event` as for add.
+    function update(target, event) {
+        error = "";
+        _target = target;
+        _pendingEvent = event;
+        _run("update", ["update", target.calendar, target.id, JSON.stringify(event)]);
+    }
+    function remove(target) {
+        error = "";
+        _target = target;
+        _run("delete", ["delete", target.calendar, target.id]);
+    }
+    property var _target: null
 
     property var _pendingEvent: null
     property var _queue: []
@@ -160,6 +185,23 @@ Singleton {
             } else {
                 Calendar.addPending(_pendingEvent, colorOf(_pendingEvent.color) || (calendars.find(c => c.id === _pendingEvent.calendar)?.color ?? ""));
                 added(true, `Added "${_pendingEvent.title}" to Google Calendar`);
+            }
+        } else if (kind === "get") {
+            if (err)
+                error = err;
+            loaded(err ? null : r);
+        } else if (kind === "update" || kind === "delete") {
+            if (err) {
+                error = err;
+                changed(false, err);
+            } else {
+                // The old version goes away at once; an edited one shows with its changes.
+                Calendar.hideEvent(_target.uid, _target.scope === "all" ? "" : _target.originalStart);
+                if (kind === "update")
+                    Calendar.addPending(_pendingEvent, colorOf(_pendingEvent.color) || (calendars.find(c => c.id === _target.calendar)?.color ?? ""));
+                else
+                    Calendar.refresh(true);
+                changed(true, kind === "update" ? `Saved "${_pendingEvent.title}"` : "Deleted");
             }
         } else if (err) {
             error = err;

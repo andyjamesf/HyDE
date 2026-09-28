@@ -22,15 +22,22 @@ if pkg_installed sddm; then
     fi
     if [ ! -f /etc/sddm.conf.d/backup_the_hyde_project.conf ] || [ "${HYDE_INSTALL_SDDM}" = true ]; then
         print_log -g "[DISPLAYMANAGER] " -b " :: " "configuring sddm..."
-        print_log -g "[DISPLAYMANAGER] " -b " :: " "Select sddm theme:" -r "\n[1]" -b " Candy" -r "\n[2]" -b " Corners"
+        print_log -g "[DISPLAYMANAGER] " -b " :: " "Select sddm theme:" -r "\n[1]" -b " Morphing Island (default: the island's lock screen, kept in sync with it)" -r "\n[2]" -b " Candy" -r "\n[3]" -b " Corners"
         read -p " :: Enter option number : " -r sddmopt
 
         case $sddmopt in
-        1) sddmtheme="Candy" ;;
-        *) sddmtheme="Corners" ;;
+        2) sddmtheme="Candy" ;;
+        3) sddmtheme="Corners" ;;
+        *) sddmtheme="MorphingIsland" ;;
         esac
 
-        if [[ ${flg_DryRun} -ne 1 ]]; then
+        if [[ ${flg_DryRun} -ne 1 && ${sddmtheme} == "MorphingIsland" ]]; then
+            # The theme ships with the island (sddm/); it gets the island's colours and wallpaper at
+            # the first login. Undo: island login uninstall
+            sudo touch /etc/sddm.conf.d/the_hyde_project.conf
+            sudo cp /etc/sddm.conf.d/the_hyde_project.conf /etc/sddm.conf.d/backup_the_hyde_project.conf
+            python3 "${XDG_CONFIG_HOME:-$HOME/.config}/morphing-island/scripts/sddm.py" install
+        elif [[ ${flg_DryRun} -ne 1 ]]; then
             sudo tar -xzf "${cloneDir}/Source/arcs/Sddm_${sddmtheme}.tar.gz" -C /usr/share/sddm/themes/
             sudo touch /etc/sddm.conf.d/the_hyde_project.conf
             sudo cp /etc/sddm.conf.d/the_hyde_project.conf /etc/sddm.conf.d/backup_the_hyde_project.conf

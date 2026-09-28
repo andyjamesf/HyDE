@@ -1,15 +1,14 @@
 -- ============================================================================
 -- Keybindings: the ones this setup adds or changes on top of HyDE's defaults
 -- ============================================================================
--- This file only holds data; HyDE's lua/morphing_island.lua reads it and creates the binds.
--- It is yours: HyDE updates never overwrite it.
+-- This file only holds data; ~/.config/hypr/hyprland.lua reads it and creates the binds.
 -- After editing, run `hyprctl reload` (then `hyprctl configerrors` must print nothing).
--- Super+/ (or Super+\) lists every active keybinding, including HyDE's own.
+-- Super+\ lists every active keybinding, including HyDE's own.
 --
 -- Writing keys
 --   "$mod + SHIFT + T"   $mod is HyDE's main modifier (SUPER). Modifiers: SUPER, SHIFT, CTRL, ALT.
 --   Key names are xkb names: A…Z, 1…9, Return, TAB, Delete, comma, period, backslash, Up, Left…
---   Some layouts (e.g. Portuguese) need Shift for "/", so keys on "/" also have a "\" twin.
+--   On a Portuguese keyboard "/" is Shift+7, so use backslash instead of slash.
 --
 -- Where HyDE's default binds come from
 --   Workspaces, window management, media keys, screenshots… are defined by HyDE in
@@ -33,7 +32,6 @@ M.shell = {
 	{ keys = "$mod + A", island = "open launcher", hyde = "qs ipc call launcher toggle", desc = "[Launcher] application finder" },
 	{ keys = "$mod + V", island = "launcher ':'", hyde = "qs ipc call launcher clipboard", desc = "[Launcher] clipboard" },
 	{ keys = "$mod + SHIFT + K", island = "launcher '='", hyde = "qs ipc call launcher calc", desc = "[Launcher] calculator" },
-	{ keys = "$mod + slash", island = "launcher '?'", hyde = "qs ipc call launcher keys", desc = "[Launcher] keybindings" },
 	{ keys = "$mod + backslash", island = "launcher '?'", hyde = "qs ipc call launcher keys", desc = "[Launcher] keybindings" },
 
 	-- Control center, notifications, island settings.
@@ -51,7 +49,6 @@ M.shell = {
 	{ keys = "$mod + SHIFT + E", island = "pick files", hyde = "qs ipc call launcher pick files", desc = "[Launcher|Pickers] file finder" },
 	{ keys = "$mod + period", island = "pick glyph", hyde = "qs ipc call launcher pick glyph", desc = "[Launcher|Pickers] glyph picker" },
 	{ keys = "$mod + SHIFT + comma", island = "pick emoji", hyde = "qs ipc call launcher pick emoji", desc = "[Launcher|Pickers] emoji picker" },
-	{ keys = "$mod + SHIFT + slash", island = "pick web", hyde = "qs ipc call launcher pick web", desc = "[Launcher|Pickers] web search" },
 	{ keys = "$mod + SHIFT + backslash", island = "pick web", hyde = "qs ipc call launcher pick web", desc = "[Launcher|Pickers] web search" },
 	{ keys = "$mod + SHIFT + R", island = "pick wallbash", hyde = "qs ipc call launcher pick wallbash", desc = "[Theming and Wallpaper] wallbash mode selector" },
 	{ keys = "$mod + SHIFT + Y", island = "pick animations", hyde = "qs ipc call launcher pick animations", desc = "[Theming and Wallpaper] select animations" },
@@ -69,6 +66,13 @@ M.shell = {
 	-- Bar layouts only exist in the HyDE shell.
 	{ keys = "$mod + ALT + Up", island = nil, hyde = "qs ipc call bar next", desc = "[Theming and Wallpaper] next bar layout" },
 	{ keys = "$mod + ALT + Down", island = nil, hyde = "qs ipc call bar prev", desc = "[Theming and Wallpaper] previous bar layout" },
+
+	-- Screenshots: the island shows the capture with Copy, Save, Edit and Delete (HyDE's shell: HyDE's
+	-- script, which opens satty). OCR ($mod+CTRL+S) stays HyDE's.
+	{ keys = "$mod + P", island = "screenshot area", hyde = "hyde-shell screenshot s", desc = "[Utilities] partial screenshot capture" },
+	{ keys = "$mod + CTRL + P", island = "screenshot freeze", hyde = "hyde-shell screenshot sf", desc = "[Utilities] partial screenshot capture (frozen screen)" },
+	{ keys = "$mod + ALT + P", island = "screenshot output", hyde = "hyde-shell screenshot m", desc = "[Utilities] print monitor" },
+	{ keys = "Print", island = "screenshot screen", hyde = "hyde-shell screenshot p", desc = "[Utilities] print all monitors" },
 
 	-- Session: the power menu asks before logging out, rebooting or powering off.
 	-- ($mod+Delete used to exit Hyprland instantly; it now opens the same menu.)
@@ -106,8 +110,32 @@ M.binds = {
 -- ----------------------------------------------------------------------------
 -- Removed before the binds above are added, so a key listed in both is reassigned.
 M.unbind = {
+	"$mod + slash", -- keybindings list: moved to $mod+backslash ("/" is Shift+7 on pt keyboards)
+	"$mod + SHIFT + slash", -- web search: moved to $mod+SHIFT+backslash
 	"$mod + ALT + T", -- dropdown terminal: needs pyprland, not installed (the key would install it)
 	"$mod + ALT + G", -- HyDE's game mode: reassigned above
+	-- HyDE's screenshot keys: reassigned above (routed to the island).
+	"$mod + P",
+	"$mod + CONTROL + P", -- written as HyDE writes it (CTRL does not match)
+	"$mod + ALT + P",
+	"Print",
+	-- Bare F10/F11/F12 change the volume in HyDE; they are taken back for apps (fullscreen, devtools).
+	-- The volume keys (XF86Audio…) still work.
+	"F10",
+	"F11",
+	"F12",
 }
+
+-- Nine workspaces: HyDE's key 0 (workspace 10) and the numpad (workspaces 11-20) are removed, for
+-- going to a workspace ($mod), moving a window there ($mod+SHIFT) and moving it silently ($mod+ALT).
+-- Each numpad key has two names (Num Lock on/off).
+for _, prefix in ipairs({ "$mod + ", "$mod + SHIFT + ", "$mod + ALT + " }) do
+	table.insert(M.unbind, prefix .. "0")
+end
+for _, key in ipairs({ "KP_1", "KP_End", "KP_2", "KP_Down", "KP_3", "KP_Next", "KP_4", "KP_Left", "KP_5",
+	"KP_Begin", "KP_6", "KP_Right", "KP_7", "KP_Home", "KP_8", "KP_Up", "KP_9", "KP_Prior", "KP_0", "KP_Insert" }) do
+	table.insert(M.unbind, "$mod + " .. key)
+	table.insert(M.unbind, "$mod + SHIFT + " .. key)
+end
 
 return M

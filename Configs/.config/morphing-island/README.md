@@ -17,11 +17,11 @@ island off      # back to the HyDE shell (bar, notifications, polkit agent)
 island toggle
 island status   # "island" or "hyde"
 island ipc <function> [args]    # e.g. island ipc open launcher
+island login install            # the login screen (SDDM) in the island's style (asks for sudo)
 ```
 
 The choice is stored in `~/.local/state/morphing-island/active`, so it survives logins and
-`hyprctl reload`. `Super+Alt+I` toggles it too. On login HyDE's `lua/morphing_island.lua` starts
-whichever shell is active.
+`hyprctl reload`. On login `hyprland.lua` starts whichever shell is active.
 
 Run by hand: `qs -p ~/.config/morphing-island` (a named config via `qs -c` is not possible while
 `~/.config/quickshell/shell.qml` exists: Quickshell then ignores its subfolders).
@@ -69,7 +69,7 @@ back or closes; clicking outside closes. The mouse only selects after it really 
 
 The same `Super` binds serve both shells: each one goes to whichever is active. They are configured in
 **`~/.config/hypr/keybinds.lua`** (documented there: add, move or remove a bind, or override one of
-HyDE's defaults); HyDE's `lua/morphing_island.lua` only reads that file. Run `hyprctl reload` after editing it.
+HyDE's defaults); `hyprland.lua` only reads that file. Run `hyprctl reload` after editing it.
 
 | Keys | Island | HyDE shell |
 |---|---|---|
@@ -78,8 +78,8 @@ HyDE's defaults); HyDE's `lua/morphing_island.lua` only reads that file. Run `hy
 | `Super+Shift+K` | calculator | calculator |
 | `Super+Alt+C`, `Super+N` | control center | control center / notifications |
 | `Super+Shift+T` / `Super+Shift+W` | theme / wallpaper pickers | HyDE's pickers |
-| `Super+/`, `Super+\` | keybindings list | keybindings list |
-| `Super+Tab`, `Super+Shift+E`, `Super+.`, `Super+Shift+,`, `Super+Shift+/` or `Super+Shift+\`, `Super+Shift+R/Y/U/G` | island pickers | HyDE's rofi menus |
+| `Super+\` | keybindings list | keybindings list |
+| `Super+Tab`, `Super+Shift+E`, `Super+.`, `Super+Shift+,`, `Super+Shift+\`, `Super+Shift+R/Y/U/G` | island pickers | HyDE's rofi menus |
 | `Super+Shift+A` | HyDE menus (all pickers) | HyDE's rofi selector |
 | `Super+Alt+I` | switch to the HyDE shell | switch to the island |
 | `Super+,`, `Super+Ctrl+B` | hide/show the pill | hide/show the bar |
@@ -121,6 +121,24 @@ services/       audio, brightness, network, Bluetooth, battery, media, notificat
                 Prefs (user overrides), Paths (XDG directories)
 theme/          Theme (roles, contrast, transitions) and Palettes
 ```
+
+## Login screen (SDDM)
+
+`sddm/` is an SDDM theme that copies the lock screen: the blurred wallpaper with a veil, and the
+clock pill at the top growing into the same card (time, date, avatar, name, password pill). Below
+it, a small pill with the session (click or Tab for the next) and suspend / restart / power off.
+With more than one user, arrows beside the name (or Up/Down) switch between them.
+
+```sh
+island login install     # install in /usr/share/sddm/themes/morphing-island and make it SDDM's (sudo)
+island login test        # preview it in a window
+island login uninstall   # back to the previous theme (HyDE's /etc/sddm.conf.d files are never touched)
+```
+
+After `install` the theme folder belongs to you, so the island keeps it in sync without sudo
+(services/SddmTheme.qml → `scripts/sddm.py sync`): colours, font, clock format, the lock card sizes,
+the wallpaper (checked every 30 s) and `~/.face`. SDDM's user cannot read your home, which is why
+these are copied into the theme folder. Options: `config/LoginScreenConfig.qml`.
 
 ## Google Calendar (adding events)
 

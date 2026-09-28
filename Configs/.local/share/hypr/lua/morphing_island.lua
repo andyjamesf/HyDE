@@ -69,6 +69,9 @@ if MorphingIsland.active() then
 	hyde.config.start.bar = "hyde-shell app -u morphing-island.service -t service -- qs -p "
 		.. home .. "/.config/morphing-island"
 	hyde.config.start.auth_dialogue = ""
+	-- The island also answers Wi-Fi passwords and Bluetooth pairing (scripts/agents.py).
+	hyde.config.start.applet_network_manager = ""
+	hyde.config.start.applet_bluetooth = ""
 end
 
 -- Hyprland's own "what's new" and donation windows don't match the desktop's design.

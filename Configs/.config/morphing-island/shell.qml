@@ -5,6 +5,7 @@ import Quickshell.Io
 import qs.core
 import qs.config
 import qs.services
+import qs.theme
 
 // Morphing Island: a single floating island at the top of each screen that turns into a clock,
 // an expanded bar, OSDs, notifications, the launcher, the control center, etc.
@@ -15,6 +16,19 @@ ShellRoot {
     readonly property int notificationCount: Notifications.count
     // The polkit agent must exist from startup (it registers with polkitd).
     readonly property bool polkitRegistered: Polkit.registered
+    // Wi-Fi and Bluetooth agent (scripts/agents.py) from startup.
+    readonly property var agentRequests: Agents.queue
+    // The login screen (SDDM) follows the island's colours and wallpaper from startup.
+    Binding {
+        target: SddmTheme
+        property: "roles"
+        value: Theme.targetRoles
+    }
+    Binding {
+        target: SddmTheme
+        property: "islandOpacity"
+        value: Theme.islandOpacity
+    }
 
     Variants {
         model: Quickshell.screens
@@ -91,6 +105,17 @@ ShellRoot {
         }
         // Night light (hyprsunset through HyDE's script); toggles. Returns "turning on" or "turning off"
         // (HyDE's state file, and so NightLight.active, updates a moment later).
+        // Takes a screenshot and shows it in the island (Copy, Save, Edit, Delete): "area",
+        // "freeze" (area on a frozen screen), "output" (focused monitor) or "screen" (all).
+        function screenshot(mode: string): void {
+            Screenshot.take(mode);
+        }
+        // Brings the login screen (SDDM theme) up to date with the island now; returns the result.
+        // Normally automatic (services/SddmTheme.qml).
+        function sddmSync(): string {
+            SddmTheme.sync();
+            return SddmTheme.lastResult ? JSON.stringify(SddmTheme.lastResult) : "syncing";
+        }
         function nightlight(): string {
             NightLight.toggle();
             return NightLight.active ? "turning off" : "turning on";
@@ -132,6 +157,48 @@ ShellRoot {
     // Test/diagnostic hooks (read-only or harmless): qs -p ~/.config/morphing-island ipc call island-debug <function>
     IpcHandler {
         target: "island-debug"
+
+        // Opens the calendar and the first editable event on a day (YYYY-MM-DD) in the edit form
+        // (only loads it; nothing is saved). Returns its title or "none".
+        function calendarEditFirst(day: string): string {
+            const d = Calendar.parseDate(day, true);
+            const e = Calendar.eventsOn(d).find(x => Calendar.editable(x));
+            if (!e)
+                return "none";
+            if (IslandController.mode !== IslandState.calendar)
+                IslandController.open(IslandState.calendar);
+            Qt.callLater(() => Calendar.editRequest = e);
+            return e.title;
+        }
+
+        // Checks for updates now (the icon updates when done).
+        function updatesRefresh(): void {
+            Updates.refresh();
+        }
+
+        // Shows a fake Wi-Fi/Bluetooth request (JSON as scripts/agents.py prints it, e.g.
+        // {"type":"confirm","id":9999,"name":"Test","code":"123456"}); its answer goes to the agent,
+        // which ignores unknown ids.
+        function agentRequest(json: string): void {
+            Agents._receive(json);
+        }
+        // The Wi-Fi/Bluetooth requests waiting, as JSON.
+        function agentQueue(): string {
+            return JSON.stringify(Agents.queue);
+        }
+
+        // Runs a button of the screenshot preview: copy, save, edit, discard.
+        function screenshotAction(name: string): string {
+            if (!["copy", "save", "edit", "discard"].includes(name))
+                return "unknown";
+            Screenshot[name]();
+            return Screenshot.savedPath || Screenshot.file || "done";
+        }
+
+        // The values the login screen (SDDM) gets from the island, as JSON.
+        function sddmValues(): string {
+            return JSON.stringify(SddmTheme.values);
+        }
 
         // Pretends the pointer is over the island of the focused screen (tests without a mouse).
         function hover(on: bool): void {

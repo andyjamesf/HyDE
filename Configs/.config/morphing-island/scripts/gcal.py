@@ -27,6 +27,12 @@ Commands (each prints one line of JSON; errors as {"error": "..."}):
         reminders    [minutes, …] popups before the start (optional: the calendar's defaults;
                      [] = none)
       → {"id", "link"}
+    gcal.py get CAL UID ORIGINAL this|all
+                                   an event as the form's fields (+ "id"), found by its iCal UID:
+                                   "all" = the event (the whole series), "this" = the occurrence
+                                   starting at ORIGINAL (20260927T170000Z, or 20260927 all day)
+    gcal.py update CAL ID JSON     changes an event (fields as for add; emptied ones are cleared)
+    gcal.py delete CAL ID          deletes an event (an occurrence id deletes only that one)
 
 No dependencies outside Python's standard library.
 """
@@ -132,7 +138,8 @@ def api(method, path, body=None):
                                           "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return json.load(r)
+            data = r.read()
+            return json.loads(data) if data else {}
     except urllib.error.HTTPError as e:
         try:
             detail = json.load(e)["error"]["message"]
@@ -244,11 +251,15 @@ def local_zone_name():
         return "UTC"
 
 
-def cmd_add(raw):
+def parse_event(raw):
     try:
-        e = json.loads(raw)
+        return json.loads(raw)
     except ValueError:
         fail("Bad event data")
+
+
+def build_body(e, editing=False):
+    """Google's event body from the form's fields. Editing: emptied fields are cleared too."""
     title = str(e.get("title", "")).strip()
     if not title:
         fail("The event needs a title")
@@ -274,13 +285,15 @@ def cmd_add(raw):
         end = {"dateTime": t.isoformat(timespec="seconds"), "timeZone": zone}
     body = {"summary": title, "start": start, "end": end}
     for k_in, k_out in (("location", "location"), ("description", "description")):
-        if str(e.get(k_in, "")).strip():
-            body[k_out] = str(e[k_in]).strip()
-    if e.get("color"):
-        body["colorId"] = str(e["color"])
+        if str(e.get(k_in, "")).strip() or editing:
+            body[k_out] = str(e.get(k_in, "")).strip()
+    if e.get("color") or editing:
+        body["colorId"] = str(e.get("color") or "") or None
     if isinstance(e.get("reminders"), list):
         body["reminders"] = {"useDefault": False,
                              "overrides": [{"method": "popup", "minutes": int(m)} for m in e["reminders"][:5]]}
+    elif editing:
+        body["reminders"] = {"useDefault": True}
     rep = e.get("repeat")
     if rep and rep.get("freq") in ("DAILY", "WEEKLY", "MONTHLY", "YEARLY"):
         parts = [f"FREQ={rep['freq']}"]
@@ -296,9 +309,74 @@ def cmd_add(raw):
             except ValueError:
                 fail("The repeat end date must look like 2026-12-31")
         body["recurrence"] = ["RRULE:" + ";".join(parts)]
-    cal = urllib.parse.quote(str(e.get("calendar") or "primary"), safe="")
-    made = api("POST", f"/calendars/{cal}/events", body)
+    elif editing and "repeat" in e:
+        body["recurrence"] = []
+    return body
+
+
+def cal_path(calendar):
+    return "/calendars/" + urllib.parse.quote(str(calendar or "primary"), safe="")
+
+
+def cmd_add(raw):
+    e = parse_event(raw)
+    made = api("POST", cal_path(e.get("calendar")) + "/events", build_body(e))
     out({"id": made.get("id", ""), "link": made.get("htmlLink", "")})
+
+
+def find_event(calendar, uid, original="", only_this=False):
+    """The event behind an iCal UID (the series for repeating ones), or with `only_this` the one
+    occurrence starting at `original` (as the iCal feed names it: 20260927T170000Z or 20260927)."""
+    items = api("GET", cal_path(calendar) + "/events?" + urllib.parse.urlencode({"iCalUID": uid, "showDeleted": "false"})).get("items", [])
+    series = next((i for i in items if not i.get("recurringEventId")), None) or (items[0] if items else None)
+    if series is None:
+        fail("That event is not in this Google calendar (read-only, or already deleted)")
+    if only_this and series.get("recurrence"):
+        return api("GET", cal_path(calendar) + "/events/" + urllib.parse.quote(f"{series['id']}_{original}", safe=""))
+    return series
+
+
+def form_fields(ev):
+    """Google's event → the form's fields (dates and times local)."""
+    all_day = "date" in ev.get("start", {})
+    if all_day:
+        start = ev["start"]["date"]
+        end = (date.fromisoformat(ev["end"]["date"]) - timedelta(days=1)).isoformat()
+    else:
+        start = datetime.fromisoformat(ev["start"]["dateTime"]).astimezone().strftime("%Y-%m-%dT%H:%M")
+        end = datetime.fromisoformat(ev["end"]["dateTime"]).astimezone().strftime("%Y-%m-%dT%H:%M")
+    rep = None
+    for rule in ev.get("recurrence", []):
+        if rule.startswith("RRULE:"):
+            parts = dict(p.split("=", 1) for p in rule[6:].split(";") if "=" in p)
+            rep = {"freq": parts.get("FREQ", ""), "interval": int(parts.get("INTERVAL", 1)),
+                   "days": parts["BYDAY"].split(",") if "BYDAY" in parts else [],
+                   "count": int(parts["COUNT"]) if "COUNT" in parts else 0,
+                   "until": (parts["UNTIL"][:4] + "-" + parts["UNTIL"][4:6] + "-" + parts["UNTIL"][6:8]) if "UNTIL" in parts else ""}
+    rem = ev.get("reminders", {})
+    return {"id": ev["id"], "title": ev.get("summary", ""), "allDay": all_day, "start": start, "end": end,
+            "location": ev.get("location", ""), "description": ev.get("description", ""), "color": ev.get("colorId", ""),
+            "repeat": rep, "reminders": None if rem.get("useDefault", True) else [o["minutes"] for o in rem.get("overrides", [])],
+            "recurringEventId": ev.get("recurringEventId", "")}
+
+
+def cmd_get(calendar, uid, original, scope):
+    out(form_fields(find_event(calendar, uid, original, scope == "this")))
+
+
+def cmd_update(calendar, event_id, raw):
+    e = parse_event(raw)
+    body = build_body(e, editing=True)
+    # One occurrence of a repeating event cannot carry its own repeat rule.
+    if "_" in event_id:
+        body.pop("recurrence", None)
+    made = api("PATCH", cal_path(calendar) + "/events/" + urllib.parse.quote(event_id, safe=""), body)
+    out({"id": made.get("id", ""), "link": made.get("htmlLink", "")})
+
+
+def cmd_delete(calendar, event_id):
+    api("DELETE", cal_path(calendar) + "/events/" + urllib.parse.quote(event_id, safe=""))
+    out({"deleted": event_id})
 
 
 def main():
@@ -316,8 +394,15 @@ def main():
         cmd_calendars()
     elif cmd == "add" and len(args) == 2:
         cmd_add(args[1])
+    elif cmd == "get" and len(args) == 5:
+        cmd_get(args[1], args[2], args[3], args[4])
+    elif cmd == "update" and len(args) == 4:
+        cmd_update(args[1], args[2], args[3])
+    elif cmd == "delete" and len(args) == 3:
+        cmd_delete(args[1], args[2])
     else:
-        fail("Usage: gcal.py status | set-client FILE | connect | disconnect | calendars | add JSON")
+        fail("Usage: gcal.py status | set-client FILE | connect | disconnect | calendars | add JSON"
+             " | get CALENDAR UID ORIGINAL_START this|all | update CALENDAR EVENT_ID JSON | delete CALENDAR EVENT_ID")
 
 
 if __name__ == "__main__":
