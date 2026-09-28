@@ -24,9 +24,9 @@ Singleton {
     // (workspaces, media playing) the right one gets as wide, and these appear next to the status
     // icons, as many as fit, in this order. Ids: "nightlight" (on/off), "screenshot" (select an
     // area), "clipboard", "picker" (colour picker), "wallpaper", "theme", "settings", "lock",
-    // "power". [] = none. Default ["nightlight", "screenshot", "clipboard", "picker", "wallpaper",
-    // "theme", "settings", "lock", "power"].
-    readonly property var extraButtons: ["nightlight", "screenshot", "clipboard", "picker", "wallpaper", "theme", "settings", "lock", "power"]
+    // "power" (already a status icon by default). [] = none. Default ["nightlight", "screenshot",
+    // "clipboard", "picker", "wallpaper", "theme", "settings", "lock"].
+    readonly property var extraButtons: ["nightlight", "screenshot", "clipboard", "picker", "wallpaper", "theme", "settings", "lock"]
     // Space between status icons in pixels. Default 10.
     readonly property int statusSpacing: 10
     // Status icon size as a fraction of Pill.height. 0–1, default 0.45.

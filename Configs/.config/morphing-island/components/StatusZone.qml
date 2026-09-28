@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.config
 import qs.core
 import qs.icons
@@ -7,12 +8,10 @@ import qs.theme
 
 // Status icons, right-aligned: the right zone of the expanded island and the status pill at the
 // screen's right edge (StatusPillConfig.icons). Ids: "volume", "bluetooth", "wifi", "battery",
-// "caffeine" (dim when off, accent when on), "notifications" (bell with the unread count; crossed out in peace
-// mode). Each icon is a button:
-//   volume        click: audio page · middle click: mute · scroll: volume
-//   bluetooth     click: Bluetooth page          wifi       click: network page
-//   notifications click: notification center (the control center, with the history)
-//   battery       click: control center          caffeine   click: turn caffeine on/off
+// "caffeine" (dim when off, accent when on), "notifications" (bell with the unread count; crossed
+// out in peace mode), "power" (the power menu). With `extras`, shortcut buttons fill the free space on their left.
+// Every icon is a button; resting the pointer on one shows what it does. Actions and hints:
+// services/Shortcuts.qml.
 Item {
     id: root
 
@@ -30,7 +29,7 @@ Item {
     // the free part of zoneWidth. They never widen the zone. [] = none (the status pill).
     property var extras: []
     readonly property real extraCell: iconSize + 2 * cellPadding + row.spacing
-    readonly property int extrasFit: Math.max(0, Math.min(extras.length, Math.floor((zoneWidth - row.implicitWidth - Expanded.statusSpacing) / extraCell)))
+    readonly property int extrasFit: Math.max(0, Math.min(extras.length, Math.floor((zoneWidth - row.implicitWidth) / extraCell)))
 
     // Nerd Font glyphs for the shortcuts that have no drawn icon.
     readonly property var extraGlyphs: ({
@@ -42,46 +41,15 @@ Item {
             settings: "\u{F0493}"
         })
 
-    // Click on a shortcut button.
-    function runExtra(id) {
-        // Capture tools: the island first shrinks back to the pill (and out of the picture).
-        if ((id === "screenshot" || id === "picker") && IslandController.pinned)
-            IslandController.togglePin();
-        if (id === "nightlight")
-            NightLight.toggle();
-        else if (id === "screenshot")
-            Launch.run(["hyde-shell", "screenshot", "s"]);
-        else if (id === "picker")
-            Launch.run(["hyprpicker", "-an"]);
-        else if (id === "clipboard") {
-            IslandController.open(IslandState.launcher);
-            LauncherState.query = ":";
-        } else if (id === "wallpaper")
-            IslandController.open(IslandState.wallpaper);
-        else if (id === "theme")
-            IslandController.open(IslandState.theme);
-        else if (id === "settings")
-            IslandController.open(IslandState.settings);
-        else if (id === "lock")
-            Launch.run(["loginctl", "lock-session"]);
-        else if (id === "power")
-            IslandController.open(IslandState.power);
-    }
-
-    // Click on an icon (see the list at the top).
-    function activate(id, button) {
-        if (id === "volume" && button === Qt.MiddleButton)
-            Audio.toggleMute();
-        else if (id === "volume")
-            IslandController.open(IslandState.audio);
-        else if (id === "bluetooth")
-            IslandController.open(IslandState.bluetooth);
-        else if (id === "wifi")
-            IslandController.open(IslandState.wifi);
-        else if (id === "caffeine")
-            Caffeine.toggle();
-        else
-            IslandController.open(IslandState.controlCenter);
+    // Hint under the hovered icon, drawn by the island's window (IslandController.hint).
+    function setHint(on, id, item) {
+        if (on) {
+            IslandController.hintScreen = QsWindow.window?.screen?.name ?? "";
+            IslandController.hintAt = item.mapToItem(null, item.width / 2, item.height);
+            IslandController.hint = id;
+        } else if (IslandController.hint === id) {
+            IslandController.hint = "";
+        }
     }
 
     // "3h 12m" / "45m" from seconds; "" while UPower has no estimate.
@@ -109,7 +77,8 @@ Item {
             wifi: wifiIcon,
             battery: batteryIcon,
             caffeine: caffeineIcon,
-            notifications: notificationsIcon
+            notifications: notificationsIcon,
+            power: powerIcon
         })
 
     // Icons that only show when they have something to say (a hidden icon takes no space in the row).
@@ -122,7 +91,8 @@ Item {
     // Shortcut buttons, right-aligned against the status icons.
     Row {
         anchors.right: row.left
-        anchors.rightMargin: root.extrasFit > 0 ? Expanded.statusSpacing : 0
+        // Same gap as between two icons inside a row (the buttons carry their own padding).
+        anchors.rightMargin: root.extrasFit > 0 ? row.spacing : 0
         anchors.verticalCenter: parent.verticalCenter
         spacing: row.spacing
 
@@ -179,7 +149,8 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: root.runExtra(extra.modelData)
+                    onClicked: Shortcuts.run(extra.modelData)
+                    onContainsMouseChanged: root.setHint(containsMouse, extra.modelData, extra)
                 }
             }
         }
@@ -223,7 +194,8 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-                    onClicked: event => root.activate(cell.modelData, event.button)
+                    onClicked: event => Shortcuts.status(cell.modelData, event.button)
+                    onContainsMouseChanged: root.setHint(containsMouse, cell.modelData, cell)
                     onWheel: event => {
                         if (cell.modelData !== "volume")
                             return;
@@ -309,6 +281,16 @@ Item {
                 font.pixelSize: Appearance.fontSize - 1
                 color: Battery.percent <= 15 && !Battery.charging ? Theme.danger : Theme.foreground
             }
+        }
+    }
+
+    // Power menu (log out, suspend, restart, shut down): always at hand, right of the battery.
+    Component {
+        id: powerIcon
+
+        PowerIcon {
+            size: root.iconSize
+            color: Theme.icon
         }
     }
 

@@ -27,8 +27,9 @@ Singleton {
     //   "wifi"           click: network page (also shows wired)
     //   "battery"        percentage inside, time left next to it; hidden on PCs without one;
     //                    click: control center
-    // Default ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"].
-    readonly property var icons: ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery"]
+    //   "power"          click: power menu (log out, suspend, restart, shut down)
+    // Default ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"].
+    readonly property var icons: ["caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"]
     // Battery percentage, inside the battery icon. Default true.
     readonly property bool batteryPercent: true
     // Time left next to the battery: until empty on battery, until full while charging ("3h 12m";

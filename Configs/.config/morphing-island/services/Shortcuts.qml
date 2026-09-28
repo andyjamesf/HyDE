@@ -1,0 +1,91 @@
+pragma Singleton
+import QtQuick
+import Quickshell
+import qs.core
+
+// What the status icons and the shortcut buttons of the expanded island do when clicked, and the
+// hint shown when the pointer rests on them (what each one is, and its state) (components/StatusZone.qml). Kept here so every
+// action can also be run and tested by IPC (`island-debug statusClick` / `shortcut`).
+Singleton {
+    // Hint for an icon or shortcut button: what it is, and its state now.
+    function hint(id) {
+        switch (id) {
+        case "volume":
+            return Audio.muted ? "Volume: muted" : `Volume: ${Math.round(Audio.volume * 100)}%`;
+        case "bluetooth":
+            return `Bluetooth: ${Bluetooth.summary}`;
+        case "wifi":
+            return Network.wired ? "Wired network" : Network.connected ? `Wi-Fi: ${Network.name}` : Network.wifiEnabled ? "Wi-Fi: not connected" : "Wi-Fi: off";
+        case "caffeine":
+            return Caffeine.active ? "Caffeine: on (the screen stays awake)" : "Caffeine: off";
+        case "notifications":
+            return Notifications.peaceMode ? "Notifications: peace mode" : Notifications.count > 0 ? `Notifications: ${Notifications.count}` : "Notifications: none";
+        case "battery":
+            return `Battery: ${Math.round(Battery.percent)}%${Battery.charging ? ", charging" : Battery.plugged ? ", plugged in" : ""}`;
+        case "nightlight":
+            return NightLight.active ? "Night light: on" : "Night light: off";
+        case "screenshot":
+            return "Screenshot";
+        case "clipboard":
+            return "Clipboard history";
+        case "picker":
+            return "Colour picker";
+        case "wallpaper":
+            return "Wallpapers";
+        case "theme":
+            return "Island theme";
+        case "settings":
+            return "Island settings";
+        case "lock":
+            return "Lock screen";
+        case "power":
+            return "Power menu";
+        }
+        return "";
+    }
+
+    // Status icons: volume (middle button: mute), bluetooth, wifi, caffeine, notifications, battery,
+    // power.
+    function status(id, button) {
+        if (id === "volume" && button === Qt.MiddleButton)
+            Audio.toggleMute();
+        else if (id === "volume")
+            IslandController.open(IslandState.audio);
+        else if (id === "bluetooth")
+            IslandController.open(IslandState.bluetooth);
+        else if (id === "wifi")
+            IslandController.open(IslandState.wifi);
+        else if (id === "caffeine")
+            Caffeine.toggle();
+        else if (id === "power")
+            IslandController.open(IslandState.power);
+        else
+            IslandController.open(IslandState.controlCenter);
+    }
+
+    // Shortcut buttons (Expanded.extraButtons).
+    function run(id) {
+        // Capture tools: the island first shrinks back to the pill (and out of the picture).
+        if ((id === "screenshot" || id === "picker") && IslandController.pinned)
+            IslandController.togglePin();
+        if (id === "nightlight")
+            NightLight.toggle();
+        else if (id === "screenshot")
+            Launch.run(["hyde-shell", "screenshot", "s"]);
+        else if (id === "picker")
+            Launch.run(["hyprpicker", "-an"]);
+        else if (id === "clipboard") {
+            IslandController.open(IslandState.launcher);
+            LauncherState.query = ":";
+        } else if (id === "wallpaper")
+            IslandController.open(IslandState.wallpaper);
+        else if (id === "theme")
+            IslandController.open(IslandState.theme);
+        else if (id === "settings")
+            IslandController.open(IslandState.settings);
+        else if (id === "lock")
+            Launch.run(["loginctl", "lock-session"]);
+        else if (id === "power")
+            IslandController.open(IslandState.power);
+    }
+}

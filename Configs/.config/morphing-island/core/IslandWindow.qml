@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import qs.config
 import qs.services
 import qs.components
+import qs.theme
 
 // One window per screen: transparent, as big as the island's largest shape, but only the island
 // receives clicks (mask). Reserves the space of the collapsed island at the top.
@@ -166,6 +167,64 @@ PanelWindow {
             batteryPercent: StatusPillConfig.batteryPercent
             batteryTime: StatusPillConfig.batteryTime
             alwaysShowBell: StatusPillConfig.alwaysShowBell
+        }
+    }
+
+    // Hint under a hovered status icon or shortcut button (IslandController.hint; text from
+    // Shortcuts.hint), after the pointer rests a moment. Once one shows, moving to a neighbour
+    // switches at once (hintArmed stays on while the pointer is off the icons less than 300 ms).
+    property bool hintArmed: false
+
+    Timer {
+        id: hintDelay
+        interval: 450
+        onTriggered: win.hintArmed = true
+    }
+    Timer {
+        id: hintGrace
+        interval: 300
+        onTriggered: win.hintArmed = false
+    }
+    Connections {
+        target: IslandController
+        function onHintChanged() {
+            if (IslandController.hint !== "" && IslandController.hintScreen === win.modelData.name) {
+                hintGrace.stop();
+                if (!win.hintArmed)
+                    hintDelay.restart();
+            } else {
+                hintDelay.stop();
+                hintGrace.restart();
+            }
+        }
+    }
+
+    Rectangle {
+        id: hintPill
+        readonly property bool showing: IslandController.hint !== "" && IslandController.hintScreen === win.modelData.name && win.hintArmed
+        z: 10
+        x: Math.round(Math.max(8, Math.min(win.width - width - 8, IslandController.hintAt.x - width / 2)))
+        y: Math.round(IslandController.hintAt.y + 8)
+        width: hintText.implicitWidth + 20
+        height: hintText.implicitHeight + 10
+        radius: height / 2
+        color: Qt.alpha(Theme.background, 0.96)
+        border.width: 1
+        border.color: Theme.border
+        opacity: showing ? 1 : 0
+        visible: opacity > 0.01
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Animations.duration(120)
+            }
+        }
+
+        Label {
+            id: hintText
+            anchors.centerIn: parent
+            text: Shortcuts.hint(IslandController.hint)
+            font.pixelSize: Appearance.fontSize - 1
         }
     }
 

@@ -38,6 +38,15 @@ Singleton {
         return pinned || (hovered && Pill.hoverExpand) ? IslandState.expanded : IslandState.clock;
     }
 
+    // Hint under a hovered icon (StatusZone): its id (text from Shortcuts.hint), the screen and
+    // where to draw it (window coordinates of the icon's bottom centre). "" = none.
+    property string hint: ""
+    property string hintScreen: ""
+    property point hintAt: Qt.point(0, 0)
+    // A click that changes the island (opens a page, closes it) takes the hint away.
+    onModeChanged: hint = ""
+    onPinnedChanged: hint = ""
+
     // Surface Esc returns to (e.g. theme or wallpaper opened from the settings).
     property string returnMode: ""
 

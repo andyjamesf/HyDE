@@ -169,6 +169,21 @@ ShellRoot {
         function calendarSetColor(index: int, color: string): void {
             Calendar.setColor(index, color);
         }
+        // Runs a status icon's click (Shortcuts.status; button 1 = left, 4 = middle) or a shortcut
+        // button (Shortcuts.run), exactly as a click would.
+        function statusClick(id: string, button: int): void {
+            Shortcuts.status(id, button);
+        }
+        function shortcut(id: string): void {
+            Shortcuts.run(id);
+        }
+        // Shows the hint of an icon/shortcut `id` at window position x, y on the focused screen
+        // ("" hides it), as hovering would.
+        function hint(id: string, x: int, y: int): void {
+            IslandController.hintScreen = IslandController.focusedScreen;
+            IslandController.hintAt = Qt.point(x, y);
+            IslandController.hint = id;
+        }
         // Current Prefs overrides as JSON (services/Prefs.qml).
         function prefs(): string {
             return JSON.stringify(Prefs.values);
