@@ -6,7 +6,7 @@ import qs.services
 import qs.theme
 
 // Left zone of the expanded island: album art + previous / play-pause / next.
-// No titles (they do not fit in the zone). Without a player: just a subtle "No media".
+// No titles (they do not fit in the zone). Without a player: nothing (the zone takes no width).
 Item {
     id: root
 
@@ -18,7 +18,7 @@ Item {
 
     width: zoneWidth
     // Natural width (ExpandedView uses it to make sure the zone is wide enough).
-    implicitWidth: Media.active ? player.implicitWidth : idle.implicitWidth
+    implicitWidth: Media.active ? player.implicitWidth : 0
     implicitHeight: Pill.height
 
     Row {
@@ -134,34 +134,6 @@ Item {
                 size: root.iconSize
                 color: Theme.icon
             }
-        }
-    }
-
-    Row {
-        id: idle
-        anchors.left: parent.left
-        anchors.leftMargin: 4
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 0
-        opacity: Media.active ? 0 : 1
-        visible: opacity > 0.01
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Animations.duration(160)
-            }
-        }
-
-        EqBars {
-            anchors.verticalCenter: parent.verticalCenter
-            playing: false
-        }
-
-        Label {
-            anchors.verticalCenter: parent.verticalCenter
-            text: "No media"
-            color: Theme.dim
-            font.pixelSize: Appearance.fontSize - 2
         }
     }
 }
