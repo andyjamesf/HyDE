@@ -129,10 +129,10 @@ Singleton {
             ]
         },
         {
-            "label": "  Theme",
+            "label": "󰏘  Theme",
             "items": [
                 {
-                    "label": "  Select Theme",
+                    "label": "󰏘  Select Theme",
                     "cmd": "qs ipc call launcher pick themes"
                 },
                 {

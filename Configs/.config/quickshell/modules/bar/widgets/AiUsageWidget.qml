@@ -43,6 +43,12 @@ Row {
     }
     property bool shown: anyData
 
+    // A Nerd Font glyph: a Private Use Area code point (BMP or supplementary planes 15-16).
+    function isNerdGlyph(ch) {
+        const c = ch.codePointAt(0);
+        return (c >= 0xE000 && c <= 0xF8FF) || c >= 0xF0000;
+    }
+
     // "<span foreground='#c'>G</span> 61% <span …>G</span> 3h06m" → [{glyph, color, text}, …]:
     // each icon with the value that follows it.
     function parse(markup) {
@@ -67,11 +73,15 @@ Row {
                 // A span may hold the icon and a value together: the errors are
                 // "<span …>󰜡 Auth Err</span>". Only the Nerd Font glyphs (Private Use Area) at the start
                 // are the icon; the rest is text (in the fixed-width icon box it covered its neighbours).
-                const g = /^((?:[\uE000-\uF8FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF])*)\s*([\s\S]*)$/.exec(m[2].trim());
+                const content = m[2].trim();
+                const chars = Array.from(content);
+                let n = 0;
+                while (n < chars.length && root.isNerdGlyph(chars[n]))
+                    n++;
                 out.push({
-                    glyph: g[1],
+                    glyph: chars.slice(0, n).join(""),
                     color: c ? c[1] : "",
-                    text: g[2]
+                    text: chars.slice(n).join("").trim()
                 });
             }
         }

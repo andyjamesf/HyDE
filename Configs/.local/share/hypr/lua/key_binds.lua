@@ -187,6 +187,16 @@ hl.bind(MOD .. " + SHIFT + slash", hl.dsp.exec_cmd(hyde.sh.menu.search()), _F)
 -- $hc=Hardware Controls
 -- $d=[$hc|Audio]
 
+-- # binddl  = , F10, $d toggle mute output , exec, hyde-shell volumecontrol.sh -o m # toggle audio mute
+-- # binddel = , F11, $d decrease volume , exec, hyde-shell volumecontrol.sh -o d # decrease volume
+-- # binddel = , F12, $d increase volume , exec, hyde-shell volumecontrol.sh -o i # increase volume
+
+_F = {description = "[Hardware Controls|Audio] un/mute output", locked = true}
+hl.bind("F10", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "m")), _F)
+_F = {description = "[Hardware Controls|Audio] decrease volume", locked = true, repeating = true}
+hl.bind("F11", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "d")), _F)
+_F = {description = "[Hardware Controls|Audio] increase volume", locked = true, repeating = true}
+hl.bind("F12", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "i")), _F)
 _F = {description = "[Hardware Controls|Audio] un/mute output", locked = true}
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(hyde.sh.volumecontrol("-o", "m")), _F)
 _F = {description = "[Hardware Controls|Audio] un/mute microphone", locked = true}
@@ -263,12 +273,36 @@ hl.bind(MOD .. "+ SHIFT + U", hl.dsp.exec_cmd("hyde-shell hyprlock --select"), _
 -- bindd = $mainMod SHIFT, R, $d wallbash mode selector , exec, pkill -x rofi || hyde-shell wallbashtoggle.sh -m # launch wallbash mode select menu
 -- bindd = $mainMod SHIFT, T, $d select a theme, exec, pkill -x rofi || hyde-shell themeselect.sh # launch theme select menu
 
--- Nine workspaces (keys 1-9).
-for i = 1, 9 do
+-- Numpad keys for workspaces 11-20. The Lua bind parser has no keycode form,
+-- so each key is bound under both keysyms it can emit: the digit while Num
+-- Lock is on, the navigation name while it is off.
+local kp = {
+    [1] = {"KP_1", "KP_End"},
+    [2] = {"KP_2", "KP_Down"},
+    [3] = {"KP_3", "KP_Next"},
+    [4] = {"KP_4", "KP_Left"},
+    [5] = {"KP_5", "KP_Begin"},
+    [6] = {"KP_6", "KP_Right"},
+    [7] = {"KP_7", "KP_Home"},
+    [8] = {"KP_8", "KP_Up"},
+    [9] = {"KP_9", "KP_Prior"},
+    [10] = {"KP_0", "KP_Insert"}
+}
+
+for i = 1, 10 do
     _F = {description = "[Workspaces|Navigation] navigate to workspace " .. i}
-    hl.bind(MOD .. " + " .. i, hl.dsp.focus({workspace = i}), _F)
+    hl.bind(MOD .. " + " .. ((i == 10) and 0 or i), hl.dsp.focus({workspace = i}), _F)
 end
 
+for i = 1, 10 do
+    for _, key in ipairs(kp[i]) do
+        hl.bind(
+            MOD .. " + " .. key,
+            hl.dsp.focus({workspace = tostring(i + 10)}),
+            {description = "[Workspaces|Navigation] navigate to workspace " .. (i + 10)}
+        )
+    end
+end
 
 _F = {description = "[Workspaces|Navigation|Relative workspace] change active workspace forwards"}
 hl.bind(MOD .. " + CONTROL + RIGHT", hl.dsp.focus({workspace = "r+1"}), _F)
@@ -278,11 +312,20 @@ hl.bind(MOD .. " + CONTROL + LEFT", hl.dsp.focus({workspace = "r-1"}), _F)
 _F = {description = "[Workspaces|Navigation] navigate to the nearest empty workspace"}
 hl.bind(MOD .. " + CONTROL + DOWN", hl.dsp.focus({workspace = "empty"}), _F)
 
-for i = 1, 9 do
+for i = 1, 10 do
     _F = {description = "[Workspaces|Move window to workspace] move focused window to workspace " .. i}
-    hl.bind(MOD .. " + SHIFT + " .. i, hl.dsp.window.move({workspace = i}), _F)
+    hl.bind(MOD .. " + SHIFT + " .. ((i == 10) and 0 or i), hl.dsp.window.move({workspace = i}), _F)
 end
 
+for i = 1, 10 do
+    for _, key in ipairs(kp[i]) do
+        hl.bind(
+            MOD .. " + SHIFT + " .. key,
+            hl.dsp.window.move({workspace = tostring(i + 10)}),
+            {description = "[Workspaces|Move window to workspace] move focused window to workspace " .. (i + 10)}
+        )
+    end
+end
 
 _F = {description = "[Workspaces|Move window to workspace|Relative workspace] move focused window to next workspace"}
 hl.bind(MOD .. " + CONTROL + ALT + RIGHT", hl.dsp.window.move({workspace = "r+1"}), _F)
@@ -306,9 +349,9 @@ hl.bind(MOD .. " + ALT + S", hl.dsp.window.move({workspace = "special", follow =
 
 --- Move silent
 ---
-for i = 1, 9 do
+for i = 1, 10 do
     _F = {description = "[Workspaces|Move window (Don't follow)] move focused window to workspace " .. i}
-    hl.bind(MOD .. " + ALT + " .. i, hl.dsp.window.move({workspace = i, follow = false}), _F)
+    hl.bind(MOD .. " + ALT + " .. ((i == 10) and 0 or i), hl.dsp.window.move({workspace = i, follow = false}), _F)
 end
 
 -- Optionals

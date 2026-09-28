@@ -26,7 +26,7 @@ Singleton {
         {
             "name": "themes",
             "description": "Switch the HyDE theme",
-            "glyph": ""
+            "glyph": "󰏘"
         },
         {
             "name": "windows",

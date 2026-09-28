@@ -22,7 +22,7 @@ Singleton {
     readonly property string name: "themes"
     readonly property string title: "HyDE themes"
     readonly property string placeholder: "Search themes…"
-    readonly property string glyph: ""
+    readonly property string glyph: "󰏘"
     readonly property bool loading: _loading && _list.length === 0
     readonly property bool grid: false
     readonly property bool keepOpen: false
