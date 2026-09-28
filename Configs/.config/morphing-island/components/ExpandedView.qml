@@ -77,5 +77,7 @@ Item {
         batteryPercent: !StatusPillConfig.enabled || StatusPillConfig.batteryPercent
         batteryTime: StatusPillConfig.enabled && StatusPillConfig.batteryTime
         alwaysShowBell: StatusPillConfig.alwaysShowBell
+        // Shortcut buttons in the space the left side leaves free on this side.
+        extras: Expanded.extraButtons
     }
 }

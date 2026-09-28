@@ -26,6 +26,47 @@ Item {
     property bool batteryTime: false
     // Keep the bell visible with no unread notifications (it opens the notification center).
     property bool alwaysShowBell: true
+    // Shortcut buttons (Expanded.extraButtons) shown left of the status icons, as many as fit in
+    // the free part of zoneWidth. They never widen the zone. [] = none (the status pill).
+    property var extras: []
+    readonly property real extraCell: iconSize + 2 * cellPadding + row.spacing
+    readonly property int extrasFit: Math.max(0, Math.min(extras.length, Math.floor((zoneWidth - row.implicitWidth - Expanded.statusSpacing) / extraCell)))
+
+    // Nerd Font glyphs for the shortcuts that have no drawn icon.
+    readonly property var extraGlyphs: ({
+            screenshot: "\u{F0E51}",
+            clipboard: "\u{F0192}",
+            picker: "\u{F020A}",
+            wallpaper: "\u{F0E09}",
+            theme: "\u{F03D8}",
+            settings: "\u{F0493}"
+        })
+
+    // Click on a shortcut button.
+    function runExtra(id) {
+        // Capture tools: the island first shrinks back to the pill (and out of the picture).
+        if ((id === "screenshot" || id === "picker") && IslandController.pinned)
+            IslandController.togglePin();
+        if (id === "nightlight")
+            NightLight.toggle();
+        else if (id === "screenshot")
+            Launch.run(["hyde-shell", "screenshot", "s"]);
+        else if (id === "picker")
+            Launch.run(["hyprpicker", "-an"]);
+        else if (id === "clipboard") {
+            IslandController.open(IslandState.launcher);
+            LauncherState.query = ":";
+        } else if (id === "wallpaper")
+            IslandController.open(IslandState.wallpaper);
+        else if (id === "theme")
+            IslandController.open(IslandState.theme);
+        else if (id === "settings")
+            IslandController.open(IslandState.settings);
+        else if (id === "lock")
+            Launch.run(["loginctl", "lock-session"]);
+        else if (id === "power")
+            IslandController.open(IslandState.power);
+    }
 
     // Click on an icon (see the list at the top).
     function activate(id, button) {
@@ -76,6 +117,72 @@ Item {
         if (id === "notifications")
             return alwaysShowBell || Notifications.count > 0 || Notifications.peaceMode;
         return id === "bluetooth" ? Bluetooth.available : id === "battery" ? Battery.available : true;
+    }
+
+    // Shortcut buttons, right-aligned against the status icons.
+    Row {
+        anchors.right: row.left
+        anchors.rightMargin: root.extrasFit > 0 ? Expanded.statusSpacing : 0
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: row.spacing
+
+        Repeater {
+            model: root.extras.slice(0, root.extrasFit)
+
+            Item {
+                id: extra
+
+                required property string modelData
+                readonly property bool on: modelData === "nightlight" && NightLight.active
+
+                anchors.verticalCenter: parent.verticalCenter
+                implicitWidth: root.iconSize + 2 * root.cellPadding
+                implicitHeight: root.iconSize + 2 * root.cellPadding
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: height / 2
+                    color: extraMouse.pressed ? Theme.pressed : extraMouse.containsMouse ? Theme.hover : "transparent"
+                }
+
+                MoonIcon {
+                    visible: extra.modelData === "nightlight"
+                    anchors.centerIn: parent
+                    size: root.iconSize
+                    color: extra.on ? Theme.accent : Theme.icon
+                }
+                PowerIcon {
+                    visible: extra.modelData === "power"
+                    anchors.centerIn: parent
+                    size: root.iconSize
+                    color: Theme.icon
+                }
+                Glyph {
+                    visible: extra.modelData === "lock"
+                    anchors.centerIn: parent
+                    kind: "lock"
+                    size: root.iconSize
+                    color: Theme.icon
+                }
+                Label {
+                    visible: root.extraGlyphs[extra.modelData] !== undefined
+                    anchors.centerIn: parent
+                    text: root.extraGlyphs[extra.modelData] ?? ""
+                    font.family: Appearance.nerdFont
+                    font.pixelSize: Math.round(root.iconSize * 0.95)
+                    elide: Text.ElideNone
+                    color: Theme.icon
+                }
+
+                MouseArea {
+                    id: extraMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.runExtra(extra.modelData)
+                }
+            }
+        }
     }
 
     Row {

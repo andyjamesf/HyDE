@@ -12,7 +12,7 @@ what it does, its unit, a sensible range and the default.
 | `Animations.qml` | animations on/off, global speed, spring stiffness, mode cross-fade and scale timings, `duration(ms)` helper |
 | `Behaviour.qml` | mouse guard (ignore fake motion for 300 ms / 3 px after a view opens), focus retry delay |
 | `Pill.qml` | the collapsed clock pill: height, minimum width, top margin, padding, hover-to-expand and its collapse delay, hidden pill, equalizer bars |
-| `Expanded.qml` | the expanded island (hover/pin): side zone width, gutters, margins, extra height, status icons and their order, media zone sizes |
+| `Expanded.qml` | the expanded island: side zone width, gutters, margins, extra height, status icons and their order, shortcut buttons that fill free space, media zone sizes |
 | `Clock.qml` | time / short date / long date formats and the locale |
 | `WorkspacesConfig.qml` | workspace pill (left edge or next to the clock) and its part of the expanded island: on/off, placement, margins, spacing, icons per workspace, one icon per app, icon size, per-screen or all workspaces |
 | `CalendarConfig.qml` | calendar: width, first day of the week, events per day, refresh interval, colours for new calendars, new events' default length and reminder choices (the calendars themselves are in `~/.local/share/quickshell/calendars.json`, outside git) |

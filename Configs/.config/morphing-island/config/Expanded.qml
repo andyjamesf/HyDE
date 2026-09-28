@@ -20,6 +20,13 @@ Singleton {
     // ids: "volume", "bluetooth", "wifi" (also shows wired), "battery". Remove an id to hide that
     // icon. Default ["volume", "bluetooth", "wifi", "battery"].
     readonly property var statusIcons: ["volume", "bluetooth", "wifi", "battery"]
+    // Shortcut buttons that fill the free space of the right zone: when the left side grows
+    // (workspaces, media playing) the right one gets as wide, and these appear next to the status
+    // icons, as many as fit, in this order. Ids: "nightlight" (on/off), "screenshot" (select an
+    // area), "clipboard", "picker" (colour picker), "wallpaper", "theme", "settings", "lock",
+    // "power". [] = none. Default ["nightlight", "screenshot", "clipboard", "picker", "wallpaper",
+    // "theme", "settings", "lock", "power"].
+    readonly property var extraButtons: ["nightlight", "screenshot", "clipboard", "picker", "wallpaper", "theme", "settings", "lock", "power"]
     // Space between status icons in pixels. Default 10.
     readonly property int statusSpacing: 10
     // Status icon size as a fraction of Pill.height. 0–1, default 0.45.
