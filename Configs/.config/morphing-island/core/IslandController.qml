@@ -61,8 +61,31 @@ Singleton {
             root.hint = "";
         }
     }
-    // A click that changes the island (opens a page, closes it) takes the hint away.
-    onModeChanged: hint = ""
+    // Right-click menu of a button (services/Menus.qml): its id ("" = none), the screen and where
+    // to draw it (window coordinates of the button's bottom centre). Drawn by IslandWindow.
+    property string menu: ""
+    property string menuScreen: ""
+    property point menuAt: Qt.point(0, 0)
+    // Opens the menu of `id` under `item` (a button); a second right click on it closes it.
+    function openMenu(id, item, screenName) {
+        if (menu === id && menuScreen === screenName) {
+            menu = "";
+            return;
+        }
+        hint = "";
+        menuScreen = screenName;
+        menuAt = item.mapToItem(null, item.width / 2, item.height);
+        menu = id;
+    }
+    function closeMenu() {
+        menu = "";
+    }
+
+    // A click that changes the island (opens a page, closes it) takes the hint and the menu away.
+    onModeChanged: {
+        hint = "";
+        menu = "";
+    }
     onPinnedChanged: hint = ""
     // Pointing at another icon ends the pinned one.
     onHintChanged: if (hint !== _pinnedHint)

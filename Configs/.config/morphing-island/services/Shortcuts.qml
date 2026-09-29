@@ -41,6 +41,8 @@ Singleton {
             return "Lock screen";
         case "power":
             return "Power menu";
+        case "system":
+            return "System: CPU, memory, temperatures…";
         case "avatar":
             return "Change your picture";
         case "batterypage":
@@ -119,6 +121,8 @@ Singleton {
             IslandController.open(IslandState.settings);
         else if (id === "lock")
             Launch.run(["loginctl", "lock-session"]);
+        else if (id === "system")
+            IslandController.open(IslandState.system);
         else if (id === "nextwallpaper")
             Launch.run(["hyde-shell", "wallpaper", "--next"]);
         else if (id === "hydetheme")

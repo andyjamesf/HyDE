@@ -44,6 +44,12 @@ Singleton {
         set(!_on);
     }
 
+    // Sets the colour temperature (kelvin) and turns night light on if it was off.
+    function setTemperature(kelvin) {
+        const k = Math.max(1000, Math.min(20000, Math.round(kelvin)));
+        Quickshell.execDetached(["sh", "-c", `hyde-shell hyprsunset -q --cm temp -s ${k}` + (_on ? "" : " && hyde-shell hyprsunset -q -t")]);
+    }
+
     FileView {
         id: state
         path: `${Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state"}/hyde/hyprsunset`

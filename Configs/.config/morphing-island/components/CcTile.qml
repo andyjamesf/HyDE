@@ -23,6 +23,8 @@ Item {
 
     signal toggled
     signal opened
+    // Right click (the tile's menu, services/Menus.qml).
+    signal menuRequested
 
     implicitWidth: 200
     implicitHeight: ControlCenter.tileHeight
@@ -80,7 +82,12 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onClicked: {
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: event => {
+            if (event.button === Qt.RightButton) {
+                root.menuRequested();
+                return;
+            }
             if (!root.enabled)
                 return;
             if (root.expandable)
@@ -141,7 +148,12 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-            onClicked: {
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: event => {
+                if (event.button === Qt.RightButton) {
+                    root.menuRequested();
+                    return;
+                }
                 if (root.enabled)
                     root.toggled();
             }

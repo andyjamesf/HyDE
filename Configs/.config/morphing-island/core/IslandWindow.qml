@@ -60,6 +60,9 @@ PanelWindow {
         Region {
             item: win.statusShown ? statusPill : null
         }
+        Region {
+            item: menuCard.showing ? menuCard : null
+        }
     }
 
     WlrLayershell.namespace: "quickshell:island"
@@ -90,6 +93,20 @@ PanelWindow {
         windows: [win]
         active: win.surface && win.grabReady
         onCleared: IslandController.close()
+    }
+
+    // A right-click menu over the pill (no surface open): clicking outside closes it. (With a
+    // surface open, the grab above covers it and closing the surface closes the menu too.)
+    property bool menuGrabReady: false
+    Timer {
+        running: menuCard.showing && !win.menuGrabReady
+        interval: 60
+        onTriggered: win.menuGrabReady = true
+    }
+    HyprlandFocusGrab {
+        windows: [win]
+        active: menuCard.showing && !win.surface && win.menuGrabReady
+        onCleared: IslandController.closeMenu()
     }
 
     // Hiding/showing the pill: it slides up off screen (and back) with the same spring.
@@ -234,6 +251,116 @@ PanelWindow {
             anchors.centerIn: parent
             text: Shortcuts.hint(IslandController.hint)
             font.pixelSize: Appearance.fontSize - 1
+        }
+    }
+
+    // Right-click menu (IslandController.menu, items from services/Menus.qml): a small card under
+    // the button, kept inside the screen. A choice runs and closes it.
+    Rectangle {
+        id: menuCard
+        readonly property bool showing: IslandController.menu !== "" && IslandController.menuScreen === win.modelData.name
+        readonly property var items: showing ? Menus.items(IslandController.menu) : []
+        onShowingChanged: if (!showing)
+            win.menuGrabReady = false
+        z: 11
+        x: Math.round(Math.max(8, Math.min(win.width - width - 8, IslandController.menuAt.x - width / 2)))
+        y: Math.round(Math.min(win.height - height - 8, IslandController.menuAt.y + 6))
+        width: 250
+        height: menuColumn.implicitHeight + 12
+        radius: 16
+        color: Qt.alpha(Theme.background, 0.97)
+        border.width: 1
+        border.color: Theme.border
+        opacity: showing ? 1 : 0
+        visible: opacity > 0.01
+        scale: showing ? 1 : 0.96
+        transformOrigin: Item.Top
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Animations.duration(110)
+            }
+        }
+        Behavior on scale {
+            NumberAnimation {
+                duration: Animations.duration(160)
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Column {
+            id: menuColumn
+            x: 6
+            y: 6
+            width: menuCard.width - 12
+
+            Repeater {
+                model: menuCard.items
+
+                Item {
+                    id: entry
+                    required property var modelData
+                    readonly property bool heading: modelData.section !== undefined
+                    width: menuColumn.width
+                    height: heading ? 26 : 32
+
+                    Rectangle {
+                        anchors.fill: parent
+                        visible: !entry.heading
+                        radius: 10
+                        color: entryMouse.pressed ? Theme.pressed : entryMouse.containsMouse ? Theme.hover : "transparent"
+                    }
+
+                    Row {
+                        id: entryRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 8
+
+                        // Tick column (kept for alignment when the menu has ticks).
+                        Rectangle {
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: !entry.heading && entry.modelData.checked !== undefined
+                            width: 8
+                            height: 8
+                            radius: 4
+                            color: entry.modelData.checked ? Theme.accent : "transparent"
+                            border.width: entry.modelData.checked ? 0 : 1
+                            border.color: Theme.faint
+                        }
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: Math.min(implicitWidth, entry.width - 40 - (entry.modelData.detail ? 60 : 0))
+                            text: entry.heading ? entry.modelData.section : entry.modelData.label
+                            color: entry.heading ? Theme.dim : Theme.foreground
+                            font.pixelSize: entry.heading ? Appearance.fontSize - 2 : Appearance.fontSize
+                            font.weight: entry.heading ? Font.DemiBold : (entry.modelData.checked ? Font.DemiBold : Font.Normal)
+                        }
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: !entry.heading && (entry.modelData.detail ?? "") !== ""
+                            text: entry.modelData.detail ?? ""
+                            color: Theme.dim
+                            font.pixelSize: Appearance.fontSize - 2
+                        }
+                    }
+
+                    MouseArea {
+                        id: entryMouse
+                        anchors.fill: parent
+                        enabled: !entry.heading
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            const run = entry.modelData.action;
+                            IslandController.closeMenu();
+                            if (run)
+                                run();
+                        }
+                    }
+                }
+            }
         }
     }
 

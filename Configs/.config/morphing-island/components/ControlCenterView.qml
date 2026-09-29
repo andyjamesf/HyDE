@@ -31,7 +31,7 @@ Item {
     readonly property bool sliding: progress < 1
 
     readonly property Item currentItem: {
-        const loaders = [mainPage, wifiPage, bluetoothPage, audioPage, mediaPage, batteryPage];
+        const loaders = [mainPage, wifiPage, bluetoothPage, audioPage, mediaPage, batteryPage, systemPage];
         return loaders.find(l => l.name === current)?.item ?? null;
     }
 
@@ -189,6 +189,19 @@ Item {
         opacity: root.opacityFor(name)
         sourceComponent: CcBatteryPage {
             shown: root.open && root.current === batteryPage.name
+        }
+    }
+
+    Loader {
+        id: systemPage
+        readonly property string name: IslandState.system
+        active: root.live(name)
+        visible: active
+        width: root.width
+        x: root.offsetFor(name)
+        opacity: root.opacityFor(name)
+        sourceComponent: CcSystemPage {
+            shown: root.open && root.current === systemPage.name
         }
     }
 }

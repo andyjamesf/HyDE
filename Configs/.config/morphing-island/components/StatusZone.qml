@@ -157,7 +157,15 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Shortcuts.run(extra.modelData)
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: event => {
+                        if (event.button === Qt.RightButton) {
+                            if (Menus.has(extra.modelData))
+                                IslandController.openMenu(extra.modelData, extra, QsWindow.window?.screen?.name ?? "");
+                        } else {
+                            Shortcuts.run(extra.modelData);
+                        }
+                    }
                     onContainsMouseChanged: root.setHint(containsMouse, extra.modelData, extra)
                 }
             }
@@ -201,8 +209,13 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-                    onClicked: event => Shortcuts.status(cell.modelData, event.button)
+                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+                    onClicked: event => {
+                        if (event.button === Qt.RightButton && Menus.has(cell.modelData))
+                            IslandController.openMenu(cell.modelData, cell, QsWindow.window?.screen?.name ?? "");
+                        else if (event.button !== Qt.RightButton)
+                            Shortcuts.status(cell.modelData, event.button);
+                    }
                     onContainsMouseChanged: root.setHint(containsMouse, cell.modelData, cell)
                     onWheel: event => {
                         if (cell.modelData !== "volume")

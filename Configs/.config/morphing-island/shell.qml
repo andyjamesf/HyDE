@@ -158,6 +158,23 @@ ShellRoot {
     IpcHandler {
         target: "island-debug"
 
+        // Opens a button's right-click menu at (x, y) on the focused screen (services/Menus.qml);
+        // "" closes it. Returns the labels of its items.
+        function menu(id: string, x: int, y: int): string {
+            IslandController.menuScreen = IslandController.focusedScreen;
+            IslandController.menuAt = Qt.point(x, y);
+            IslandController.menu = id;
+            return Menus.items(id).map(i => i.section ?? i.label).join(" | ");
+        }
+        // Runs item n (counting headings) of an open menu's list.
+        function menuRun(id: string, n: int): string {
+            const it = Menus.items(id)[n];
+            if (!it || !it.action)
+                return "none";
+            it.action();
+            return it.label;
+        }
+
         // Sets the power profile the way the battery page does (0 saver, 1 balanced, 2 performance);
         // returns the one now active.
         function powerProfile(p: int): string {

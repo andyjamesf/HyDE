@@ -41,6 +41,12 @@ Item {
         }
     }
 
+    // Right-click menu of a tile or button, under it.
+    function menu(id, item) {
+        if (Menus.has(id))
+            IslandController.openMenu(id, item, QsWindow.window?.screen?.name ?? "");
+    }
+
     // Switches pages inside the control center, on the same screen.
     function go(p) {
         IslandController.mode = p;
@@ -178,13 +184,18 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: root.go(IslandState.battery)
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        onClicked: event => event.button === Qt.RightButton ? root.menu("battery", batteryButton) : root.go(IslandState.battery)
                         onContainsMouseChanged: root.hint(containsMouse, "batterypage", batteryButton)
                     }
                 }
 
                 Repeater {
                     model: [
+                        {
+                            id: "system",
+                            glyph: "\u{F061A}"
+                        },
                         {
                             id: "settings",
                             glyph: "\u{F0493}"
@@ -205,6 +216,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         size: 32
                         onClicked: Shortcuts.run(modelData.id)
+                        rightClickable: Menus.has(modelData.id)
+                        onRightClicked: root.menu(modelData.id, headerButton)
                         onHoveredChanged: root.hint(hovered, modelData.id, headerButton)
 
                         Label {
@@ -235,8 +248,18 @@ Item {
                     required property string modelData
                     required property int index
 
+                    id: tileLoader
                     width: index === tiles.ids.length - 1 && index % 2 === 0 ? tiles.width : tiles.half
                     sourceComponent: root.tileComponents[modelData]
+
+                    // Right click: the tile's menu (services/Menus.qml).
+                    Connections {
+                        target: tileLoader.item
+                        ignoreUnknownSignals: true
+                        function onMenuRequested() {
+                            root.menu(tileLoader.modelData, tileLoader.item);
+                        }
+                    }
                 }
             }
         }
@@ -484,7 +507,8 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Shortcuts.run(shortcutCell.modelData)
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: event => event.button === Qt.RightButton ? root.menu(shortcutCell.modelData, parent) : Shortcuts.run(shortcutCell.modelData)
                             onContainsMouseChanged: root.hint(containsMouse, shortcutCell.modelData, parent)
                         }
                     }

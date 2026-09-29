@@ -19,6 +19,9 @@ Item {
     readonly property bool pressed: mouse.pressed
 
     signal clicked
+    // Right click (e.g. a menu); only when something listens (rightClickable).
+    signal rightClicked
+    property bool rightClickable: false
 
     implicitWidth: size
     implicitHeight: size
@@ -63,9 +66,14 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        acceptedButtons: root.rightClickable ? Qt.LeftButton | Qt.RightButton : Qt.LeftButton
         onClicked: mouseEvent => {
             mouseEvent.accepted = true;
-            if (root.enabled)
+            if (!root.enabled)
+                return;
+            if (mouseEvent.button === Qt.RightButton)
+                root.rightClicked();
+            else
                 root.clicked();
         }
     }
