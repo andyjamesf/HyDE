@@ -6,14 +6,17 @@ INTERVAL seconds (default 2) while it runs. Only /proc and /sys are read (no ext
 
 Each line: {
   "cpu": {"model", "percent", "cores": [percent…], "freq": MHz, "load": [1, 5, 15 min]},
-  "memory": {"used", "total", "swapUsed", "swapTotal"},            (bytes)
+  "memory": {"used", "total", "apps", "cache", "free", "available", "shared",
+             "swapUsed", "swapTotal"},                               (bytes)
   "temps": [{"name", "celsius"}…],                                   (one per sensor chip)
   "gpu": {"percent", "vramUsed", "vramTotal"} or null,
   "disks": [{"mount", "used", "total"}…],
   "net": {"rx", "tx"},                                               (bytes per second)
   "diskio": {"read", "write"},                                       (bytes per second)
   "power": watts drawn from the battery (0 on AC) or null,
-  "uptime": seconds, "processes": [{"name", "cpu", "memory"}…]      (top 5 by CPU)
+  "uptime": seconds, "counts": {"processes", "threads"},
+  "processes": [{"pid", "name", "cpu", "memory", "threads"}…]        (top 10 by CPU)
+  "processesByMemory": […]                                            (top 10 by memory)
 }
 """
 import glob
@@ -65,7 +68,12 @@ def memory():
     for line in read("/proc/meminfo").splitlines():
         k, _, v = line.partition(":")
         m[k] = int(v.split()[0]) * 1024
-    return {"used": m.get("MemTotal", 0) - m.get("MemAvailable", 0), "total": m.get("MemTotal", 0),
+    total, free = m.get("MemTotal", 0), m.get("MemFree", 0)
+    cache = m.get("Buffers", 0) + m.get("Cached", 0) + m.get("SReclaimable", 0) - m.get("Shmem", 0)
+    return {"used": total - m.get("MemAvailable", 0), "total": total,
+            # Split for the bar: programs, disk cache (freed when needed) and truly free.
+            "apps": max(0, total - free - cache), "cache": max(0, cache), "free": free,
+            "available": m.get("MemAvailable", 0), "shared": m.get("Shmem", 0),
             "swapUsed": m.get("SwapTotal", 0) - m.get("SwapFree", 0), "swapTotal": m.get("SwapTotal", 0)}
 
 
@@ -165,7 +173,8 @@ def proc_times():
             continue
         name = s[s.find("(") + 1:s.rfind(")")]
         v = s[s.rfind(")") + 2:].split()
-        out[d] = (name, int(v[11]) + int(v[12]), int(v[21]) * PAGE)
+        # utime + stime, resident memory, threads.
+        out[d] = (name, int(v[11]) + int(v[12]), int(v[21]) * PAGE, int(v[17]))
     return out
 
 
@@ -180,16 +189,18 @@ def main():
         cpu = cpu_times()
         pct = [round(100 * (1 - (i2 - i1) / max(1, t2 - t1)), 1) for (t1, i1), (t2, i2) in zip(prev_cpu, cpu)]
         net, io, procs = net_bytes(), disk_bytes(), proc_times()
-        top = []
-        for pid, (name, ticks, rss) in procs.items():
+        every = []
+        threads = 0
+        for pid, (name, ticks, rss, nthreads) in procs.items():
+            threads += nthreads
             before = prev_procs.get(pid)
-            if before and before[0] == name:
-                top.append({"pid": pid, "name": name, "cpu": round(100 * (ticks - before[1]) / TICKS / dt / ncpu, 1), "memory": rss})
-        top.sort(key=lambda p: -p["cpu"])
-        top = top[:5]
+            used = ticks - before[1] if before and before[0] == name else 0
+            every.append({"pid": int(pid), "name": name, "cpu": round(100 * used / TICKS / dt / ncpu, 1), "memory": rss, "threads": nthreads})
+        by_cpu = sorted(every, key=lambda p: (-p["cpu"], -p["memory"]))[:10]
+        by_mem = sorted(every, key=lambda p: -p["memory"])[:10]
         # A thread name ("MainThread", "Web Content") says little: use the program's file name.
-        for p in top:
-            argv0 = read(f"/proc/{p.pop('pid')}/cmdline").split("\0")[0]
+        for p in {id(x): x for x in by_cpu + by_mem}.values():
+            argv0 = read(f"/proc/{p['pid']}/cmdline").split("\0")[0]
             if argv0:
                 p["name"] = os.path.basename(argv0.split()[0]) or p["name"]
         la = read("/proc/loadavg").split()[:3]
@@ -200,7 +211,8 @@ def main():
             "net": {"rx": round((net[0] - prev_net[0]) / dt), "tx": round((net[1] - prev_net[1]) / dt)},
             "diskio": {"read": round((io[0] - prev_io[0]) / dt), "write": round((io[1] - prev_io[1]) / dt)},
             "power": power(), "uptime": int(float(read("/proc/uptime", "0").split()[0])),
-            "processes": top,
+            "processes": by_cpu, "processesByMemory": by_mem,
+            "counts": {"processes": len(procs), "threads": threads},
         }), flush=True)
         prev_cpu, prev_net, prev_io, prev_procs, prev_t = cpu, net, io, procs, now
 

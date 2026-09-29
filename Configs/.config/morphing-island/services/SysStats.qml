@@ -3,15 +3,45 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// PC statistics for the System page (components/CcSystemPage.qml), from scripts/sysstats.py. The
-// script only runs while something shows them (users > 0), every 2 seconds.
+// PC statistics for the System page (components/CcSystemPage.qml) and its detached window
+// (core/StatsWindow.qml), from scripts/sysstats.py. The script only runs while one of them is on
+// screen (pageShown or detached), every 2 seconds. The detached window, its screen and position are remembered
+// (Prefs "stats.*"), so it comes back after a restart.
 Singleton {
     id: root
 
-    // How many views show the stats; the script runs while > 0.
-    property int users: 0
+    // The System page is on screen (set by it).
+    property bool pageShown: false
     // The last reading (see scripts/sysstats.py), null until the first arrives.
     property var data: null
+    // Process list order, shared by the page and the window: "cpu" or "memory".
+    property string sortBy: "cpu"
+
+    // The floating window: shown, on which screen, top-left corner in that screen's pixels.
+    readonly property bool detached: Prefs.get("stats.detached", false)
+    readonly property string screen: Prefs.get("stats.screen", "")
+    readonly property int x: Prefs.get("stats.x", -1)
+    readonly property int y: Prefs.get("stats.y", -1)
+    readonly property bool compact: Prefs.get("stats.compact", false)
+
+    function setCompact(on) {
+        if (on)
+            Prefs.set("stats.compact", true);
+        else
+            Prefs.reset("stats.compact");
+    }
+
+    function detach(screenName) {
+        Prefs.set("stats.screen", screenName);
+        Prefs.set("stats.detached", true);
+    }
+    function attach() {
+        Prefs.reset("stats.detached");
+    }
+    function moveTo(px, py) {
+        Prefs.set("stats.x", Math.round(px));
+        Prefs.set("stats.y", Math.round(py));
+    }
 
     // 1.2 GB, 850 MB…
     function bytes(n) {
@@ -25,7 +55,7 @@ Singleton {
 
     Process {
         command: ["python3", Quickshell.shellPath("scripts/sysstats.py"), "2"]
-        running: root.users > 0
+        running: root.pageShown || root.detached
         stdout: SplitParser {
             onRead: line => {
                 try {

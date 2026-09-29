@@ -36,6 +36,13 @@ ShellRoot {
         IslandWindow {}
     }
 
+    // PC statistics detached from the control center (System page): a floating card over the apps.
+    Variants {
+        model: Quickshell.screens
+
+        StatsWindow {}
+    }
+
     // Lock screen (ext-session-lock + PAM): see services/Lock.qml.
     LockScreen {}
 
@@ -109,6 +116,16 @@ ShellRoot {
         // "freeze" (area on a frozen screen), "output" (focused monitor) or "screen" (all).
         function screenshot(mode: string): void {
             Screenshot.take(mode);
+        }
+        // The PC statistics window: "detach" (floating, on the focused screen), "attach" (closes it),
+        // "toggle", "compact" (switches the compact view).
+        function stats(action: string): void {
+            if (action === "detach" || (action === "toggle" && !SysStats.detached))
+                SysStats.detach(IslandController.focusedScreen);
+            else if (action === "attach" || action === "toggle")
+                SysStats.attach();
+            else if (action === "compact")
+                SysStats.setCompact(!SysStats.compact);
         }
         // Brings the login screen (SDDM theme) up to date with the island now; returns the result.
         // Normally automatic (services/SddmTheme.qml).

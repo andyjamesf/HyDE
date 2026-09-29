@@ -41,6 +41,8 @@ Singleton {
             return "Lock screen";
         case "power":
             return "Power menu";
+        case "detachstats":
+            return "Detach: a floating window over your apps";
         case "system":
             return "System: CPU, memory, temperatures…";
         case "avatar":
