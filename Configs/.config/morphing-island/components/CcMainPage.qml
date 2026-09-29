@@ -11,7 +11,8 @@ import qs.theme
 // Main page of the control center: header (your picture and name, time since boot, battery,
 // settings, lock, power), quick-toggle tiles (ControlCenter.tiles), volume, microphone and
 // brightness sliders, a media row, HyDE shortcuts (ControlCenter.shortcuts) and, at the bottom, the
-// notification history. The height grows with the history (up to maxRows rows; then it scrolls).
+// notification history. The height grows with the history (up to maxRows rows, and never past the
+// bottom of the island's window: the rows that don't fit scroll).
 Item {
     id: root
 
@@ -23,7 +24,11 @@ Item {
     readonly property int notifRowHeight: ControlCenter.notificationRowHeight
     readonly property int maxRows: ControlCenter.maxNotificationRows
     readonly property int notifCount: Notifications.count
-    readonly property int visibleRows: Math.min(notifCount, maxRows)
+    // Rows that fit under everything above the list inside the island's window (its height is
+    // capped by the screen): the list scrolls past them.
+    readonly property int windowHeight: QsWindow.window?.height ?? 760
+    readonly property int fitRows: Math.max(1, Math.floor((windowHeight - Pill.topMargin - 12 - 2 * pad - notifList.y) / notifRowHeight))
+    readonly property int visibleRows: Math.min(notifCount, maxRows, fitRows)
 
     readonly property string outputName: (Audio.sinks ?? []).find(s => s.isDefault)?.name ?? ""
 
@@ -589,7 +594,7 @@ Item {
             height: root.visibleRows * root.notifRowHeight
             visible: root.notifCount > 0
             clip: true
-            interactive: root.notifCount > root.maxRows
+            interactive: root.notifCount > root.visibleRows
             boundsBehavior: Flickable.StopAtBounds
             model: ScriptModel {
                 values: Notifications.list

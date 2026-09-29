@@ -4,8 +4,9 @@ import Quickshell
 
 // AI usage icon ("ai" in StatusPillConfig.icons): how much of each AI tool's limit is used, from
 // the same scripts as the HyDE shell's bar widget (~/.local/bin/ai-usage-watch). The icon is only
-// the symbol, coloured by the tool closest to its limit; a click fetches fresh numbers and shows
-// them under the icon. It hides itself when none of the commands gives an answer (e.g. a PC
+// the symbol, coloured by the fullest usage window (red from 90 %); a click fetches fresh numbers
+// and opens the AI popup (components/AiUsageView.qml: every window of every tool, with its reset
+// time). It hides itself when none of the commands gives an answer (e.g. a PC
 // without them). (Named AiUsageConfig because services/AiUsage.qml is the service.)
 Singleton {
     // The tools, in the order shown: label, how often to fetch (seconds) and the command, which
@@ -30,6 +31,4 @@ Singleton {
             cmd: "copilot-credits"
         }
     ]
-    // How long the usage stays on screen after a click, in milliseconds. Default 8000.
-    readonly property int showMs: 8000
 }

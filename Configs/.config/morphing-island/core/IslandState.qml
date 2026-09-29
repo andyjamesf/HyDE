@@ -28,11 +28,13 @@ Singleton {
     readonly property string power: "power"
     readonly property string auth: "auth"
     readonly property string calendar: "calendar"
+    // AI usage popup (the AI icon).
+    readonly property string ai: "ai"
     // Wi-Fi password or Bluetooth pairing request (services/Agents.qml).
     readonly property string agent: "agent"
 
     readonly property var transients: [volume, mic, brightness, notification, screenshot]
-    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, battery, system, theme, wallpaper, settings, power, auth, calendar, agent]
+    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, battery, system, theme, wallpaper, settings, power, auth, calendar, agent, ai]
     // Surfaces that take the keyboard exclusively: text input, and the pickers with a grid (so
     // arrows and Enter work without clicking first).
     readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power, calendar, agent]

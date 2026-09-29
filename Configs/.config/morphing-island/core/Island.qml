@@ -18,7 +18,7 @@ IslandSurface {
 
     // Content of the current mode (the target of the shape).
     readonly property Item content: slots.find(s => s.current)?.item ?? null
-    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, screenshotSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot, calendarSlot, agentSlot]
+    readonly property var slots: [clockSlot, expandedSlot, volumeSlot, micSlot, brightnessSlot, notificationSlot, screenshotSlot, launcherSlot, controlSlot, themeSlot, wallpaperSlot, powerSlot, settingsSlot, authSlot, calendarSlot, agentSlot, aiSlot]
     // Modes that share the control center's content (the pages slide inside it).
     readonly property var controlModes: [IslandState.controlCenter].concat(IslandState.subviews)
 
@@ -201,6 +201,14 @@ IslandSurface {
         focus: current
         sourceComponent: AgentView {
             open: agentSlot.current
+        }
+    }
+    ModeSlot {
+        id: aiSlot
+        mode: IslandState.ai
+        current: island.mode === mode
+        sourceComponent: AiUsageView {
+            open: aiSlot.current
         }
     }
 }

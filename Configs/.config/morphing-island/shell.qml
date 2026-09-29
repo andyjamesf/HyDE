@@ -175,6 +175,14 @@ ShellRoot {
     IpcHandler {
         target: "island-debug"
 
+        // Removes from the history the notifications of one app (test cleanup); returns how many.
+        function dismissApp(app: string): int {
+            const list = Notifications.list.filter(n => n.appName === app);
+            for (const n of list)
+                Notifications.dismiss(n);
+            return list.length;
+        }
+
         // Opens a button's right-click menu at (x, y) on the focused screen (services/Menus.qml);
         // "" closes it. Returns the labels of its items.
         function menu(id: string, x: int, y: int): string {

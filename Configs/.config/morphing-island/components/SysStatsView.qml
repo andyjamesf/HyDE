@@ -39,25 +39,52 @@ Column {
         Meter {
             value: (root.d?.cpu.percent ?? 0) / 100
         }
-        Row {
+        // Logical processors: two rows of bars, each with its number and load.
+        Grid {
+            id: coreGrid
             visible: !root.compact
+            readonly property int n: root.d?.cpu.cores.length ?? 0
             width: parent.width
-            spacing: 3
+            columns: Math.max(1, Math.ceil(n / 2))
+            spacing: 4
             Repeater {
                 model: root.d?.cpu.cores ?? []
                 Rectangle {
                     required property var modelData
-                    readonly property int n: root.d?.cpu.cores.length ?? 1
-                    width: (parent.width - 3 * (n - 1)) / n
-                    height: 22
-                    radius: 3
-                    color: Qt.alpha(Theme.foreground, 0.08)
+                    required property int index
+                    width: (coreGrid.width - coreGrid.spacing * (coreGrid.columns - 1)) / coreGrid.columns
+                    height: 44
+                    radius: 6
+                    color: Qt.alpha(Theme.foreground, 0.07)
+                    clip: true
                     Rectangle {
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        height: Math.max(2, parent.height * modelData / 100)
-                        radius: 3
-                        color: modelData > 90 ? Theme.danger : Theme.accent
+                        height: Math.max(3, parent.height * modelData / 100)
+                        color: modelData > 90 ? Theme.danger : Qt.alpha(Theme.accent, 0.85)
+                        Behavior on height {
+                            NumberAnimation {
+                                duration: Animations.duration(300)
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                    }
+                    Label {
+                        anchors.top: parent.top
+                        anchors.topMargin: 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: String(index)
+                        color: Theme.faint
+                        font.pixelSize: Appearance.fontSize - 4
+                    }
+                    Label {
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: `${Math.round(modelData)}`
+                        color: modelData > 45 ? Theme.accentContent : Theme.foreground
+                        font.pixelSize: Appearance.fontSize - 3
+                        font.weight: Font.DemiBold
                     }
                 }
             }

@@ -30,8 +30,8 @@ Singleton {
     //   "power"          click: power menu (log out, suspend, restart, shut down)
     //   "updates"        only while updates wait, with their number (config/UpdatesConfig.qml);
     //                    click: a terminal lists them and asks before updating
-    //   "ai"             AI usage, only the symbol (config/AiUsageConfig.qml); click: fresh numbers
-    //                    shown under it; hidden when the usage scripts are missing
+    //   "ai"             AI usage, only the symbol (config/AiUsageConfig.qml); click: the AI
+    //                    popup with every tool's limits; hidden when the usage scripts are missing
     // Default ["updates", "ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"].
     readonly property var icons: ["updates", "ai", "caffeine", "notifications", "volume", "bluetooth", "wifi", "battery", "power"]
     // Battery percentage, inside the battery icon. Default true.

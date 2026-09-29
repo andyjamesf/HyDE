@@ -85,9 +85,9 @@ Singleton {
         else if (id === "updates")
             Updates.open();
         else if (id === "ai") {
-            // Fresh numbers, shown under the icon for a while (they fill in as they arrive).
+            // Fresh numbers, in the AI popup (they fill in as they arrive).
             AiUsage.refresh();
-            IslandController.pinHint("ai", AiUsageConfig.showMs);
+            IslandController.open(IslandState.ai);
         } else
             IslandController.open(IslandState.controlCenter);
     }
