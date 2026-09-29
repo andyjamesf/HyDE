@@ -182,8 +182,11 @@ def main():
     model = cpu_model()
     prev_cpu, prev_net, prev_io, prev_procs, prev_t = cpu_times(), net_bytes(), disk_bytes(), proc_times(), time.monotonic()
     ncpu = max(1, len(prev_cpu) - 1)
+    # The first reading comes quickly (the page shows it at once); then every INTERVAL.
+    wait = min(INTERVAL, 0.35)
     while True:
-        time.sleep(INTERVAL)
+        time.sleep(wait)
+        wait = INTERVAL
         now = time.monotonic()
         dt = max(0.001, now - prev_t)
         cpu = cpu_times()
