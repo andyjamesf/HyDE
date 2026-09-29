@@ -20,6 +20,7 @@ Singleton {
     readonly property string bluetooth: "bluetooth"
     readonly property string audio: "audio"
     readonly property string media: "media"
+    readonly property string battery: "battery"
     readonly property string theme: "theme"
     readonly property string wallpaper: "wallpaper"
     readonly property string settings: "settings"
@@ -30,12 +31,12 @@ Singleton {
     readonly property string agent: "agent"
 
     readonly property var transients: [volume, mic, brightness, notification, screenshot]
-    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, theme, wallpaper, settings, power, auth, calendar, agent]
+    readonly property var surfaces: [launcher, controlCenter, wifi, bluetooth, audio, media, battery, theme, wallpaper, settings, power, auth, calendar, agent]
     // Surfaces that take the keyboard exclusively: text input, and the pickers with a grid (so
     // arrows and Enter work without clicking first).
     readonly property var keyboardModes: [launcher, auth, settings, theme, wallpaper, power, calendar, agent]
     // Control center subviews (Esc goes back to the control center, not to the clock).
-    readonly property var subviews: [wifi, bluetooth, audio, media]
+    readonly property var subviews: [wifi, bluetooth, audio, media, battery]
 
     function isTransient(m) {
         return transients.includes(m);

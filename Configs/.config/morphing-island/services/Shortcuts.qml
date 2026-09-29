@@ -41,6 +41,18 @@ Singleton {
             return "Lock screen";
         case "power":
             return "Power menu";
+        case "avatar":
+            return "Change your picture";
+        case "batterypage":
+            return `Battery: ${Battery.profileName} profile`;
+        case "nextwallpaper":
+            return "Next wallpaper";
+        case "hydetheme":
+            return "HyDE theme";
+        case "animations":
+            return "Animations";
+        case "keybindings":
+            return "Keybindings";
         case "updates":
             return `Updates: ${Updates.count} (${Updates.summary})`;
         case "ai":
@@ -64,6 +76,8 @@ Singleton {
             Caffeine.toggle();
         else if (id === "power")
             IslandController.open(IslandState.power);
+        else if (id === "battery")
+            IslandController.open(IslandState.battery);
         else if (id === "updates")
             Updates.open();
         else if (id === "ai") {
@@ -72,6 +86,15 @@ Singleton {
             IslandController.pinHint("ai", AiUsageConfig.showMs);
         } else
             IslandController.open(IslandState.controlCenter);
+    }
+
+    // Opens the launcher in one of the pickers (services/Pickers.qml).
+    function pick(name) {
+        LauncherState.provider = name;
+        if (IslandController.mode !== IslandState.launcher)
+            IslandController.open(IslandState.launcher);
+        else
+            LauncherState.query = "";
     }
 
     // Shortcut buttons (Expanded.extraButtons).
@@ -96,6 +119,16 @@ Singleton {
             IslandController.open(IslandState.settings);
         else if (id === "lock")
             Launch.run(["loginctl", "lock-session"]);
+        else if (id === "nextwallpaper")
+            Launch.run(["hyde-shell", "wallpaper", "--next"]);
+        else if (id === "hydetheme")
+            pick("themes");
+        else if (id === "animations")
+            pick("animations");
+        else if (id === "keybindings") {
+            IslandController.open(IslandState.launcher);
+            LauncherState.query = "?";
+        }
         else if (id === "power")
             IslandController.open(IslandState.power);
     }

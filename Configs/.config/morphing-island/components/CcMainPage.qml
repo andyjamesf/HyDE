@@ -8,8 +8,9 @@ import qs.icons
 import qs.services
 import qs.theme
 
-// Main page of the control center: header (time, date, battery), quick-toggle tiles
-// (ControlCenter.tiles), volume and brightness sliders, a media row and, at the bottom, the
+// Main page of the control center: header (your picture and name, time since boot, battery,
+// settings, lock, power), quick-toggle tiles (ControlCenter.tiles), volume, microphone and
+// brightness sliders, a media row, HyDE shortcuts (ControlCenter.shortcuts) and, at the bottom, the
 // notification history. The height grows with the history (up to maxRows rows; then it scrolls).
 Item {
     id: root
@@ -28,6 +29,17 @@ Item {
 
     implicitWidth: ControlCenter.width
     implicitHeight: column.implicitHeight + 2 * pad
+
+    // Hint under a hovered header or shortcut button (text: Shortcuts.hint).
+    function hint(on, id, item) {
+        if (on) {
+            IslandController.hintScreen = QsWindow.window?.screen?.name ?? "";
+            IslandController.hintAt = item.mapToItem(null, item.width / 2, item.height);
+            IslandController.hint = id;
+        } else if (IslandController.hint === id) {
+            IslandController.hint = "";
+        }
+    }
 
     // Switches pages inside the control center, on the same screen.
     function go(p) {
@@ -53,52 +65,156 @@ Item {
         width: root.width - 2 * root.pad
         spacing: root.gap
 
-        // Header: time and date on the left, battery on the right.
+        // Header: your picture (click: choose another), name and time since boot on the left; battery
+        // (click: battery page), settings, lock and power on the right.
         Item {
             width: parent.width
-            height: 30
+            height: 40
 
-            Row {
+            Rectangle {
+                id: avatarFrame
                 anchors.left: parent.left
-                anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 10
+                width: 38
+                height: 38
+                radius: width / 2
+                color: Theme.surface
+                border.width: 1
+                border.color: avatarMouse.containsMouse ? Theme.accent : Theme.border
 
                 Label {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Time.time
-                    font.pixelSize: Appearance.fontSize + 7
+                    anchors.centerIn: parent
+                    visible: avatarImage.status !== Image.Ready
+                    text: SysInfo.user.charAt(0).toUpperCase()
+                    color: Theme.accent
                     font.weight: Font.DemiBold
                 }
+                ClippingRectangle {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    radius: width / 2
+                    color: "transparent"
+                    visible: avatarImage.status === Image.Ready
+
+                    Image {
+                        id: avatarImage
+                        anchors.fill: parent
+                        source: `file://${SysInfo.avatar}?v=${SysInfo.avatarVersion}`
+                        fillMode: Image.PreserveAspectCrop
+                        sourceSize.width: 80
+                        sourceSize.height: 80
+                        asynchronous: true
+                        cache: false
+                    }
+                }
+                MouseArea {
+                    id: avatarMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: SysInfo.chooseAvatar()
+                    onContainsMouseChanged: root.hint(containsMouse, "avatar", avatarFrame)
+                }
+            }
+
+            Column {
+                anchors.left: avatarFrame.right
+                anchors.leftMargin: 10
+                anchors.right: headerButtons.left
+                anchors.rightMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
 
                 Label {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Time.longDate
+                    width: parent.width
+                    text: SysInfo.user
+                    font.weight: Font.DemiBold
+                }
+                Label {
+                    width: parent.width
+                    text: `Up for ${SysInfo.uptime}`
                     color: Theme.dim
+                    font.pixelSize: Appearance.fontSize - 2
                 }
             }
 
             Row {
+                id: headerButtons
                 anchors.right: parent.right
-                anchors.rightMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 6
-                visible: Battery.available
+                spacing: 2
 
-                Label {
+                // Battery: percentage and icon; opens the battery page (power profiles).
+                Rectangle {
+                    id: batteryButton
                     anchors.verticalCenter: parent.verticalCenter
-                    text: `${Math.round(Battery.percent)}%`
-                    color: Theme.dim
-                    font.pixelSize: Appearance.fontSize - 1
+                    visible: Battery.available
+                    width: batteryRow.implicitWidth + 16
+                    height: 32
+                    radius: height / 2
+                    color: batteryMouse.pressed ? Theme.pressed : batteryMouse.containsMouse ? Theme.hover : "transparent"
+
+                    Row {
+                        id: batteryRow
+                        anchors.centerIn: parent
+                        spacing: 6
+
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: `${Math.round(Battery.percent)}%`
+                            color: Theme.dim
+                            font.pixelSize: Appearance.fontSize - 1
+                        }
+                        BatteryIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            size: 20
+                            showPercent: false
+                            present: Battery.available
+                            percent: Battery.percent
+                            charging: Battery.charging
+                        }
+                    }
+                    MouseArea {
+                        id: batteryMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.go(IslandState.battery)
+                        onContainsMouseChanged: root.hint(containsMouse, "batterypage", batteryButton)
+                    }
                 }
 
-                BatteryIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    size: 20
-                    showPercent: false
-                    present: Battery.available
-                    percent: Battery.percent
-                    charging: Battery.charging
+                Repeater {
+                    model: [
+                        {
+                            id: "settings",
+                            glyph: "\u{F0493}"
+                        },
+                        {
+                            id: "lock",
+                            glyph: "\u{F033E}"
+                        },
+                        {
+                            id: "power",
+                            glyph: "\u{F0425}"
+                        }
+                    ]
+
+                    IconButton {
+                        id: headerButton
+                        required property var modelData
+                        anchors.verticalCenter: parent.verticalCenter
+                        size: 32
+                        onClicked: Shortcuts.run(modelData.id)
+                        onHoveredChanged: root.hint(hovered, modelData.id, headerButton)
+
+                        Label {
+                            text: headerButton.modelData.glyph
+                            font.family: Appearance.nerdFont
+                            font.pixelSize: 17
+                            elide: Text.ElideNone
+                            color: Theme.icon
+                        }
+                    }
                 }
             }
         }
@@ -145,6 +261,26 @@ Item {
                     color: volumeSlider.iconColor
                     level: Audio.volume
                     muted: Audio.muted
+                }
+            }
+
+            BigSlider {
+                id: micSlider
+                width: parent.width
+                visible: Audio.source !== null && Audio.source !== undefined
+                value: Audio.micVolume
+                muted: Audio.micMuted
+                label: Audio.micMuted ? "Mic off" : `${Math.round(Audio.micVolume * 100)}%`
+                iconClickable: true
+                onMoved: v => Audio.setMicVolume(v)
+                onIconClicked: Audio.toggleMicMute()
+
+                Label {
+                    text: Audio.micMuted ? "\u{F036D}" : "\u{F036C}"
+                    font.family: Appearance.nerdFont
+                    font.pixelSize: 16
+                    elide: Text.ElideNone
+                    color: micSlider.iconColor
                 }
             }
 
@@ -299,6 +435,60 @@ Item {
                 kind: "chevron"
                 size: 14
                 color: mediaMouse.containsMouse ? Theme.foreground : Theme.faint
+            }
+        }
+
+        // HyDE shortcuts (ControlCenter.shortcuts): icon buttons spread over the width; the pointer
+        // on one shows what it does.
+        Row {
+            id: shortcutRow
+            width: parent.width
+            visible: ControlCenter.shortcuts.length > 0
+
+            readonly property var glyphs: ({
+                    nextwallpaper: "\u{F04AD}",
+                    wallpaper: "\u{F02E9}",
+                    hydetheme: "\u{F03D8}",
+                    animations: "\u{F05D8}",
+                    keybindings: "\u{F030C}"
+                })
+
+            Repeater {
+                model: ControlCenter.shortcuts.filter(id => shortcutRow.glyphs[id] !== undefined)
+
+                Item {
+                    id: shortcutCell
+                    required property string modelData
+                    width: shortcutRow.width / Math.max(1, ControlCenter.shortcuts.length)
+                    height: 40
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 44
+                        height: 36
+                        radius: 18
+                        color: shortcutMouse.pressed ? Theme.pressed : shortcutMouse.containsMouse ? Theme.hover : Qt.alpha(Theme.foreground, 0.04)
+                        border.width: 1
+                        border.color: Theme.border
+
+                        Label {
+                            anchors.centerIn: parent
+                            text: shortcutRow.glyphs[shortcutCell.modelData]
+                            font.family: Appearance.nerdFont
+                            font.pixelSize: 18
+                            elide: Text.ElideNone
+                            color: Theme.icon
+                        }
+                        MouseArea {
+                            id: shortcutMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Shortcuts.run(shortcutCell.modelData)
+                            onContainsMouseChanged: root.hint(containsMouse, shortcutCell.modelData, parent)
+                        }
+                    }
+                }
             }
         }
 
@@ -538,7 +728,9 @@ Item {
             sound: soundTileComponent,
             peace: peaceTileComponent,
             nightlight: nightTileComponent,
-            caffeine: caffeineTileComponent
+            caffeine: caffeineTileComponent,
+            mic: micTileComponent,
+            profile: profileTileComponent
         })
 
     Component {
@@ -643,6 +835,53 @@ Item {
             MoonIcon {
                 size: 17
                 color: nightTile.iconColor
+            }
+        }
+    }
+
+    Component {
+        id: micTileComponent
+
+        CcTile {
+            id: micTile
+            width: parent?.width ?? 0
+            title: "Microphone"
+            status: Audio.micMuted ? "Off" : `${Math.round(Audio.micVolume * 100)}%`
+            active: !Audio.micMuted
+            expandable: true
+            onToggled: Audio.toggleMicMute()
+            onOpened: root.go(IslandState.audio)
+
+            Label {
+                text: Audio.micMuted ? "\u{F036D}" : "\u{F036C}"
+                font.family: Appearance.nerdFont
+                font.pixelSize: 18
+                elide: Text.ElideNone
+                color: micTile.iconColor
+            }
+        }
+    }
+
+    // Power profile: a click goes to the next one; the arrow opens the battery page with all three.
+    Component {
+        id: profileTileComponent
+
+        CcTile {
+            id: profileTile
+            width: parent?.width ?? 0
+            title: "Power Profile"
+            status: Battery.profileName
+            active: Battery.profile !== 1
+            expandable: true
+            onToggled: Battery.cycleProfile()
+            onOpened: root.go(IslandState.battery)
+
+            Label {
+                text: ["\u{F032A}", "\u{F05D1}", "\u{F14DE}"][Battery.profile] ?? "\u{F05D1}"
+                font.family: Appearance.nerdFont
+                font.pixelSize: 18
+                elide: Text.ElideNone
+                color: profileTile.iconColor
             }
         }
     }

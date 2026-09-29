@@ -158,6 +158,13 @@ ShellRoot {
     IpcHandler {
         target: "island-debug"
 
+        // Sets the power profile the way the battery page does (0 saver, 1 balanced, 2 performance);
+        // returns the one now active.
+        function powerProfile(p: int): string {
+            Battery.setProfile(p);
+            return Battery.profileName;
+        }
+
         // Opens the calendar and the first editable event on a day (YYYY-MM-DD) in the edit form
         // (only loads it; nothing is saved). Returns its title or "none".
         function calendarEditFirst(day: string): string {
