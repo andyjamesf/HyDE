@@ -17,10 +17,10 @@ PanelWindow {
     required property var modelData
 
     // On the screen it was detached on (or the first one, if that screen is gone).
-    readonly property bool here: SysStats.detached && (SysStats.screen === modelData.name || (!Quickshell.screens.some(s => s.name === SysStats.screen) && modelData === Quickshell.screens[0]))
+    readonly property bool here: SysStats.detached && (SysStats.screen === modelData?.name || (!Quickshell.screens.some(s => s.name === SysStats.screen) && modelData === Quickshell.screens[0]))
 
     // Top-left corner (logical pixels); dragging moves it, the release saves it.
-    property real px: SysStats.x >= 0 ? SysStats.x : modelData.width - implicitWidth - 24
+    property real px: SysStats.x >= 0 ? SysStats.x : modelData?.width - implicitWidth - 24
     property real py: SysStats.y >= 0 ? SysStats.y : 64
 
     screen: modelData
@@ -30,12 +30,12 @@ PanelWindow {
         left: true
     }
     margins {
-        left: Math.round(Math.max(0, Math.min(modelData.width - implicitWidth, px)))
-        top: Math.round(Math.max(0, Math.min(modelData.height - implicitHeight, py)))
+        left: Math.round(Math.max(0, Math.min(modelData?.width - implicitWidth, px)))
+        top: Math.round(Math.max(0, Math.min(modelData?.height - implicitHeight, py)))
     }
     implicitWidth: SysStats.compact ? 320 : 400
     // At most three quarters of the screen tall (the rest scrolls).
-    implicitHeight: Math.min(card.contentHeight + 2, Math.round(modelData.height * 0.75))
+    implicitHeight: Math.min(card.contentHeight + 2, Math.round(modelData?.height * 0.75))
     exclusiveZone: 0
     color: "transparent"
 
@@ -74,8 +74,8 @@ PanelWindow {
                 onPositionChanged: event => {
                     if (!pressed)
                         return;
-                    win.px = Math.max(0, Math.min(win.modelData.width - win.implicitWidth, win.margins.left + event.x - sx));
-                    win.py = Math.max(0, Math.min(win.modelData.height - win.implicitHeight, win.margins.top + event.y - sy));
+                    win.px = Math.max(0, Math.min(win.modelData?.width - win.implicitWidth, win.margins.left + event.x - sx));
+                    win.py = Math.max(0, Math.min(win.modelData?.height - win.implicitHeight, win.margins.top + event.y - sy));
                 }
                 onReleased: SysStats.moveTo(win.px, win.py)
             }

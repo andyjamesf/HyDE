@@ -5,6 +5,8 @@
 #
 #   island on | off | toggle | status
 #   island ipc <function> [args]   e.g. island ipc open launcher
+#   island run                     run the island, starting it again if it crashes (used at login
+#                                  and by `island on`; a crash while locked locks again at once)
 #   island login install | uninstall | test
 #                                  the login screen (SDDM) in the island's style; install asks for sudo
 set -euo pipefail
@@ -49,7 +51,7 @@ on() {
     for u in $(polkit_units); do systemctl --user stop "$u" || true; done
     applets_off
     systemctl --user reset-failed "$unit" 2>/dev/null || true
-    hyde-shell app -u "$unit" -t service -- qs -p "$cfg"
+    hyde-shell app -u "$unit" -t service -- "$HOME/.local/bin/island" run
     hyprctl eval 'MorphingIsland.set(true)' >/dev/null
     echo "Morphing Island active."
 }
@@ -72,6 +74,21 @@ case "${1:-status}" in
     toggle) if is_on; then off; else on; fi ;;
     status) if is_on; then echo "island"; else echo "hyde"; fi ;;
     ipc) shift; exec qs -p "$cfg" ipc call island "$@" ;;
+    # Keeps the island up: a crash (any exit but a normal one or a stop) starts it again after a
+    # second, at most 5 times a minute.
+    run)
+        starts=()
+        while :; do
+            qs -p "$cfg" && exit 0
+            code=$?
+            [[ $code -eq 143 || $code -eq 130 ]] && exit "$code"
+            now=$(date +%s)
+            starts=($(for t in "${starts[@]}"; do ((now - t < 60)) && echo "$t"; done) "$now")
+            ((${#starts[@]} > 5)) && { echo "island: crashed too often, giving up" >&2; exit "$code"; }
+            echo "island: exited with $code, starting it again" >&2
+            sleep 1
+        done
+        ;;
     login) shift; exec python3 "$cfg/scripts/sddm.py" "${1:-test}" ;;
     *) sed -n '2,9p' "$0"; exit 1 ;;
 esac

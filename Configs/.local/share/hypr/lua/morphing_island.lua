@@ -66,8 +66,8 @@ end
 
 -- At login: start the island instead of the HyDE shell, and let it be the polkit agent.
 if MorphingIsland.active() then
-	hyde.config.start.bar = "hyde-shell app -u morphing-island.service -t service -- qs -p "
-		.. home .. "/.config/morphing-island"
+	-- `island run` starts it again if it crashes (and it locks again if the screen was locked).
+	hyde.config.start.bar = "hyde-shell app -u morphing-island.service -t service -- " .. home .. "/.local/bin/island run"
 	hyde.config.start.auth_dialogue = ""
 	-- The island also answers Wi-Fi passwords and Bluetooth pairing (scripts/agents.py).
 	hyde.config.start.applet_network_manager = ""

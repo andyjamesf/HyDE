@@ -105,6 +105,24 @@ Singleton {
 
         property bool locked: false
         property string cardScreen: ""
+
+        // Mirrored in a file (lockMarker) so a new island process knows the screen was locked.
+        onLockedChanged: Quickshell.execDetached(locked ? ["touch", root.lockMarker] : ["rm", "-f", root.lockMarker])
+    }
+
+    // Crash recovery. If the island dies while the screen is locked (e.g. a monitor unplugged at
+    // the moment of locking), Hyprland keeps the session locked ("lockscreen app died") and, with
+    // misc:allow_session_lock_restore, lets a new client take the lock over. `island run` starts
+    // the island again; this file tells the new process to lock at once. It lives in the runtime
+    // directory, so a logout or reboot clears it.
+    readonly property string lockMarker: `${Paths.runtimeDir}/morphing-island-locked`
+    FileView {
+        path: root.lockMarker
+        printErrors: false
+        onLoaded: if (!persist.locked) {
+            console.warn("lock: the island restarted while the screen was locked; locking again");
+            root.lock();
+        }
     }
 
     Timer {

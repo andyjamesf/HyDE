@@ -17,11 +17,11 @@ PanelWindow {
     readonly property bool rawHover: island.hovered || IslandController.forceHover
     // Hover as seen by the base mode: on at once, off Pill.hoverCollapseDelay ms after leaving.
     property bool hoverHeld: false
-    readonly property string displayMode: IslandController.modeFor(modelData.name, hoverHeld)
+    readonly property string displayMode: IslandController.modeFor(modelData?.name, hoverHeld)
     readonly property bool surface: IslandState.isSurface(displayMode)
     // With the pointer over this screen's OSD/notification, the countdown pauses (and resumes on
     // leaving). Also re-evaluated when the transient moves to another screen, not only on hover.
-    readonly property bool holding: rawHover && modelData.name === IslandController.screen
+    readonly property bool holding: rawHover && modelData?.name === IslandController.screen
     onHoldingChanged: IslandController.held = holding
 
     onRawHoverChanged: {
@@ -45,7 +45,7 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: Math.min(modelData.height - 40, 760)
+    implicitHeight: Math.min((modelData?.height ?? 800) - 40, 760)
     // With the pill hidden only surfaces and transients show; the clock slides up off screen.
     readonly property bool baseHidden: Pill.hidden && (displayMode === IslandState.clock || displayMode === IslandState.expanded)
 
@@ -205,14 +205,14 @@ PanelWindow {
     Connections {
         target: IslandController
         function onHintPinnedChanged() {
-            if (IslandController.hintPinned && IslandController.hintScreen === win.modelData.name) {
+            if (IslandController.hintPinned && IslandController.hintScreen === win.modelData?.name) {
                 hintDelay.stop();
                 hintGrace.stop();
                 win.hintArmed = true;
             }
         }
         function onHintChanged() {
-            if (IslandController.hint !== "" && IslandController.hintScreen === win.modelData.name) {
+            if (IslandController.hint !== "" && IslandController.hintScreen === win.modelData?.name) {
                 hintGrace.stop();
                 if (IslandController.hintPinned)
                     win.hintArmed = true;
@@ -227,7 +227,7 @@ PanelWindow {
 
     Rectangle {
         id: hintPill
-        readonly property bool showing: IslandController.hint !== "" && IslandController.hintScreen === win.modelData.name && win.hintArmed
+        readonly property bool showing: IslandController.hint !== "" && IslandController.hintScreen === win.modelData?.name && win.hintArmed
         z: 10
         x: Math.round(Math.max(8, Math.min(win.width - width - 8, IslandController.hintAt.x - width / 2)))
         y: Math.round(IslandController.hintAt.y + 8)
@@ -258,7 +258,7 @@ PanelWindow {
     // the button, kept inside the screen. A choice runs and closes it.
     Rectangle {
         id: menuCard
-        readonly property bool showing: IslandController.menu !== "" && IslandController.menuScreen === win.modelData.name
+        readonly property bool showing: IslandController.menu !== "" && IslandController.menuScreen === win.modelData?.name
         readonly property var items: showing ? Menus.items(IslandController.menu) : []
         onShowingChanged: if (!showing)
             win.menuGrabReady = false
